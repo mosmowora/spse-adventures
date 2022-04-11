@@ -1,2 +1,2 @@
 # Import
-import pygame as pygam
+import pygame as pig
