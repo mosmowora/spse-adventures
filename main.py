@@ -1,7 +1,7 @@
 # Import
 import pygame as pig
-diuash
 
-def jozef(list):
-    list.append("x")
-    
+
+def marko(): 
+    return 1 + 1
+print(marko())
