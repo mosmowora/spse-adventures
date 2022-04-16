@@ -21,7 +21,7 @@ class Spritesheet:
         
         sprite = pygame.Surface([width, height])
         sprite.blit(self.sheet, (0, 0), (x, y, width, height))
-        sprite.set_colorkey(black)
+        sprite.set_colorkey(BLACK)
         return sprite
 
 class Player(pygame.sprite.Sprite):
@@ -35,14 +35,14 @@ class Player(pygame.sprite.Sprite):
         """
 
         self.game = game
-        self._layer = player_layer
+        self._layer = PLAYER_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-        self.x = x * tilesize
-        self.y = y * tilesize
-        self.width = tilesize
-        self.height = tilesize
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
 
         self.x_change = 0
         self.y_change = 0
@@ -82,16 +82,16 @@ class Player(pygame.sprite.Sprite):
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]: 
-            self.x_change -= player_speed
+            self.x_change -= PLAYER_SPEED
             self.facing = "left"
         elif keys[pygame.K_d]: 
-            self.x_change += player_speed
+            self.x_change += PLAYER_SPEED
             self.facing = "right"
         elif keys[pygame.K_w]: 
-            self.y_change -= player_speed
+            self.y_change -= PLAYER_SPEED
             self.facing = "up"
         elif keys[pygame.K_s]: 
-            self.y_change += player_speed
+            self.y_change += PLAYER_SPEED
             self.facing = "down"
 
     def collide_blocks(self, direction: str):
@@ -127,28 +127,28 @@ class Player(pygame.sprite.Sprite):
         """
 
         # Down animations
-        down_animations = [
+        facing_down = [
             self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)
         ]
 
         # Up animations
-        up_animations = [
+        facing_up = [
             self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)
         ]
 
         # Left animations
-        left_animations = [
+        facing_left = [
             self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)
         ]
 
         # Right animations
-        right_animations = [
+        facing_right = [
             self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
@@ -159,7 +159,7 @@ class Player(pygame.sprite.Sprite):
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
             else:
-                self.image = down_animations[math.floor(self.animation_loop)]
+                self.image = facing_down[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -168,7 +168,7 @@ class Player(pygame.sprite.Sprite):
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height)
             else:
-                self.image = up_animations[math.floor(self.animation_loop)]
+                self.image = facing_up[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -177,7 +177,7 @@ class Player(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height)
             else:
-                self.image = left_animations[math.floor(self.animation_loop)]
+                self.image = facing_left[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -186,7 +186,7 @@ class Player(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height)
             else:
-                self.image = right_animations[math.floor(self.animation_loop)]
+                self.image = facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -201,14 +201,14 @@ class Block(pygame.sprite.Sprite):
         """
 
         self.game = game
-        self._layer = block_layer
+        self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-        self.x = x * tilesize
-        self.y = y * tilesize
-        self.width = tilesize
-        self.height = tilesize
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
 
         self.x_change = 0
         self.y_change = 0
@@ -235,14 +235,14 @@ class Ground(pygame.sprite.Sprite):
         """
 
         self.game = game
-        self._layer = ground_layer
+        self._layer = GROUND_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
 
-        self.x = x * tilesize
-        self.y = y * tilesize
-        self.width = tilesize
-        self.height = tilesize
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
 
         self.x_change = 0
         self.y_change = 0

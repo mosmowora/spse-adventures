@@ -1,5 +1,5 @@
 # Import
-import pygame, sys
+import pygame
 from sprites import *; from config import *
 
 class Game:
@@ -16,14 +16,14 @@ class Game:
         pygame.init() 
 
         # Screen, time, font, running
-        self.screen = pygame.display.set_mode((win_width, win_height))
+        self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
 
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
     
-    def createTilemap(self):
+    def create_tile_map(self):
         """
         Creates tile map
         """
@@ -52,7 +52,7 @@ class Game:
         self.npcs = pygame.sprite.LayeredUpdates()
 
         # Tilemap
-        self.createTilemap()
+        self.create_tile_map()
 
 
     def main(self):
@@ -93,9 +93,9 @@ class Game:
         Draw for the game loop
         """
 
-        self.screen.fill(black) # Draws screen
+        self.screen.fill(BLACK) # Draws screen
         self.all_sprites.draw(self.screen) # Draws sprites onto the scree
-        self.clock.tick(fps) # How often does the game update
+        self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
 
     def game_over(self):
@@ -114,4 +114,3 @@ while g.running:
     g.game_over()
 
 pygame.quit()
-sys.exit()

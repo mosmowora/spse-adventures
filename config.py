@@ -1,21 +1,21 @@
 # Import
 from typing import List
 
-win_width: int = 640
-win_height: int = 480
-tilesize: int = 32
-fps: int = 60
+WIN_WIDTH: int = 640
+WIN_HEIGHT: int = 480
+TILE_SIZE: int = 32
+FPS: int = 60
 
-player_layer: int = 4
-object_layer: int = 3
-block_layer: int = 2
-ground_layer: int = 1
+PLAYER_LAYER: int = 4
+OBJECT_LAYER: int = 3
+BLOCK_LAYER: int = 2
+GROUND_LAYER: int = 1
 
-player_speed: int = 2
+PLAYER_SPEED: int = 2
 
-red: tuple = (255, 0, 0)
-black: tuple = (0, 0, 0)
-blue: tuple = (0, 0, 255)
+RED: tuple = (255, 0, 0)
+BLACK: tuple = (0, 0, 0)
+BLUE: tuple = (0, 0, 255)
 
 tilemap: List[str] = [
     "WWOOOWW",
