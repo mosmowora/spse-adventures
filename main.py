@@ -31,7 +31,11 @@ class Game:
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
                 Ground(self, j, i)
-                if column == "W": Wall(self, j, i)
+                if column == "W": Block(self, j, i, "W")
+                elif column == "S": Block(self, j, i, "S")
+                elif column == "O": Block(self, j, i, "O")
+                elif column == "D": Block(self, j, i, "D")
+                elif column == "L": Block(self, j, i, "L")
                 elif column == "P": Player(self, j, i)
 
     def new(self):
@@ -44,7 +48,7 @@ class Game:
 
         # Sprites, blocks, npcs
         self.all_sprites = pygame.sprite.LayeredUpdates()
-        self.walls = pygame.sprite.LayeredUpdates()
+        self.blocks = pygame.sprite.LayeredUpdates()
         self.npcs = pygame.sprite.LayeredUpdates()
 
         # Tilemap
