@@ -14,7 +14,7 @@ class Game:
 
         # Pygame initialization
         pygame.init() 
-
+        
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
@@ -30,11 +30,11 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [satna, chodba_0, "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # skolske poschodia a mozne roomky do ktorych moze hrac vojst
+        self.rooms = [satna, satna_1, chodba_0, "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # skolske poschodia a mozne roomky do ktorych moze hrac vojst
         self.in_room = self.rooms[0] # hrac v danej roomke
 
         # Inventory
-        self.inv = []
+        self.inv = ["kluc od satne"]
 
         # Objects you can interact with
         self.interacted = ""
@@ -44,6 +44,8 @@ class Game:
         self.kluc_v_kosi = True
         self.zamknuta_skrinka = True
         self.zamknuta_satna = True
+        self.kluc_v_skrinke = True
+        self.kokosky_v_skrinke = True
 
         self.x_hop = 0
         self.y_hop = 0
@@ -69,9 +71,6 @@ class Game:
                 elif column == "T": self.interactive[Block(self, j, i, "T")] = "K" + str(i) + str(j) # Trashcan
                 elif column == "P": self.player = Player(self, j, i) # Player
                 elif column == "N": Npc(self, j, i) # NPC
-        
-        #return (self.player.x, self.player.y)
-                
 
     def new(self):
         """
@@ -90,24 +89,8 @@ class Game:
         self.interactible = pygame.sprite.LayeredUpdates()
 
         # Tilemap
-        #self.player_pos = 
         self.create_tile_map()
-        
-    # def check_active_scene_change(self, scene: str):
-        # "satna", "chodba_0", "chodba_1", "chodba_2", "chodba_3", "chodba_4"
-        # match scene:
-        #     case "satna":
-        #         if self.player_pos.x: 
-        
-        
-    def change_rooms(self, previous_scene: str):
-        """
-        Changes the map for player to play in
-        """
-
-        if self.rooms.index(previous_scene) + 1 >= len(self.rooms): print("No other room available")
-        else: self.in_room = self.rooms.index(previous_scene) + 1
-
+    
     def main(self):
         """
         Game loop
@@ -170,6 +153,8 @@ class Game:
         Game over screen
         """
 
+        self.animate()
+
         # Creates text
         text = self.big_font.render("Game Over", True, BLACK)
         text_rect = text.get_rect(center = (75, 50))
@@ -199,7 +184,7 @@ class Game:
             self.screen.blit(self.game_over_background, (0, 0))
             self.screen.blit(text, text_rect)
             self.screen.blit(restart_button.image, restart_button.rect)
-            self.clock.tick(FPS)
+            self.clock.tick(FPS // 2)
             pygame.display.update()
 
     def intro_screen(self):
@@ -244,7 +229,7 @@ class Game:
         When character is talking
         """
 
-        for _ in range(150):
+        for _ in range(100):
             text = self.font.render(content, True, WHITE)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
@@ -258,7 +243,7 @@ class Game:
         Hrabanie v kosi
         """
 
-        if self.in_room == satna:
+        if self.in_room == satna or self.in_room == satna_1:
             self.talking("There's paper on the side of the trashcan.")
             self.talking("It says 2.SA. You agree with this statement.")
             if self.kluc_v_kosi: 
@@ -273,7 +258,7 @@ class Game:
         Hladnie v skrinke
         """
 
-        if self.in_room == satna:
+        if self.in_room == satna or self.in_room == satna_1:
             if self.interacted == "SKRINKA":
                 if self.zamknuta_skrinka:
                     if "kluc od skrinky" in self.inv:
@@ -281,10 +266,20 @@ class Game:
                         self.zamknuta_skrinka = False
                     else: self.talking("Locked locker.")
                 else: 
-                    self.inv.append("kluc od satne")
-                    self.talking("There's a key. It seems to be the key from this room.")
+                    if self.kluc_v_skrinke:
+                        self.inv.append("kluc od satne")
+                        self.talking("There's a key. It seems to be the key from this room.")
+                        self.kluc_v_skrinke = False
+                    else: self.talking("It's empty.")
+            elif self.interacted == "skrinka":
+                if self.kokosky_v_skrinke:
+                    self.talking("Wow, what is this?")
+                    self.talking("You found the forbidden Kokosky fragment. [1/4]")
+                    self.kokosky_v_skrinke = False
+                    self.inv.append("Kokosky1")
+                else: self.talking("It's empty, but smells.")
             else: 
-                if "kluc od skrinky" in self.inv: self.talking("Wrong locker.")
+                if "kluc od skrinky" in self.inv and self.kluc_v_skrinke: self.talking("Wrong locker.")
                 else: self.talking("Locked locker.")
 
     def lavicka(self):
@@ -306,15 +301,21 @@ class Game:
         Odomknutie/prejdenie dverami
         """
 
-        if self.in_room == satna:
+        if self.in_room == satna or self.in_room == satna_1:
             if self.zamknuta_satna:
                 if "kluc od satne" in self.inv: 
                     self.talking("I unlocked the door.")
                     self.zamknuta_satna = False
                 else: self.talking("I need to find key to unlock the door.")
             else: 
-                self.in_room = self.rooms[1]
+                self.in_room = self.rooms[2]
                 self.create_tile_map()
+                for sprite in self.all_sprites: sprite.rect.x -= 35 * TILE_SIZE
+
+        elif self.in_room == chodba_0:
+            self.in_room = self.rooms[1]
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.y -= 7 * TILE_SIZE
 
 
 g = Game()

@@ -619,6 +619,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = "Dvere"
                     elif self.interactive[hits[0]] == "S" + str(i) + str(j): 
                         if i == 8 and j == 13: self.game.interacted = "SKRINKA"
+                        elif i == 3 and j == 7: self.game.interacted = "skrinka"
                         else: self.game.interacted = "Skrinka"
                     elif self.interactive[hits[0]] == "L" + str(i) + str(j): 
                         self.game.x_hop = hits[0].rect.left
