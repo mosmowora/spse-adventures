@@ -22,7 +22,9 @@ class Game:
 
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
-        self.rooms = ["satna", "chodba_0", "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # skolske poschodia a mmozne roomky do ktorych moze hrac bojst
+        self.npcs_spritesheet = Spritesheet("img/npc.png")
+
+        self.rooms = [satna, chodba_0, "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # skolske poschodia a mmozne roomky do ktorych moze hrac vojst
         self.in_room = self.rooms[0] # hrac v danej roomke
     
     def create_tile_map(self):
@@ -30,17 +32,18 @@ class Game:
         Creates tile map
         """
 
-        for i, row in enumerate(satna):
+        for i, row in enumerate(self.in_room):
             for j, column in enumerate(row):
                 Ground(self, j, i)
-                if column == "_": Blockade(self, j, i)
-                elif column == "W": Block(self, j, i, "W")
-                elif column == "S": Block(self, j, i, "S")
-                elif column == "O": Block(self, j, i, "O")
-                elif column == "D": Block(self, j, i, "D")
-                elif column == "L": Block(self, j, i, "L")
-                elif column == "T": Block(self, j, i, "T")
-                elif column == "P": self.player_coords = Player(self, j, i)
+                if column == "_": Blockade(self, j, i) # Black
+                elif column == "W": Block(self, j, i, "W") # Basic wall
+                elif column == "S": Block(self, j, i, "S") # Skrinka
+                elif column == "O": Block(self, j, i, "O") # Okno
+                elif column == "D": Block(self, j, i, "D") # Dvere
+                elif column == "L": Block(self, j, i, "L") # Lavicka
+                elif column == "T": Block(self, j, i, "T") # Trashcan
+                elif column == "P": self.player_coords = Player(self, j, i) # Player
+                elif column == "N": Npc(self, j, i) # NPC
         
         return (self.player_coords.x, self.player_coords.y)
                 
@@ -55,6 +58,7 @@ class Game:
 
         # Sprites, blocks, npcs
         self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.player_sprite = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.npcs = pygame.sprite.LayeredUpdates()
 
@@ -118,7 +122,7 @@ class Game:
         Draw for the game loop
         """
 
-        self.screen.fill(BLACK) # Draws screen
+        self.screen.fill(NEARLY_BLACK) # Draws screen
         self.all_sprites.draw(self.screen) # Draws sprites onto the scree
         self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
