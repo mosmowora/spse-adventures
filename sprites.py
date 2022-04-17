@@ -1,3 +1,5 @@
+from msilib.schema import ControlEvent
+from re import S
 import pygame, math, random as r
 from config import *
 
@@ -57,6 +59,34 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+        # Down animations
+        self.facing_down = [
+            self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)
+        ]
+
+        # Up animations
+        self.facing_up = [
+            self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)
+        ]
+
+        # Left animations
+        self.facing_left = [
+            self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)
+        ]
+
+        # Right animations
+        self.facing_right = [
+            self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
+        ]
+
     def update(self):
         """
         Update for the player
@@ -109,7 +139,7 @@ class Player(pygame.sprite.Sprite):
         if direction == "x":
             hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
             if hits:
-                
+
                 # Moving right
                 if self.x_change > 0: 
                     for sprite in self.game.all_sprites: sprite.rect.x += PLAYER_SPEED
@@ -124,7 +154,7 @@ class Player(pygame.sprite.Sprite):
         elif direction == "y":
             hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
             if hits:
-                
+
                 # Moving down
                 if self.y_change > 0: 
                     for sprite in self.game.all_sprites: sprite.rect.y += PLAYER_SPEED
@@ -175,40 +205,12 @@ class Player(pygame.sprite.Sprite):
         Animates player movement
         """
 
-        # Down animations
-        facing_down = [
-            self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)
-        ]
-
-        # Up animations
-        facing_up = [
-            self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)
-        ]
-
-        # Left animations
-        facing_left = [
-            self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)
-        ]
-
-        # Right animations
-        facing_right = [
-            self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
-            self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
-        ]
-
         # Down
         if self.facing == "down":
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
             else:
-                self.image = facing_down[math.floor(self.animation_loop)]
+                self.image = self.facing_down[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -217,7 +219,7 @@ class Player(pygame.sprite.Sprite):
             if self.y_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height)
             else:
-                self.image = facing_up[math.floor(self.animation_loop)]
+                self.image = self.facing_up[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -226,7 +228,7 @@ class Player(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height)
             else:
-                self.image = facing_left[math.floor(self.animation_loop)]
+                self.image = self.facing_left[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -235,7 +237,7 @@ class Player(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height)
             else:
-                self.image = facing_right[math.floor(self.animation_loop)]
+                self.image = self.facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -251,7 +253,7 @@ class Npc(pygame.sprite.Sprite):
 
         self.game = game
         self._layer = NPC_LAYER
-        self.groups = self.game.all_sprites, self.game.npcs
+        self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x * TILE_SIZE
@@ -272,6 +274,34 @@ class Npc(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+        # Down animations
+        self.facing_down = [
+            self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(35, 2, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(68, 2, self.width, self.height)
+        ]
+
+        # Up animations
+        self.facing_up = [
+            self.game.npcs_spritesheet.get_sprite(3, 34, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(35, 34, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(68, 34, self.width, self.height)
+        ]
+
+        # Left animations
+        self.facing_left = [
+            self.game.npcs_spritesheet.get_sprite(3, 98, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(35, 98, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(68, 98, self.width, self.height)
+        ]
+
+        # Right animations
+        self.facing_right = [
+            self.game.npcs_spritesheet.get_sprite(3, 66, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(35, 66, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(68, 66, self.width, self.height)
+        ]
 
     def update(self):
         """
@@ -377,40 +407,12 @@ class Npc(pygame.sprite.Sprite):
         Animates npc movement
         """
 
-        # Down animations
-        facing_down = [
-            self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 2, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 2, self.width, self.height)
-        ]
-
-        # Up animations
-        facing_up = [
-            self.game.npcs_spritesheet.get_sprite(3, 34, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 34, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 34, self.width, self.height)
-        ]
-
-        # Left animations
-        facing_left = [
-            self.game.npcs_spritesheet.get_sprite(3, 98, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 98, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 98, self.width, self.height)
-        ]
-
-        # Right animations
-        facing_right = [
-            self.game.npcs_spritesheet.get_sprite(3, 66, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 66, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 66, self.width, self.height)
-        ]
-
         # Down
         if self.facing == "down":
             if self.y_change == 0:
                 self.image = self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height)
             else:
-                self.image = facing_down[math.floor(self.animation_loop)]
+                self.image = self.facing_down[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -419,7 +421,7 @@ class Npc(pygame.sprite.Sprite):
             if self.y_change == 0:
                 self.image = self.game.npcs_spritesheet.get_sprite(3, 34, self.width, self.height)
             else:
-                self.image = facing_up[math.floor(self.animation_loop)]
+                self.image = self.facing_up[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -428,7 +430,7 @@ class Npc(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.npcs_spritesheet.get_sprite(3, 98, self.width, self.height)
             else:
-                self.image = facing_left[math.floor(self.animation_loop)]
+                self.image = self.facing_left[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -437,7 +439,7 @@ class Npc(pygame.sprite.Sprite):
             if self.x_change == 0:
                 self.image = self.game.npcs_spritesheet.get_sprite(3, 66, self.width, self.height)
             else:
-                self.image = facing_right[math.floor(self.animation_loop)]
+                self.image = self.facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
@@ -451,9 +453,13 @@ class Block(pygame.sprite.Sprite):
         Initialization
         """
 
+        # Interactible blocks
+        inter = ["S", "D", "L", "T"]
+
         self.game = game
         self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
+        if type in inter: self.groups = self.game.all_sprites, self.game.blocks, self.game.interactible
+        else: self.groups = self.game.all_sprites, self.game.blocks
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x * TILE_SIZE
@@ -474,7 +480,6 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-
 
 class Blockade(pygame.sprite.Sprite):
     """
@@ -533,3 +538,88 @@ class Ground(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class Interact(pygame.sprite.Sprite):
+    """
+    Class for intracting
+    """
+
+    def __init__(self, game, x: int, y: int):
+        """
+        Initialization
+        """
+
+        # Game
+        self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites, self.game.interacts
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        # Coordinates and size
+        self.x = x
+        self.y = y
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
+
+        self.image = pygame.image.load("img/interact.png")
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.interacting()
+
+    def interacting(self):
+        """
+        Interacting with objects
+        """
+
+        hits = pygame.sprite.spritecollide(self, self.game.interactible, False)
+
+        if hits: print("Hello world!")
+
+class Button:
+    """
+    Class for button
+    """
+
+    def __init__(self, x, y, width, height, fg, bg, content, fontsize):
+        """
+        Initialization
+        """
+
+        # Font
+        self.font = pygame.font.Font("Roboto.ttf", fontsize)
+        self.content = content
+
+        # Coordinates and size
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+        # Colors
+        self.fg = fg
+        self.bg = bg
+
+        # Bg txt
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(self.bg)
+        self.rect = self.image.get_rect()
+
+        # Hitbox
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        # Text
+        self.text = self.font.render(self.content, True, self.fg)
+        self.text_rect = self.text.get_rect(center=(self.width / 2, self.height / 2)) 
+        self.image.blit(self.text, self.text_rect)
+
+    def is_pressed(self, pos, pressed):
+        """
+        Pressing button
+        """
+
+        if self.rect.collidepoint(pos) and pressed[0]: return True
+        else: return False

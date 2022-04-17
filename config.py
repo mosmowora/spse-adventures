@@ -15,10 +15,11 @@ GROUND_LAYER: int = 1
 PLAYER_SPEED: int = 2
 NPC_SPEED: int = 2
 
-RED: tuple = (255, 0, 0)
+WHITE: tuple = (255, 255, 255)
 BLACK: tuple = (0, 0, 0)
-BLUE: tuple = (0, 0, 255)
 NEARLY_BLACK: tuple = (1, 1, 1)
+RED: tuple = (255, 0, 0)
+BLUE: tuple = (0, 0, 255)
 
 satna: List[str] = [
     "_______WWOOOWW______",
