@@ -123,7 +123,7 @@ class Game:
         """
 
         self.screen.fill(NEARLY_BLACK) # Draws screen
-        self.all_sprites.draw(self.screen) # Draws sprites onto the scree
+        self.all_sprites.draw(self.screen) # Draws sprites onto the screen
         self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
 
