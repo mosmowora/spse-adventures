@@ -9,3 +9,6 @@ storyline ideas:
     goal: get out of school 
     you get confused reading kokocke otazky and get lost in school
     
+
+gameplay ideas:
+    scene changes based on the active scene and player's position

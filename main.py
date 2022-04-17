@@ -22,13 +22,15 @@ class Game:
 
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
+        self.rooms = ["satna", "chodba_0", "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # skolske poschodia a mmozne roomky do ktorych moze hrac bojst
+        self.in_room = self.rooms[0] # hrac v danej roomke
     
     def create_tile_map(self):
         """
         Creates tile map
         """
 
-        for i, row in enumerate(tilemap):
+        for i, row in enumerate(satna):
             for j, column in enumerate(row):
                 Ground(self, j, i)
                 if column == "_": Blockade(self, j, i)
@@ -38,7 +40,10 @@ class Game:
                 elif column == "D": Block(self, j, i, "D")
                 elif column == "L": Block(self, j, i, "L")
                 elif column == "T": Block(self, j, i, "T")
-                elif column == "P": Player(self, j, i)
+                elif column == "P": self.player_coords = Player(self, j, i)
+        
+        return (self.player_coords.x, self.player_coords.y)
+                
 
     def new(self):
         """
@@ -54,8 +59,22 @@ class Game:
         self.npcs = pygame.sprite.LayeredUpdates()
 
         # Tilemap
-        self.create_tile_map()
-
+        self.player_pos = self.create_tile_map()
+        
+    # def check_active_scene_change(self, scene: str):
+        # "satna", "chodba_0", "chodba_1", "chodba_2", "chodba_3", "chodba_4"
+        # match scene:
+        #     case "satna":
+        #         if self.player_pos.x: 
+        
+        
+    def change_rooms(self, previous_scene: str):
+        """
+        Changes the map for player to play in
+        """
+        if self.rooms.index(previous_scene) + 1 >= len(self.rooms):
+            print("No other room available")
+        else: self.in_room = self.rooms.index(previous_scene) + 1
 
     def main(self):
         """
@@ -67,6 +86,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            # self.check_active_scene_change(self.in_room)
 
         # After player dies
         self.running = False
@@ -80,7 +100,10 @@ class Game:
         for event in pygame.event.get():
 
             # Close button
-            if event.type == pygame.QUIT: self.playing, self.running = False, False
+            if event.type == pygame.QUIT: self.playing = self.running = False
+                
+            # print(f"x:{self.player_pos[0]}, y:{self.player_pos[1]}")
+
 
     def update(self):
         """
