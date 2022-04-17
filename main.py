@@ -37,6 +37,7 @@ class Game:
                 elif column == "D": Block(self, j, i, "D")
                 elif column == "L": Block(self, j, i, "L")
                 elif column == "P": Player(self, j, i)
+                elif column == ".": Blockade(self, j, i)
 
     def new(self):
         """

@@ -218,18 +218,48 @@ class Block(pygame.sprite.Sprite):
         elif type == "O": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "L": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
+        elif type == ".": self.image = self.game.terrain_spritesheet.get_sprite(36, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
 
+class Blockade(pygame.sprite.Sprite):
+    """
+    Main class for adding black block to the screen
+    """
+    
+    def __init__(self, game, x: int, y: int):
+        """
+        Initialization
+        """
+        
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
+
+        self.x_change = 0
+        self.y_change = 0
+
+        self.image = self.game.terrain_spritesheet.get_sprite(150, 3, self.width, self.height) # I can't do the coordinates
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
 class Ground(pygame.sprite.Sprite):
     """
     Class for ground
     """
 
-    def __init__(self, game, x, y):
+    def __init__(self, game, x: int, y: int):
         """
         Initialization
         """
