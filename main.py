@@ -31,13 +31,14 @@ class Game:
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
                 Ground(self, j, i)
-                if column == "W": Block(self, j, i, "W")
+                if column == "_": Blockade(self, j, i)
+                elif column == "W": Block(self, j, i, "W")
                 elif column == "S": Block(self, j, i, "S")
                 elif column == "O": Block(self, j, i, "O")
                 elif column == "D": Block(self, j, i, "D")
                 elif column == "L": Block(self, j, i, "L")
+                elif column == "T": Block(self, j, i, "T")
                 elif column == "P": Player(self, j, i)
-                elif column == ".": Blockade(self, j, i)
 
     def new(self):
         """
