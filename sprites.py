@@ -1,5 +1,4 @@
-from msilib.schema import ControlEvent
-from re import S
+# Imports
 import pygame, math, random as r
 from config import *
 
@@ -54,6 +53,7 @@ class Player(pygame.sprite.Sprite):
 
         self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
 
+        self.player_sitting = False
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -104,8 +104,16 @@ class Player(pygame.sprite.Sprite):
         self.collide_blocks("y")
         self.collide_npc("y")
         
-        self.x_change = 0
-        self.y_change = 0
+        # Sitting
+        if self.player_sitting:
+            self.rect.x = self.x_change
+            self.rect.y = self.y_change
+            self.image = self.game.character_spritesheet.get_sprite(102, 2, self.width, self.height)
+
+        # Not sitting
+        else: 
+            self.x_change = 0
+            self.y_change = 0
 
     def movement(self):
         """
@@ -240,6 +248,31 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
+
+    def sit(self, sit, x, y):
+        """
+        Player sits on bench
+        """
+
+        if sit: 
+            self.player_sitting = True
+            self.y_change = y
+            self.x_change = x
+        elif not sit: 
+            self.x_change = self.y_change = 0
+            if self.facing == "up": 
+                for sprite in self.game.all_sprites: sprite.rect.y += PLAYER_SPEED
+                self.y_change += TILE_SIZE
+            elif self.facing == "down": 
+                for sprite in self.game.all_sprites: sprite.rect.y -= PLAYER_SPEED
+                self.y_change -= TILE_SIZE
+            elif self.facing == "left": 
+                for sprite in self.game.all_sprites: sprite.rect.x += PLAYER_SPEED
+                self.x_change += TILE_SIZE
+            elif self.facing == "right": 
+                for sprite in self.game.all_sprites: sprite.rect.x -= PLAYER_SPEED
+                self.x_change -= TILE_SIZE
+            self.player_sitting = False
 
 class Npc(pygame.sprite.Sprite):
     """
@@ -544,10 +577,13 @@ class Interact(pygame.sprite.Sprite):
     Class for intracting
     """
 
-    def __init__(self, game, x: int, y: int):
+    def __init__(self, game, x: int, y: int, inter: dict):
         """
         Initialization
         """
+
+        # Dictionary
+        self.interactive = inter
 
         # Game
         self.game = game
@@ -575,9 +611,20 @@ class Interact(pygame.sprite.Sprite):
         """
 
         hits = pygame.sprite.spritecollide(self, self.game.interactible, False)
-
-        if hits: print("Hello world!")
-
+        
+        if hits: 
+            for i, row in enumerate(self.game.in_room):
+                for j, column in enumerate(row):
+                    if self.interactive[hits[0]] == "K" + str(i) + str(j): self.game.interacted = "Kos"
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = "Dvere"
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): 
+                        if i == 8 and j == 13: self.game.interacted = "SKRINKA"
+                        else: self.game.interacted = "Skrinka"
+                    elif self.interactive[hits[0]] == "L" + str(i) + str(j): 
+                        self.game.x_hop = hits[0].rect.left
+                        self.game.y_hop = hits[0].rect.top
+                        self.game.interacted = "Lavicka"
+                    
 class Button:
     """
     Class for button
