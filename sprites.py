@@ -249,7 +249,7 @@ class Player(pygame.sprite.Sprite):
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
-    def sit(self, sit, x, y):
+    def sit(self, sit: bool, x: int, y: int):
         """
         Player sits on bench
         """
