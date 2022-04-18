@@ -30,7 +30,7 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [first_floor, chodba_1, chodba_1_1, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
+        self.rooms = [first_floor, second_floor, chodba_1_1, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
         self.in_room = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
@@ -66,12 +66,15 @@ class Game:
                 elif column == "w": Block(self, j, i, "w") # Window
                 elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
+                elif column == "Z": self.interactive[Block(self, j, i, "Z")] = "Z" + str(i) + str(j) # Stairs
                 elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
                 elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
-                elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Rails
+                elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
+                elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
+                elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
                 elif column == "N": Npc(self, j, i) # NPC
 
     def new(self):
@@ -372,11 +375,23 @@ class Game:
         
         # Light in inventory
         if "light" in self.inv:
-            self.talking("I got light with me.")
-            self.talking("I'll be able to see now.")
-            self.in_room = self.rooms[-1] # Basement
-            self.create_tile_map()
-            for sprite in self.all_sprites: sprite.rect.x -= 16 * TILE_SIZE
+
+            # From right
+            if self.interacted[1] == 17 and self.interacted[2] in (192, 193):
+                self.talking("I got light with me.")
+                self.talking("I'll be able to see now.")
+                self.in_room = self.rooms[-1] # Basement
+                self.create_tile_map()
+                for sprite in self.all_sprites: sprite.rect.x -= 15 * TILE_SIZE
+
+            # From left
+            elif self.interacted[1] in (26, 27) and self.interacted[2] == 116:
+                self.talking("I got light with me.")
+                self.talking("I'll be able to see now.")
+                self.in_room = self.rooms[-1] # Basement
+                self.create_tile_map()
+                for sprite in self.all_sprites: sprite.rect.x += 8 * TILE_SIZE
+                self.player.rect.x -= 24 * TILE_SIZE
 
         # No light
         else:
@@ -391,27 +406,40 @@ class Game:
 
         # Basement
         if self.interacted[0] == "Stairs_up" and self.in_room == basement:
-            self.in_room = self.rooms[0] # Ground floor
-            self.create_tile_map()
-            for sprite in self.all_sprites: 
-                sprite.rect.x -= 182 * TILE_SIZE
-                sprite.rect.y -= 11 * TILE_SIZE
-            self.player.rect.x += 24 * TILE_SIZE
-            self.player.rect.y += 11 * TILE_SIZE
+
+            # From right
+            if self.interacted[1] in (6, 7) and self.interacted[2] == 26:
+                self.in_room = self.rooms[0] # Ground floor
+                self.create_tile_map()
+                for sprite in self.all_sprites: 
+                    sprite.rect.x -= 182 * TILE_SIZE
+                    sprite.rect.y -= 10 * TILE_SIZE
+                self.player.rect.x += 24 * TILE_SIZE
+                self.player.rect.y += 10 * TILE_SIZE
+
+            # From left
+            if self.interacted[1] in (6, 7) and self.interacted[2] == 0:
+                self.in_room = self.rooms[0] # Ground floor
+                self.create_tile_map()
+                for sprite in self.all_sprites: 
+                    sprite.rect.x -= 106 * TILE_SIZE
+                    sprite.rect.y -= 20 * TILE_SIZE
+                self.player.rect.x -= 53 * TILE_SIZE
+                self.player.rect.y += 20 * TILE_SIZE
 
         # Ground floor -> 1st floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
-            self.in_room = self.rooms[1]    # chodba_1
+            self.in_room = self.rooms[1] # First floor
             self.create_tile_map()
             for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE 
             
         # 1st floor -> Ground floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room in (chodba_1, chodba_1_1):
+        elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
             self.in_room = self.rooms[0] # Ground floor
             self.create_tile_map()
             for sprite in self.all_sprites: 
                 sprite.rect.x -= 172 * TILE_SIZE
-                sprite.rect.y -= 11 * TILE_SIZE
+                sprite.rect.y -= 13 * TILE_SIZE
             self.player.rect.x += 14 * TILE_SIZE
             self.player.rect.y += 11 * TILE_SIZE
         
