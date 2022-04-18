@@ -487,7 +487,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "D", "B", "t", "S"]
+        inter = ["L", "D", "B", "t", "S", "g", "b"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -505,11 +505,14 @@ class Block(pygame.sprite.Sprite):
 
         if type == "W": self.image = self.game.terrain_spritesheet.get_sprite(2, 36, self.width, self.height)
         elif type == "L": self.image = self.game.terrain_spritesheet.get_sprite(36, 36, self.width, self.height)
-        elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(70, 2, self.width, self.height) # x70 y2 or x104 y2 idk ktore su lepsie
+        elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(70, 2, self.width, self.height)
         elif type == "w": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
+        elif type == "g": self.image = self.game.terrain_spritesheet.get_sprite(104, 2, self.width, self.height)
+        elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
+        elif type == "b": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -569,7 +572,7 @@ class Ground(pygame.sprite.Sprite):
 
         self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height)
         if type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
-
+        
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -643,7 +646,10 @@ class Interact(pygame.sprite.Sprite):
 
                     # Stairs
                     elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = "Stairs"
+                    elif self.interactive[hits[0]] == "g" + str(i) + str(j): self.game.interacted = "Sters"
 
+                    # Basement
+                    elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = "Basement"
 class Button:
     """
     Class for button

@@ -18,7 +18,7 @@ class Game:
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
-        self.running = True
+        self.game_running = True
         self.big_font = pygame.font.Font("Roboto.ttf", 32)
         self.font = pygame.font.Font("Roboto.ttf", 22)
 
@@ -30,11 +30,11 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [satna, satna_1, chodba_0, "chodba_1", "chodba_2", "chodba_3", "chodba_4"] # Rooms where player can go
-        self.in_room = self.rooms[0] # Room where player is rn
+        self.rooms = [satna, satna_1, chodba_0, chodba_0_1, chodba_1, chodba_1_0, chodba_0_2, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
+        self.in_room = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
-        self.inv = []
+        self.inv = ["kluc od skrinky", "light"]
 
         # Objects you can interact with
         self.interacted = ""
@@ -63,14 +63,17 @@ class Game:
             for j, column in enumerate(row):
                 Ground(self, j, i, column)
                 if column == "_": Blockade(self, j, i) # Black
+                elif column == "P": self.player = Player(self, j, i) # Player
                 elif column == "W": Block(self, j, i, "W") # Basic wall
-                elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "w": Block(self, j, i, "w") # Window
+                elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
+                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Stairs down
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
-                elif column == "P": self.player = Player(self, j, i) # Player
+                elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
+                elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Rails
                 elif column == "N": Npc(self, j, i) # NPC
 
     def new(self):
@@ -113,7 +116,7 @@ class Game:
         for event in pygame.event.get():
 
             # Close button
-            if event.type == pygame.QUIT: self.playing = self.running = False
+            if event.type == pygame.QUIT: self.playing = self.game_running = False
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e: 
                 match self.player.facing:
@@ -128,6 +131,8 @@ class Game:
                     case "Locker": self.locker()
                     case "Bench": self.bench()
                     case "Stairs": self.stairs()
+                    case "Sters": self.stairs()
+                    case "Basement": self.basement()
                 self.interacted = ""
 
 
@@ -154,8 +159,6 @@ class Game:
         Game over screen
         """
 
-        self.animate()
-
         # Creates text
         text = self.big_font.render("Game Over", True, BLACK)
         text_rect = text.get_rect(center = (75, 50))
@@ -167,11 +170,11 @@ class Game:
         for sprite in self.all_sprites: sprite.kill()
 
         # Loop
-        while self.running:
+        while self.game_running:
 
             # Close button
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.running = False
+                if event.type == pygame.QUIT: self.game_running = False
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -209,7 +212,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: intro = self.running = False
+                if event.type == pygame.QUIT: intro = self.game_running = False
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -295,12 +298,28 @@ class Game:
         self.talking("You enjoyed this sitting session.")
         self.talking("But now it's time to continue your journey.")
         self.player.sit(False, self.x_hop, self.y_hop)
+        
+    def basement(self):
+        """
+        Going into the basement
+        """
+        
+        if "light" in self.inv:
+            self.talking("I got light with me.")
+            self.talking("I'll be able to see now.")
+            self.in_room = self.rooms[-1]
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.x -= 16 * TILE_SIZE
+        else:
+            self.talking("No way I am going down there without light.")
+            self.talking("I don't want to get lost in school.")
+            self.talking("I'll go there when I have some light with me.")
 
     def door(self):
         """
         Unlocking/going through door
         """
-
+        # satne
         if self.in_room == satna or self.in_room == satna_1:
             if self.locked_changing_room:
                 if "kluc od satne" in self.inv: 
@@ -310,9 +329,10 @@ class Game:
             else: 
                 self.in_room = self.rooms[2]
                 self.create_tile_map()
-                for sprite in self.all_sprites: sprite.rect.x -= 35 * TILE_SIZE
+                for sprite in self.all_sprites: sprite.rect.x -= 65 * TILE_SIZE
 
-        elif self.in_room == chodba_0:
+        # Prizemie
+        elif self.in_room in (chodba_0, chodba_0_1, chodba_0_2):
             if self.interacted == "DOOR":
                 self.in_room = self.rooms[1]
                 self.create_tile_map()
@@ -320,20 +340,45 @@ class Game:
             elif self.interacted == "door":
                 self.talking("Buffet Amper. I like to buy food here.")
                 self.talking("Sadly it's closed now.")
+                
 
     def stairs(self):
         """
-        Going up/down
+        Going up/down the stairs
         """
+        # Basement
+        if self.interacted == "Stairs" and self.in_room == basement:
+            self.in_room = self.rooms[6]    # chodba_0_2
+            self.create_tile_map()
+            for sprite in self.all_sprites: 
+                sprite.rect.x -= 88 * TILE_SIZE
+                sprite.rect.y += 2 * TILE_SIZE
 
-        print("To be added!")
+        # Prizemie = hore schodmi
+        elif self.interacted == "Stairs" and self.in_room in (chodba_0, chodba_0_1, chodba_0_2) or self.interacted == "Stairs" and self.in_room in (chodba_1, chodba_1_0):
+            self.in_room = self.rooms[4]    # chodba_1
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE
+        
+        # Prizemie = dole schodmi
+        elif self.interacted == "Sters" and self.in_room in (chodba_0, chodba_0_1, chodba_0_2):
+            self.in_room = self.rooms[3]    # chodba_0_1
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.x -= 50 * TILE_SIZE
+            
+        # 1. Poschodie = dole schodmi
+        elif self.interacted == "Sters" and self.in_room in (chodba_1, chodba_1_0, chodba_0_2):
+            self.in_room = self.rooms[3]    # chodba_0_1
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE
+        
 
 
 g = Game()
 g.intro_screen()
 g.new()
 
-while g.running:
+while g.game_running:
     g.main()
     g.game_over()
 
