@@ -93,7 +93,7 @@ class Player(pygame.sprite.Sprite):
         """
 
         # Moving
-        self.movement()
+        if not self.player_sitting: self.movement()
         self.animate()
 
         # Collision
@@ -487,7 +487,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["S", "D", "L", "T"]
+        inter = ["L", "D", "B", "t", "S"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -504,11 +504,12 @@ class Block(pygame.sprite.Sprite):
         self.y_change = 0
 
         if type == "W": self.image = self.game.terrain_spritesheet.get_sprite(2, 36, self.width, self.height)
-        elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(36, 36, self.width, self.height)
-        elif type == "O": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
+        elif type == "L": self.image = self.game.terrain_spritesheet.get_sprite(36, 36, self.width, self.height)
+        elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(70, 2, self.width, self.height) # x70 y2 or x104 y2 idk ktore su lepsie
+        elif type == "w": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
-        elif type == "L": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
-        elif type == "T": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
+        elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
+        elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -548,7 +549,7 @@ class Ground(pygame.sprite.Sprite):
     Class for ground
     """
 
-    def __init__(self, game, x: int, y: int):
+    def __init__(self, game, x: int, y: int, type: str):
         """
         Initialization
         """
@@ -567,6 +568,7 @@ class Ground(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height)
+        if type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -605,27 +607,43 @@ class Interact(pygame.sprite.Sprite):
 
         self.interacting()
 
+        self.kill()
+
     def interacting(self):
         """
         Interacting with objects
         """
 
         hits = pygame.sprite.spritecollide(self, self.game.interactible, False)
-        
-        if hits: 
+
+        if hits:
             for i, row in enumerate(self.game.in_room):
                 for j, column in enumerate(row):
-                    if self.interactive[hits[0]] == "K" + str(i) + str(j): self.game.interacted = "Kos"
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = "Dvere"
-                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): 
-                        if i == 8 and j == 13: self.game.interacted = "SKRINKA"
-                        elif i == 3 and j == 7: self.game.interacted = "skrinka"
-                        else: self.game.interacted = "Skrinka"
+
+                    # Trashcan
+                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = "Trashcan"
+
+                    # Door
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j):
+                        if i == 5 and j == 44: self.game.interacted = "DOOR"
+                        elif i == 10 and j == 55: self.game.interacted = "door"
+                        else: self.game.interacted = "Door"
+
+                    # Locker
                     elif self.interactive[hits[0]] == "L" + str(i) + str(j): 
+                        if i == 8 and j == 13: self.game.interacted = "LOCKER" # With key
+                        elif i == 3 and j == 7: self.game.interacted = "locker" # Kokosky
+                        else: self.game.interacted = "Locker" # Basic
+
+                    # Bench
+                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): 
                         self.game.x_hop = hits[0].rect.left
                         self.game.y_hop = hits[0].rect.top
-                        self.game.interacted = "Lavicka"
-                    
+                        self.game.interacted = "Bench"
+
+                    # Stairs
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = "Stairs"
+
 class Button:
     """
     Class for button
