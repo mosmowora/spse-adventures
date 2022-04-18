@@ -30,14 +30,14 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [satna, satna_1, chodba_0, chodba_0_1, chodba_1, chodba_1_0, chodba_0_2, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
+        self.rooms = [first_floor, chodba_1, chodba_1_1, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
         self.in_room = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
-        self.inv = ["kluc od skrinky", "light"]
+        self.inv = ["locker key", "changing_room key", "light"]
 
         # Objects you can interact with
-        self.interacted = ""
+        self.interacted = ["", "", ""]
         self.interactive = {}
     
         # Variables for finding items/doing stuff
@@ -46,9 +46,6 @@ class Game:
         self.locked_changing_room = True
         self.key_in_locker = True
         self.kokosky_in_locker = True
-
-        self.x_hop = 0
-        self.y_hop = 0
 
     def create_tile_map(self):
         """
@@ -61,14 +58,15 @@ class Game:
 
         for i, row in enumerate(self.in_room):
             for j, column in enumerate(row):
-                Ground(self, j, i, column)
+                Ground(self, j, i)
                 if column == "_": Blockade(self, j, i) # Black
+                elif column == "!": Block(self, j, i, "!") # No entry ground
                 elif column == "P": self.player = Player(self, j, i) # Player
                 elif column == "W": Block(self, j, i, "W") # Basic wall
                 elif column == "w": Block(self, j, i, "w") # Window
                 elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
-                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Stairs down
+                elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
@@ -94,6 +92,8 @@ class Game:
 
         # Tilemap
         self.create_tile_map()
+
+        for sprite in self.all_sprites: sprite.rect.x -= 158 * TILE_SIZE
     
     def main(self):
         """
@@ -118,22 +118,28 @@ class Game:
             # Close button
             if event.type == pygame.QUIT: self.playing = self.game_running = False
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_e: 
+            # Pressed E
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+
+                # What was clicked
                 match self.player.facing:
                     case "up": Interact(self, self.player.rect.x, self.player.rect.y - TILE_SIZE, self.interactive)
                     case "down": Interact(self, self.player.rect.x, self.player.rect.y + TILE_SIZE, self.interactive)
                     case "left": Interact(self, self.player.rect.x - TILE_SIZE, self.player.rect.y, self.interactive)
                     case "right": Interact(self, self.player.rect.x + TILE_SIZE, self.player.rect.y, self.interactive) 
                 
-                match self.interacted.capitalize():
+                # What was clicked
+                match self.interacted[0].capitalize():
                     case "Trashcan": self.trashcan()
                     case "Door": self.door()
                     case "Locker": self.locker()
                     case "Bench": self.bench()
-                    case "Stairs": self.stairs()
-                    case "Sters": self.stairs()
+                    case "Stairs_up": self.stairs()
+                    case "Stairs_down": self.stairs()
                     case "Basement": self.basement()
-                self.interacted = ""
+
+                # Reset
+                self.interacted = ["", "", ""]
 
 
     def update(self):
@@ -247,13 +253,18 @@ class Game:
         Poking around in trashcan
         """
 
-        if self.in_room == satna or self.in_room == satna_1:
+        # In changing room
+        if self.interacted[1] == 13 and self.interacted[2] == 165:
             self.talking("There's paper on the side of the trashcan.")
             self.talking("It says 2.SA. You agree with this statement.")
+
+            # Key in trash
             if self.key_in_trash: 
-                self.inv.append("kluc od skrinky")
+                self.inv.append("locker key")
                 self.key_in_trash = False 
                 self.talking("You found a key in the trashcan. It says AR.")
+
+            # Empty trashcan
             else: self.talking("There is nothing interesting.")
 
     def locker(self):
@@ -261,116 +272,148 @@ class Game:
         Unlocking the locker
         """
 
-        if self.in_room == satna or self.in_room == satna_1:
-            if self.interacted == "LOCKER":
-                if self.locked_locker:
-                    if "kluc od skrinky" in self.inv:
-                        self.talking("I unlocked the locker.")
-                        self.locked_locker = False
-                    else: self.talking("Locked locker.")
-                else: 
-                    if self.key_in_locker:
-                        self.inv.append("kluc od satne")
-                        self.talking("There's a key. It seems to be the key from this room.")
-                        self.key_in_locker = False
-                    else: self.talking("It's empty.")
-            elif self.interacted == "locker":
-                if self.kokosky_in_locker:
-                    self.talking("Wow, what is this?")
-                    self.talking("You found the forbidden Kokosky fragment. [1/4]")
-                    self.kokosky_in_locker = False
-                    self.inv.append("Kokosky1")
-                else: self.talking("It's empty, but smells.")
-            else: 
-                if "kluc od skrinky" in self.inv and self.key_in_locker: self.talking("Wrong locker.")
+        # Locker with key
+        if self.interacted[1] == 9 and self.interacted[2] == 171:
+
+            # Locked
+            if self.locked_locker:
+
+                # Has key
+                if "locker key" in self.inv:
+                    self.talking("I unlocked the locker.")
+                    self.locked_locker = False
+
+                # No key
                 else: self.talking("Locked locker.")
+
+            # Unlocked
+            else:
+
+                # Key in locker
+                if self.key_in_locker:
+                    self.inv.append("changing_room key")
+                    self.talking("There's a key. It seems to be the key from this room.")
+                    self.key_in_locker = False
+
+                # Locker empty
+                else: self.talking("It's empty.")
+        
+        # Locker with kokosky
+        elif self.interacted[1] == 4 and self.interacted[2] == 165:
+
+            # Locker full
+            if self.kokosky_in_locker:
+                self.talking("Hmm? Why is it unlocked?")
+                self.talking("Wow, what is this?")
+                self.talking("You found the forbidden Kokosky fragment. [1/4]")
+                self.kokosky_in_locker = False
+                self.inv.append("Kokosky1")
+
+            # Locker empty
+            else: self.talking("It's empty, but smells.")
+
+        # Other
+        else: 
+            
+            # Key in inventory
+            if "locker key" in self.inv and self.key_in_locker: self.talking("Wrong locker.")
+            
+            # No key
+            else: self.talking("Locked locker.")
 
     def bench(self):
         """
         Sitting on the bench
         """
 
-        self.player.sit(True, self.x_hop, self.y_hop)
+        self.player.sit(True, self.interacted[1], self.interacted[2])
         self.update()
         self.draw()
         self.talking("You sit on a bench.")
         self.talking("Sitting is really interesting.")
         self.talking("You enjoyed this sitting session.")
         self.talking("But now it's time to continue your journey.")
-        self.player.sit(False, self.x_hop, self.y_hop)
-        
-    def basement(self):
-        """
-        Going into the basement
-        """
-        
-        if "light" in self.inv:
-            self.talking("I got light with me.")
-            self.talking("I'll be able to see now.")
-            self.in_room = self.rooms[-1]
-            self.create_tile_map()
-            for sprite in self.all_sprites: sprite.rect.x -= 16 * TILE_SIZE
-        else:
-            self.talking("No way I am going down there without light.")
-            self.talking("I don't want to get lost in school.")
-            self.talking("I'll go there when I have some light with me.")
+        self.player.sit(False, self.interacted[1], self.interacted[2])
 
     def door(self):
         """
         Unlocking/going through door
         """
-        # satne
-        if self.in_room == satna or self.in_room == satna_1:
+
+        # Changing room -> Hall
+        if self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 167:
+
+            # Door is locked
             if self.locked_changing_room:
-                if "kluc od satne" in self.inv: 
+
+                # Key in inventory
+                if "changing_room key" in self.inv: 
                     self.talking("I unlocked the door.")
                     self.locked_changing_room = False
-                else: self.talking("I need to find key to unlock the door.")
-            else: 
-                self.in_room = self.rooms[2]
-                self.create_tile_map()
-                for sprite in self.all_sprites: sprite.rect.x -= 65 * TILE_SIZE
 
-        # Prizemie
-        elif self.in_room in (chodba_0, chodba_0_1, chodba_0_2):
-            if self.interacted == "DOOR":
-                self.in_room = self.rooms[1]
-                self.create_tile_map()
-                for sprite in self.all_sprites: sprite.rect.y -= 7 * TILE_SIZE
-            elif self.interacted == "door":
-                self.talking("Buffet Amper. I like to buy food here.")
-                self.talking("Sadly it's closed now.")
+                # No key
+                else: self.talking("I need to find key to unlock the door.")
+            
+            # Door is unlocked
+            else: self.player.rect.y += 2 * TILE_SIZE
+
+        # Hall -> Changing room
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.player.rect.y -= 2 * TILE_SIZE
+
+        # Hall -> Buffet Amper
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
+            self.talking("Buffet Amper. I like to buy food here.")
+            self.talking("Sadly it's closed now.")
                 
+    def basement(self):
+        """
+        Going into the basement
+        """
+        
+        # Light in inventory
+        if "light" in self.inv:
+            self.talking("I got light with me.")
+            self.talking("I'll be able to see now.")
+            self.in_room = self.rooms[-1] # Basement
+            self.create_tile_map()
+            for sprite in self.all_sprites: sprite.rect.x -= 16 * TILE_SIZE
+
+        # No light
+        else:
+            self.talking("No way I am going down there without light.")
+            self.talking("I don't want to get lost in school.")
+            self.talking("I'll go there when I have some light with me.")
 
     def stairs(self):
         """
         Going up/down the stairs
         """
+
         # Basement
-        if self.interacted == "Stairs" and self.in_room == basement:
-            self.in_room = self.rooms[6]    # chodba_0_2
+        if self.interacted[0] == "Stairs_up" and self.in_room == basement:
+            self.in_room = self.rooms[0] # Ground floor
             self.create_tile_map()
             for sprite in self.all_sprites: 
-                sprite.rect.x -= 88 * TILE_SIZE
-                sprite.rect.y += 2 * TILE_SIZE
+                sprite.rect.x -= 182 * TILE_SIZE
+                sprite.rect.y -= 11 * TILE_SIZE
+            self.player.rect.x += 24 * TILE_SIZE
+            self.player.rect.y += 11 * TILE_SIZE
 
-        # Prizemie = hore schodmi
-        elif self.interacted == "Stairs" and self.in_room in (chodba_0, chodba_0_1, chodba_0_2) or self.interacted == "Stairs" and self.in_room in (chodba_1, chodba_1_0):
-            self.in_room = self.rooms[4]    # chodba_1
+        # Ground floor -> 1st floor
+        elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
+            self.in_room = self.rooms[1]    # chodba_1
             self.create_tile_map()
-            for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE
-        
-        # Prizemie = dole schodmi
-        elif self.interacted == "Sters" and self.in_room in (chodba_0, chodba_0_1, chodba_0_2):
-            self.in_room = self.rooms[3]    # chodba_0_1
-            self.create_tile_map()
-            for sprite in self.all_sprites: sprite.rect.x -= 50 * TILE_SIZE
+            for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE 
             
-        # 1. Poschodie = dole schodmi
-        elif self.interacted == "Sters" and self.in_room in (chodba_1, chodba_1_0, chodba_0_2):
-            self.in_room = self.rooms[3]    # chodba_0_1
+        # 1st floor -> Ground floor
+        elif self.interacted[0] == "Stairs_down" and self.in_room in (chodba_1, chodba_1_1):
+            self.in_room = self.rooms[0] # Ground floor
             self.create_tile_map()
-            for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE
+            for sprite in self.all_sprites: 
+                sprite.rect.x -= 172 * TILE_SIZE
+                sprite.rect.y -= 11 * TILE_SIZE
+            self.player.rect.x += 14 * TILE_SIZE
+            self.player.rect.y += 11 * TILE_SIZE
         
 
 

@@ -487,7 +487,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "D", "B", "t", "S", "g", "b"]
+        inter = ["L", "D", "B", "t", "S", "s", "b"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -510,9 +510,10 @@ class Block(pygame.sprite.Sprite):
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
-        elif type == "g": self.image = self.game.terrain_spritesheet.get_sprite(104, 2, self.width, self.height)
+        elif type == "s": self.image = self.game.terrain_spritesheet.get_sprite(104, 2, self.width, self.height)
         elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
         elif type == "b": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
+        elif type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -552,7 +553,7 @@ class Ground(pygame.sprite.Sprite):
     Class for ground
     """
 
-    def __init__(self, game, x: int, y: int, type: str):
+    def __init__(self, game, x: int, y: int):
         """
         Initialization
         """
@@ -571,7 +572,6 @@ class Ground(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height)
-        if type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
         
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -624,32 +624,24 @@ class Interact(pygame.sprite.Sprite):
                 for j, column in enumerate(row):
 
                     # Trashcan
-                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = "Trashcan"
+                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j):
-                        if i == 5 and j == 44: self.game.interacted = "DOOR"
-                        elif i == 10 and j == 55: self.game.interacted = "door"
-                        else: self.game.interacted = "Door"
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j]
 
                     # Locker
-                    elif self.interactive[hits[0]] == "L" + str(i) + str(j): 
-                        if i == 8 and j == 13: self.game.interacted = "LOCKER" # With key
-                        elif i == 3 and j == 7: self.game.interacted = "locker" # Kokosky
-                        else: self.game.interacted = "Locker" # Basic
+                    elif self.interactive[hits[0]] == "L" + str(i) + str(j): self.game.interacted = ["Locker", i, j]
 
                     # Bench
-                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): 
-                        self.game.x_hop = hits[0].rect.left
-                        self.game.y_hop = hits[0].rect.top
-                        self.game.interacted = "Bench"
+                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
-                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = "Stairs"
-                    elif self.interactive[hits[0]] == "g" + str(i) + str(j): self.game.interacted = "Sters"
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
+                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
 
                     # Basement
-                    elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = "Basement"
+                    elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = ["Basement", i, j]
+
 class Button:
     """
     Class for button
