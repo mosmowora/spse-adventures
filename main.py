@@ -367,6 +367,69 @@ class Game:
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
             self.talking("Buffet Amper. I like to buy food here.")
             self.talking("Sadly it's closed now.")
+
+        # Hall -> 020
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166: self.talking("020")
+
+        # Hall -> 021
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: self.talking("021")
+
+        # Hall -> 022
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 152: self.talking("022")
+
+        # Hall -> 023
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 133: self.talking("023")
+
+        # Hall -> ???
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: self.talking("???")
+
+        # Hall -> 025
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: self.talking("025")
+
+        # Hall -> 026
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: self.talking("026")
+
+        # Hall -> 027
+        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.talking("027")
+
+        # Hall -> 010
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: self.talking("010")
+
+        # Hall -> 009
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: self.talking("009")
+
+        # Hall -> 008
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 19: self.talking("008")
+
+        # Hall -> 007
+        elif self.player.facing == "left" and self.interacted[1] == 17 and self.interacted[2] == 11: self.talking("007")
+
+        # 007 -> 006
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9: self.talking("006")
+
+        # Hall -> 004
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: self.talking("004")
+
+        # Hall -> 003
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 24: self.talking("003")
+
+        # Hall -> 002
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 35: self.talking("002")
+
+        # Hall -> 012
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 73: self.talking("012")
+
+        # Hall -> 013
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 95: self.talking("013")
+
+        # Hall -> 014
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 114: self.talking("014")
+
+        # Hall -> 015
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 135: self.talking("015")
+
+        # Hall -> 016
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 159: self.talking("016")
                 
     def basement(self):
         """
