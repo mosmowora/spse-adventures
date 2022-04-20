@@ -12,7 +12,7 @@ OBJECT_LAYER: int = 3
 BLOCK_LAYER: int = 2
 GROUND_LAYER: int = 1
 
-PLAYER_SPEED: int = 10
+PLAYER_SPEED: int = 2
 NPC_SPEED: int = 2
 
 WHITE: tuple = (255, 255, 255)
