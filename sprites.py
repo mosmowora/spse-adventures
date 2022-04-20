@@ -302,9 +302,9 @@ class Npc(pygame.sprite.Sprite):
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
 
-        #self.color = r.choice([3, 99, 198, 297, 396, 495, 594, 693, 792])
+        self.color = r.choice([0, 99, 198, 297, 396, 495, 594, 693, 792])
 
-        self.image = self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height)
+        self.image = self.game.npcs_spritesheet.get_sprite(self.color, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -312,30 +312,30 @@ class Npc(pygame.sprite.Sprite):
 
         # Down animations
         self.facing_down = [
-            self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 2, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 2, self.width, self.height)
+            self.game.npcs_spritesheet.get_sprite(self.color + 3, 2, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 35, 2, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 68, 2, self.width, self.height)
         ]
 
         # Up animations
         self.facing_up = [
-            self.game.npcs_spritesheet.get_sprite(3, 34, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 34, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 34, self.width, self.height)
+            self.game.npcs_spritesheet.get_sprite(self.color + 3, 34, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 35, 34, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 68, 34, self.width, self.height)
         ]
 
         # Left animations
         self.facing_left = [
-            self.game.npcs_spritesheet.get_sprite(3, 98, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 98, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 98, self.width, self.height)
+            self.game.npcs_spritesheet.get_sprite(self.color + 3, 98, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 35, 98, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 68, 98, self.width, self.height)
         ]
 
         # Right animations
         self.facing_right = [
-            self.game.npcs_spritesheet.get_sprite(3, 66, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(35, 66, self.width, self.height),
-            self.game.npcs_spritesheet.get_sprite(68, 66, self.width, self.height)
+            self.game.npcs_spritesheet.get_sprite(self.color + 3, 66, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 35, 66, self.width, self.height),
+            self.game.npcs_spritesheet.get_sprite(self.color + 68, 66, self.width, self.height)
         ]
 
     def update(self):
@@ -351,12 +351,10 @@ class Npc(pygame.sprite.Sprite):
         self.rect.x += self.x_change
         self.collide_blocks("x")
         self.collide_player("x")
-        self.collide_npc("x")
         self.rect.y += self.y_change
         self.collide_blocks("y")
         self.collide_player("y")
-        self.collide_npc("y")
-        
+
         self.x_change = 0
         self.y_change = 0
 
@@ -439,33 +437,6 @@ class Npc(pygame.sprite.Sprite):
                 # Moving up
                 if self.y_change < 0: self.rect.y = hits[0].rect.bottom
 
-    def collide_npc(self, direction: str):
-        """
-        Colliding with Npcs
-        """
-
-        # Moving left and right
-        if direction == "x":
-            hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
-            if hits:
-                
-                # Moving right
-                if self.x_change > 0: self.rect.x = hits[0].rect.left - self.rect.width
-
-                # Moving left
-                if self.x_change < 0: self.rect.x = hits[0].rect.right
-        
-        # Moving down and up
-        elif direction == "y":
-            hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
-            if hits:
-                
-                # Moving down
-                if self.y_change > 0: self.rect.y = hits[0].rect.top - self.rect.height
-
-                # Moving up
-                if self.y_change < 0: self.rect.y = hits[0].rect.bottom
-
     def animate(self):
         """
         Animates npc movement
@@ -518,7 +489,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "D", "B", "t", "S", "Z", "s", "b", "d"]
+        inter = ["L", "D", "B", "t", "S", "Z", "s", "z", "b", "d"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -539,12 +510,15 @@ class Block(pygame.sprite.Sprite):
         elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(70, 2, self.width, self.height)
         elif type == "Z": self.image = self.game.terrain_spritesheet.get_sprite(138, 105, self.width, self.height)
         elif type == "s": self.image = self.game.terrain_spritesheet.get_sprite(104, 2, self.width, self.height)
+        elif type == "z": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
         elif type == "w": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
-        elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
-        elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(70, 70, self.width, self.height)
+        elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(172, 36, self.width, self.height)
+        elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
+        elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
+        elif type == "ř": self.image = self.game.terrain_spritesheet.get_sprite(70, 70, self.width, self.height)
         elif type == "b": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
         elif type == "d": self.image = self.game.terrain_spritesheet.get_sprite(104, 70, self.width, self.height)
         elif type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
@@ -670,9 +644,10 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
-                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
-                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
-                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "z" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
 
                     # Basement
                     elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = ["Basement", i, j]

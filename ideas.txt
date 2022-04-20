@@ -1,3 +1,6 @@
+you get confused reading kokocke otazky and get lost in school
+
+PRO TIP: (do things that we can actually code)
 štebot - npc with useful advice
 kokošky collectibles (4 piece puzzle)
 bananky collectibles
@@ -7,8 +10,8 @@ vujcik jumpscare
 storyline ideas:
     pov you wake up in šatňa
     goal: get out of school 
-    you get confused reading kokocke otazky and get lost in school
+    you win watching eastern shows in the other building
     
 
 gameplay ideas:
-    scene changes based on the active scene and player's position
+    player can go up the level's doors according to his pass level he has (level 1, level 2, level 3 and level 4)
