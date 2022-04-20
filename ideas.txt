@@ -15,3 +15,6 @@ storyline ideas:
 
 gameplay ideas:
     player can go up the level's doors according to his pass level he has (level 1, level 2, level 3 and level 4)
+
+easter eggs:
+    Kontura's vtipníček
