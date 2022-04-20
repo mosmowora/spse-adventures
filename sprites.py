@@ -281,7 +281,7 @@ class Npc(pygame.sprite.Sprite):
 
     def __init__(self, game, x: int, y: int):
         """
-        Initialization
+        Initialization for NPCs
         """
 
         self.game = game
@@ -301,6 +301,8 @@ class Npc(pygame.sprite.Sprite):
         self.animation_loop = 1
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
+
+        #self.color = r.choice([3, 99, 198, 297, 396, 495, 594, 693, 792])
 
         self.image = self.game.npcs_spritesheet.get_sprite(3, 2, self.width, self.height)
 
@@ -349,9 +351,11 @@ class Npc(pygame.sprite.Sprite):
         self.rect.x += self.x_change
         self.collide_blocks("x")
         self.collide_player("x")
+        self.collide_npc("x")
         self.rect.y += self.y_change
         self.collide_blocks("y")
         self.collide_player("y")
+        self.collide_npc("y")
         
         self.x_change = 0
         self.y_change = 0
@@ -427,6 +431,33 @@ class Npc(pygame.sprite.Sprite):
         # Moving down and up
         elif direction == "y":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+            if hits:
+                
+                # Moving down
+                if self.y_change > 0: self.rect.y = hits[0].rect.top - self.rect.height
+
+                # Moving up
+                if self.y_change < 0: self.rect.y = hits[0].rect.bottom
+
+    def collide_npc(self, direction: str):
+        """
+        Colliding with Npcs
+        """
+
+        # Moving left and right
+        if direction == "x":
+            hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
+            if hits:
+                
+                # Moving right
+                if self.x_change > 0: self.rect.x = hits[0].rect.left - self.rect.width
+
+                # Moving left
+                if self.x_change < 0: self.rect.x = hits[0].rect.right
+        
+        # Moving down and up
+        elif direction == "y":
+            hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
             if hits:
                 
                 # Moving down
@@ -624,7 +655,7 @@ class Interact(pygame.sprite.Sprite):
 
         if hits:
             for i, row in enumerate(self.game.in_room):
-                for j, column in enumerate(row):
+                for j, _ in enumerate(row):
 
                     # Trashcan
                     if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
@@ -667,7 +698,7 @@ class Button:
         self.width = width
         self.height = height
 
-        # Colors
+        # self.colors
         self.fg = fg
         self.bg = bg
 

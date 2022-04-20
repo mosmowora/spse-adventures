@@ -19,7 +19,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.game_running = True
-        self.big_font = pygame.font.Font("Roboto.ttf", 32)
+        self.big_font = pygame.font.Font("Caveat.ttf", 32)
         self.font = pygame.font.Font("Roboto.ttf", 22)
 
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -30,15 +30,17 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [first_floor, second_floor, chodba_1_1, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
+        self.rooms = [ground_floor, first_floor, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
         self.in_room = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
-        self.inv = ["locker key", "changing_room key", "light"]
+        self.inv: List[str] = ["locker key", "changing_room key", "light"]
 
         # Objects you can interact with
         self.interacted = ["", "", ""]
         self.interactive = {}
+
+        self.npc = []
     
         # Variables for finding items/doing stuff
         self.key_in_trash = True
@@ -75,7 +77,7 @@ class Game:
                 elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
                 elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
                 elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
-                elif column == "N": Npc(self, j, i) # NPC
+                elif column == "N": self.npc.append(Npc(self, j, i)) # NPC
 
     def new(self):
         """
@@ -237,13 +239,13 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
-    def talking(self, content):
+    def talking(self, msg_content: str):
         """
         When character is talking
         """
 
         for _ in range(100):
-            text = self.font.render(content, True, WHITE)
+            text = self.font.render(msg_content, True, WHITE)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
@@ -358,10 +360,14 @@ class Game:
                 else: self.talking("I need to find key to unlock the door.")
             
             # Door is unlocked
-            else: self.player.rect.y += 2 * TILE_SIZE
+            else: 
+                for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+                self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> Changing room
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.player.rect.y -= 2 * TILE_SIZE
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: 
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
 
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
@@ -369,67 +375,196 @@ class Game:
             self.talking("Sadly it's closed now.")
 
         # Hall -> 020
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166: self.talking("020 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166:
+            self.talking("020 - not a classroom")
 
         # Hall -> 021
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: self.talking("021 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: 
+            self.talking("021 - not a classroom")
 
         # Hall -> 022
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 152: self.talking("022 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 152: 
+            self.talking("022 - not a classroom")
 
         # Hall -> 023
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 133: self.talking("023 - LIT 3")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 133: 
+            self.talking("023 - LIT 3")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
+        # 023 -> Hall
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 133: 
+            self.talking("023 - LIT 3")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+            
         # Hall -> ???
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: self.talking("??? - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: 
+            self.talking("??? - not a classroom")
 
         # Hall -> 025
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: self.talking("025 - LCUJ 4")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: 
+            self.talking("025 - LCUJ 4")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
+
+        # 025 -> Hall 
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 96: 
+            self.talking("025 - LCUJ 4")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
 
         # Hall -> 026
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: self.talking("026 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: 
+            self.talking("026 - not a classroom")
+
+        # 026 -> Hall
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 88: 
+            self.talking("026 - not a classroom")
 
         # Hall -> 027
-        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.talking("027 - not a classroom")
+        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: 
+            self.talking("027 - not a classroom")
 
         # Hall -> 010
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: self.talking("010 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: 
+            self.talking("010 - Toilets")
 
         # Hall -> 009
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: self.talking("009 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: 
+            self.talking("009 - not a classroom")
 
         # Hall -> 008
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 19: self.talking("008 - DPXA 3")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 19: 
+            self.talking("008 - DPXA 3")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
+
+        # 008 -> Hall
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 19: 
+            self.talking("008 - DPXA 3")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
 
         # Hall -> 007
-        elif self.player.facing == "left" and self.interacted[1] == 17 and self.interacted[2] == 11: self.talking("007 - LIT 10")
+        elif self.player.facing == "left" and self.interacted[1] == 17 and self.interacted[2] == 11: 
+            self.talking("007 - LIT 10")
+            for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
+            self.player.rect.x -= 2 * TILE_SIZE
+
+        # 007 -> Hall
+        elif self.player.facing == "right" and self.interacted[1] == 17 and self.interacted[2] == 11: 
+            self.talking("007 - LIT 10")
+            for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
+            self.player.rect.x += 2 * TILE_SIZE
 
         # 007 -> 006
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9: self.talking("006 - LIT 9")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9:
+            self.talking("006 - LIT 9")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 006 -> 007
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 9:
+            self.talking("006 - LIT 9")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 004
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: self.talking("004 - LIT 8")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: 
+            self.talking("004 - LIT 8")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 004 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 20: 
+            self.talking("004 - LIT 8")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 003
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 24: self.talking("003 - DPXA 2")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 24: 
+            self.talking("003 - DPXA 2")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 003 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 24: 
+            self.talking("003 - DPXA 2")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 002
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 35: self.talking("002 - DPXA 1")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 35: 
+            self.talking("002 - DPXA 1")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 002 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 35: 
+            self.talking("002 - DPXA 1")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 012
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 73: self.talking("012 - II.A")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 79: 
+            self.talking("012 - II.A")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 012 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 79: 
+            self.talking("012 - II.A")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 013
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 95: self.talking("013 - II.B")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 88: 
+            self.talking("013 - II.B")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 013 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 88: 
+            self.talking("013 - II.B")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 014
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 114: self.talking("014 - LAELE")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 114: 
+            self.talking("014 - LAELE")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+        
+        # 014 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 114: 
+            self.talking("014 - LAELE")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 015
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 135: self.talking("015 - II.C")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 135: 
+            self.talking("015 - II.C")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # 015 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 135: 
+            self.talking("015 - II.C")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 016
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 159: self.talking("016 - II.SA")
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 159: 
+            self.talking("016 - II.SA")
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+                
+        # 016 -> Hall
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 159: 
+            self.talking("016 - II.SA")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
                 
     def basement(self):
         """
@@ -491,13 +626,13 @@ class Game:
                 self.player.rect.y += 20 * TILE_SIZE
 
         # Ground floor -> 1st floor
-        elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
+        elif self.interacted[0] == "Stairs_up" and self.in_room == ground_floor:
             self.in_room = self.rooms[1] # First floor
             self.create_tile_map()
             for sprite in self.all_sprites: sprite.rect.x -= 80 * TILE_SIZE 
             
         # 1st floor -> Ground floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
+        elif self.interacted[0] == "Stairs_down" and self.in_room == first_floor:
             self.in_room = self.rooms[0] # Ground floor
             self.create_tile_map()
             for sprite in self.all_sprites: 
