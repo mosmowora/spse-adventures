@@ -532,7 +532,7 @@ class Blockade(pygame.sprite.Sprite):
     Main class for adding black block to the screen
     """
     
-    def __init__(self, game, x: int, y: int):
+    def __init__(self, game, x: int, y: int, type: str):
         """
         Initialization
         """
@@ -550,7 +550,8 @@ class Blockade(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
-        self.image = self.game.terrain_spritesheet.get_sprite(36, 2, self.width, self.height) # I can't do the coordinates
+        if type == "_": self.image = self.game.terrain_spritesheet.get_sprite(206, 2, self.width, self.height)
+        elif type == "?": self.image = self.game.terrain_spritesheet.get_sprite(36, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -644,10 +645,10 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
-                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
-                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
-                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
-                    elif self.interactive[hits[0]] == "z" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
+                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
+                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
+                    elif self.interactive[hits[0]] == "z" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
 
                     # Basement
                     elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = ["Basement", i, j]
@@ -696,5 +697,4 @@ class Button:
         Pressing button
         """
 
-        if self.rect.collidepoint(pos) and pressed[0]: return True
-        else: return False
+        return True if self.rect.collidepoint(pos) and pressed[0] else False
