@@ -489,7 +489,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "D", "B", "t", "S", "Z", "s", "z", "b", "d"]
+        inter = ["L", "D", "B", "t", "T", "S", "Z", "s", "z", "b", "d"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -508,13 +508,14 @@ class Block(pygame.sprite.Sprite):
         if type == "W": self.image = self.game.terrain_spritesheet.get_sprite(2, 36, self.width, self.height)
         elif type == "L": self.image = self.game.terrain_spritesheet.get_sprite(36, 36, self.width, self.height)
         elif type == "S": self.image = self.game.terrain_spritesheet.get_sprite(70, 2, self.width, self.height)
-        elif type == "Z": self.image = self.game.terrain_spritesheet.get_sprite(138, 105, self.width, self.height)
+        elif type == "Z": self.image = self.game.terrain_spritesheet.get_sprite(138, 104, self.width, self.height)
         elif type == "s": self.image = self.game.terrain_spritesheet.get_sprite(104, 2, self.width, self.height)
         elif type == "z": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
         elif type == "w": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
+        elif type == "T": self.image = self.game.terrain_spritesheet.get_sprite(2, 104, self.width, self.height)
         elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(172, 36, self.width, self.height)
         elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
@@ -634,6 +635,9 @@ class Interact(pygame.sprite.Sprite):
 
                     # Trashcan
                     if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
+
+                    # Toilet
+                    if self.interactive[hits[0]] == "T" + str(i) + str(j): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
                     elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j]; print(j, i)

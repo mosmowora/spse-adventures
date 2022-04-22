@@ -75,6 +75,7 @@ class Game:
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
+                elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
                 elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
                 elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
                 elif column == "Ř": self.interactive[Block(self, j, i, "Ř")] = "Ř" + str(i) + str(j) # Rails ground_floor
@@ -146,6 +147,7 @@ class Game:
                     case "Stairs_up": self.stairs()
                     case "Stairs_down": self.stairs()
                     case "Basement": self.basement()
+                    case "Toilet": self.toilet()
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -374,6 +376,23 @@ class Game:
         # Hall -> 010
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: 
             self.door_info("010 - Toilets")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
+
+        # 010 -> Hall
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 33: 
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # Toilet room -> Stall
+        elif self.player.facing == "up" and self.interacted[1] == 24 and self.interacted[2] in (37, 39):
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.player.rect.y -= 2 * TILE_SIZE
+
+        # Stall -> Toilet room
+        elif self.player.facing == "down" and self.interacted[1] == 24 and self.interacted[2] in (37, 39):
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
 
         # Hall -> 009
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: 
@@ -802,6 +821,13 @@ class Game:
                     sprite.rect.y -= 7 * TILE_SIZE
                 self.player.rect.x -= 120 * TILE_SIZE
                 self.player.rect.y += 8 * TILE_SIZE
+
+    def toilet(self):
+        """
+        PeePeePooPoo time
+        """
+
+        self.talking("PeePeePooPoo time.")
         
 
 g = Game()
