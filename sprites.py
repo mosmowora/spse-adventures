@@ -636,7 +636,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j]
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j]; print(j, i)
 
                     # Locker
                     elif self.interactive[hits[0]] == "L" + str(i) + str(j): self.game.interacted = ["Locker", i, j]
