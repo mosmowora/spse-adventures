@@ -1,5 +1,4 @@
 # Import
-from numpy import tile
 import pygame
 from sprites import *; from config import *
 
@@ -570,13 +569,13 @@ class Game:
 
         # Hall -> 122/1
         if self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] in (11, 12):
-            self.door_info("122/1 -  LIT 1")
+            self.door_info("122/1 -  LIT 1 (III.SA)")
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 122/1 -> Hall
         elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] in (11, 12):
-            self.door_info("122/1 -  LIT 1 (III.SA)")
+            self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
             self.center_player_after_doors()
         
@@ -894,7 +893,6 @@ class Game:
         """
         PeePeePooPoo time
         """
-
         self.talking("PeePeePooPoo time.")
         
 
