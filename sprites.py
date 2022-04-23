@@ -489,7 +489,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "D", "B", "t", "T", "S", "Z", "s", "z", "b", "d"]
+        inter = ["L", "D", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -516,6 +516,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
         elif type == "T": self.image = self.game.terrain_spritesheet.get_sprite(2, 104, self.width, self.height)
+        elif type == "Ť": self.image = self.game.terrain_spritesheet.get_sprite(36, 104, self.width, self.height)
         elif type == "R": self.image = self.game.terrain_spritesheet.get_sprite(172, 36, self.width, self.height)
         elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
@@ -638,9 +639,10 @@ class Interact(pygame.sprite.Sprite):
 
                     # Toilet
                     if self.interactive[hits[0]] == "T" + str(i) + str(j): self.game.interacted = ["Toilet", i ,j]
+                    if self.interactive[hits[0]] == "Ť" + str(i) + str(j): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
 
                     # Locker
                     elif self.interactive[hits[0]] == "L" + str(i) + str(j): self.game.interacted = ["Locker", i, j]
