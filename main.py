@@ -235,13 +235,13 @@ class Game:
         made_rect = made.get_rect(x=490, y=450)
 
         # Start button
-        play_button = Button(10, 60, 150, 50, WHITE, BLACK, "Play", 32)
+        play_button = Button(10, 60, 180, 50, WHITE, BLACK, "Play", 32)
 
         # Settings button
-        settings_button = Button(10, 120, 150, 50, WHITE, BLACK, "Settings", 32)
+        settings_button = Button(10, 120, 180, 50, WHITE, BLACK, "Settings", 32)
 
-        # Leadboard button
-        leaderboard_button = Button(10, 180, 150, 50, WHITE, BLACK, "Leadboard", 32)
+        # Leaderboard button
+        leaderboard_button = Button(10, 180, 180, 50, WHITE, BLACK, "Leaderboard", 32)
 
         # Main loop for intro
         while intro:
