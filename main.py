@@ -125,6 +125,8 @@ class Game:
             self.events()
             self.update()
             self.draw()
+        
+        return self
 
     def events(self):
         """
@@ -239,7 +241,7 @@ class Game:
         settings_button = Button(10, 120, 150, 50, WHITE, BLACK, "Settings", 32)
 
         # Leadboard button
-        leadboard_button = Button(10, 180, 150, 50, WHITE, BLACK, "Leadboard", 32)
+        leaderboard_button = Button(10, 180, 150, 50, WHITE, BLACK, "Leadboard", 32)
 
         # Main loop for intro
         while intro:
@@ -261,7 +263,7 @@ class Game:
             if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
             
             # Leadboard button was pressed
-            if leadboard_button.is_pressed(mouse_pos, mouse_pressed): self.leadboard()
+            if leaderboard_button.is_pressed(mouse_pos, mouse_pressed): self.leaderboard()
 
             # Diplaying background, title, buttons
             self.screen.blit(self.intro_background, (0, 0))
@@ -269,10 +271,13 @@ class Game:
             self.screen.blit(made, made_rect)
             self.screen.blit(play_button.image, play_button.rect)
             self.screen.blit(settings_button.image, settings_button.rect)
-            self.screen.blit(leadboard_button.image, leadboard_button.rect)
+            self.screen.blit(leaderboard_button.image, leaderboard_button.rect)
             self.clock.tick(FPS)
             pygame.display.update()
 
+        return self
+    
+    
     def start(self):
         """
         Starting the game
@@ -316,7 +321,8 @@ class Game:
                     if event.key == pygame.K_BACKSPACE: self.player_name = self.player_name[:-1]
                     
                     # Enter
-                    elif event.key == pygame.K_RETURN and len(self.player_name) > 0: picking_name = False
+                    elif event.key == pygame.K_RETURN: 
+                        if len(self.player_name) > 0: picking_name = False
 
                     # Unicode
                     elif active: self.player_name += event.unicode
@@ -353,9 +359,9 @@ class Game:
         """
         print("If we had one")
 
-    def leadboard(self):
+    def leaderboard(self):
         """
-        Opens leadboard window
+        Opens leaderboard window
         """
         print("If we had one")
 
@@ -400,7 +406,7 @@ class Game:
             # Key in trash
             if self.key_in_trash: 
                 self.inv.append("locker key")
-                self.key_in_trash = False 
+                self.key_in_trash = False
                 self.talking(f"{self.player_name} found a key in the trashcan. It says AR.")
 
             # Empty trashcan
@@ -443,12 +449,13 @@ class Game:
             if self.locked_changing_room:
 
                 # Key in inventory
-                if "changing_room key" in self.inv: 
+                if "changing_room key" in self.inv:
                     self.talking(f"{self.player_name} unlocked the door.")
                     self.locked_changing_room = False
 
                 # No key
-                else: self.talking(f"{self.player_name} can't find key to unlock the door.")
+                else: 
+                    self.talking(f"{self.player_name} can't find key to unlock the door.")
                     
             # Door is unlocked
             else: 
@@ -1057,11 +1064,8 @@ class Game:
         
 
 g = Game()
-g.intro_screen()
-g.new()
+g.intro_screen().new()
 
-while g.game_running:
-    g.main()
-    g.game_over()
+while g.game_running: g.main().game_over()
 
 pygame.quit()
