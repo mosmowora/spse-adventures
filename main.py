@@ -27,7 +27,7 @@ class Game:
         self.npcs_spritesheet = Spritesheet("img/npc.png")
 
         # Into and Game Over backgrounds
-        self.intro_background = pygame.image.load("img/introbackground.png")
+        self.intro_background = pygame.image.load("img/intro_background.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
         self.rooms = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
@@ -220,8 +220,17 @@ class Game:
         title = self.big_font.render("SPSE ADVENTURE", True, BLACK)
         title_rect = title.get_rect(x=10, y=10)
 
+        made = self.font.render("Made by: MTS", True, WHITE)
+        made_rect = made.get_rect(x=490, y=450)
+
         # Start button
-        play_button = Button(10, 50, 100, 50, WHITE, BLACK, "Play", 32)
+        play_button = Button(10, 50, 150, 50, WHITE, BLACK, "Play", 32)
+
+        # Settings button
+        settings_button = Button(10, 110, 150, 50, WHITE, BLACK, "Settings", 32)
+
+        # Leadboard button
+        leadboard_button = Button(10, 170, 150, 50, WHITE, BLACK, "Leadboard", 32)
 
         # Main loop for intro
         while intro:
@@ -236,15 +245,36 @@ class Game:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
 
-            # Button was pressed
+            # Play button was pressed
             if play_button.is_pressed(mouse_pos, mouse_pressed): intro = False
 
-            # Diplaying background, title, button
+            # Settings button was pressed
+            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
+            
+            # Leadboard button was pressed
+            if leadboard_button.is_pressed(mouse_pos, mouse_pressed): self.leadboard()
+
+            # Diplaying background, title, buttons
             self.screen.blit(self.intro_background, (0, 0))
             self.screen.blit(title, title_rect)
+            self.screen.blit(made, made_rect)
             self.screen.blit(play_button.image, play_button.rect)
+            self.screen.blit(settings_button.image, settings_button.rect)
+            self.screen.blit(leadboard_button.image, leadboard_button.rect)
             self.clock.tick(FPS)
             pygame.display.update()
+
+    def settings(self):
+        """
+        Opens settings window
+        """
+        print("If we had one")
+
+    def leadboard(self):
+        """
+        Opens leadboard window
+        """
+        print("If we had one")
 
     def door_info(self, msg_content: str):
         """
@@ -259,8 +289,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        
-        
+              
     def talking(self, msg_content: str):
         """
         When character is talking
@@ -813,8 +842,7 @@ class Game:
         elif self.in_room == first_floor: self.first_floor_doors()
 
         # Second floor
-        elif self.in_room == second_floor: self.second_floor_doors()
-        
+        elif self.in_room == second_floor: self.second_floor_doors()        
         
     def basement(self):
         """
