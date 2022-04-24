@@ -19,9 +19,10 @@ class Game:
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.game_running = True
-        self.big_font = pygame.font.Font("Caveat.ttf", 32)
+        self.big_font = pygame.font.Font("Caveat.ttf", 40)
         self.font = pygame.font.Font("Roboto.ttf", 22)
 
+        # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
         self.npcs_spritesheet = Spritesheet("img/npc.png")
@@ -30,15 +31,18 @@ class Game:
         self.intro_background = pygame.image.load("img/intro_background.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
-        self.in_room = self.rooms[0] # Room where player is rn (starting point)
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
+        self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
         self.inv: List[str] = ["locker key", "changing_room key", "light"]
 
         # Objects you can interact with
-        self.interacted = ["", "", ""]
-        self.interactive = {}
+        self.interacted: List[str] = ["", "", "", "", ""]
+        self.interactive= {}
+
+        # Player name
+        self.player_name: str = ""
 
         self.npc = []
     
@@ -116,7 +120,6 @@ class Game:
             self.events()
             self.update()
             self.draw()
-            # self.check_active_scene_change(self.in_room)
 
     def events(self):
         """
@@ -220,17 +223,18 @@ class Game:
         title = self.big_font.render("SPSE ADVENTURE", True, BLACK)
         title_rect = title.get_rect(x=10, y=10)
 
+        # Made by
         made = self.font.render("Made by: MTS", True, WHITE)
         made_rect = made.get_rect(x=490, y=450)
 
         # Start button
-        play_button = Button(10, 50, 150, 50, WHITE, BLACK, "Play", 32)
+        play_button = Button(10, 60, 150, 50, WHITE, BLACK, "Play", 32)
 
         # Settings button
-        settings_button = Button(10, 110, 150, 50, WHITE, BLACK, "Settings", 32)
+        settings_button = Button(10, 120, 150, 50, WHITE, BLACK, "Settings", 32)
 
         # Leadboard button
-        leadboard_button = Button(10, 170, 150, 50, WHITE, BLACK, "Leadboard", 32)
+        leadboard_button = Button(10, 180, 150, 50, WHITE, BLACK, "Leadboard", 32)
 
         # Main loop for intro
         while intro:
@@ -246,7 +250,7 @@ class Game:
             mouse_pressed = pygame.mouse.get_pressed()
 
             # Play button was pressed
-            if play_button.is_pressed(mouse_pos, mouse_pressed): intro = False
+            if play_button.is_pressed(mouse_pos, mouse_pressed): self.start(); break
 
             # Settings button was pressed
             if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
@@ -263,6 +267,80 @@ class Game:
             self.screen.blit(leadboard_button.image, leadboard_button.rect)
             self.clock.tick(FPS)
             pygame.display.update()
+
+    def start(self):
+        """
+        Starting the game
+        """
+
+        picking_name = True
+        active = False
+
+        # Title
+        title = self.big_font.render("SPSE ADVENTURE", True, BLACK)
+        title_rect = title.get_rect(x=10, y=10)
+
+        # Made by
+        made = self.font.render("Made by: MTS", True, WHITE)
+        made_rect = made.get_rect(x=490, y=450)
+
+        # Your name
+        your_name = self.font.render("Your name:", True, WHITE)
+        your_name_rect = made.get_rect(x=10, y=62)
+        
+        # Input rectangle
+        input_rect = pygame.Rect(130, 60, 200, 32)
+
+        while picking_name:
+
+            for event in pygame.event.get():
+      
+                # Quit
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+        
+                # Click
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if input_rect.collidepoint(event.pos): active = True
+                    else: active = False
+
+                # Keyboard
+                if event.type == pygame.KEYDOWN:
+      
+                    # Check for backspace
+                    if event.key == pygame.K_BACKSPACE: self.player_name = self.player_name[:-1]
+                    
+                    # Enter
+                    elif event.key == pygame.K_RETURN and len(self.player_name) > 0: picking_name = False
+
+                    # Unicode
+                    elif active: self.player_name += event.unicode
+
+            # Background
+            self.screen.blit(self.intro_background, (0, 0))
+
+            # Your name
+            self.screen.blit(your_name, your_name_rect)
+
+            if active: color = GRAY
+            else: color = BLACK
+
+            # Input rectangle
+            pygame.draw.rect(self.screen, color, input_rect)
+    
+            # Text
+            text_surface = self.font.render(self.player_name, True, (255, 255, 255))
+            self.screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
+
+            # Width of rectangle
+            input_rect.w = max(200, text_surface.get_width()+10)
+
+            # Other
+            self.screen.blit(made, made_rect)
+            self.screen.blit(title, title_rect)
+            self.clock.tick(FPS)
+            pygame.display.flip()
+        
 
     def settings(self):
         """

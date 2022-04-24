@@ -1,25 +1,32 @@
 # Import
 from typing import List
 
+# Sizes
 WIN_WIDTH: int = 640
 WIN_HEIGHT: int = 480
 TILE_SIZE: int = 32
+
+# Fps
 FPS: int = 60
 
+# Layers
 PLAYER_LAYER: int = 5
 NPC_LAYER: int = 4
 OBJECT_LAYER: int = 3
 BLOCK_LAYER: int = 2
 GROUND_LAYER: int = 1
 
+# Speeds
 PLAYER_SPEED: int = 10
 NPC_SPEED: int = 5
 
-WHITE: tuple = (255, 255, 255)
-BLACK: tuple = (0, 0, 0)
-NEARLY_BLACK: tuple = (1, 1, 1)
-RED: tuple = (255, 0, 0)
-BLUE: tuple = (0, 0, 255)
+# Colors
+WHITE: tuple =          (255, 255, 255)
+BLACK: tuple =          (  0,   0,   0)
+NEARLY_BLACK: tuple =   (  1,   1,   1)
+RED: tuple =            (255,   0,   0)
+BLUE: tuple =           (  0,   0, 255)
+GRAY: tuple =           ( 64,  64,  64)
 
 basement: List[str]  = [
     "???????????????????????????",
