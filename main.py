@@ -30,6 +30,11 @@ class Game:
         # Into and Game Over backgrounds
         self.intro_background = pygame.image.load("img/intro_background.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
+        
+        # Window icon and title (not final)
+        icon = pygame.image.load('img/spselogo.png')
+        pygame.display.set_icon(icon)
+        pygame.display.set_caption('SPŠE ADVENTURE')
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
@@ -340,7 +345,7 @@ class Game:
             self.screen.blit(title, title_rect)
             self.clock.tick(FPS)
             pygame.display.flip()
-        
+    
 
     def settings(self):
         """
@@ -396,7 +401,7 @@ class Game:
             if self.key_in_trash: 
                 self.inv.append("locker key")
                 self.key_in_trash = False 
-                self.talking("You found a key in the trashcan. It says AR.")
+                self.talking(f"{self.player_name} found a key in the trashcan. It says AR.")
 
             # Empty trashcan
             else: self.talking("There is nothing interesting.")
@@ -439,11 +444,11 @@ class Game:
 
                 # Key in inventory
                 if "changing_room key" in self.inv: 
-                    self.talking("I unlocked the door.")
+                    self.talking(f"{self.player_name} unlocked the door.")
                     self.locked_changing_room = False
 
                 # No key
-                else: self.talking("I need to find key to unlock the door.")
+                else: self.talking(f"{self.player_name} can't find key to unlock the door.")
                     
             # Door is unlocked
             else: 
@@ -853,7 +858,7 @@ class Game:
 
                 # Has key
                 if "locker key" in self.inv:
-                    self.talking("I unlocked the locker.")
+                    self.talking(f"{self.player_name} unlocked the locker.")
                     self.locked_locker = False
 
                 # No key
@@ -878,7 +883,7 @@ class Game:
             if self.kokosky_in_locker:
                 self.talking("Hmm? Why is it unlocked?")
                 self.talking("Wow, what is this?")
-                self.talking("You found the forbidden Kokosky fragment. [1/4]")
+                self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [1/4]")
                 self.kokosky_in_locker = False
                 self.inv.append("Kokosky1")
 
@@ -1048,7 +1053,7 @@ class Game:
         """
         PeePeePooPoo time
         """
-        self.talking("PeePeePooPoo time.")
+        self.talking(f"{self.player_name} has PeePeePooPoo time now.")
         
 
 g = Game()
