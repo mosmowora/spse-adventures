@@ -642,7 +642,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] == "Ť" + str(i) + str(j): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
+                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]
 
                     # Locker
                     elif self.interactive[hits[0]] == "L" + str(i) + str(j): self.game.interacted = ["Locker", i, j]
@@ -651,10 +651,10 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
-                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
-                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]
-                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
-                    elif self.interactive[hits[0]] == "z" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]
+                    elif self.interactive[hits[0]] == "S" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "Z" + str(i) + str(j): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "s" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "z" + str(i) + str(j): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
 
                     # Basement
                     elif self.interactive[hits[0]] == "b" + str(i) + str(j): self.game.interacted = ["Basement", i, j]

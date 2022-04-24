@@ -30,7 +30,7 @@ class Game:
         self.intro_background = pygame.image.load("img/introbackground.png")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
 
-        self.rooms = [ground_floor, first_floor, "chodba_2", "chodba_2_0", "chodba_3", "chodba_3_0", "chodba_4", "chodba_4_0", basement] # Rooms where player can go
+        self.rooms = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
         self.in_room = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
@@ -590,7 +590,27 @@ class Game:
             self.door_info("122/1 -  LIT 1 (III.SA)")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
-        
+            
+        # Hall -> Kabinet pri 122/1
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 17:
+            for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
+        # Kabinet pri 122/1 -> Hall
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 17:
+            for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
+        # Hall -> Kabinet HED, MIT
+        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 7:
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
+        # Kabinet HED, MIT -> Hall
+        elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 7:
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
         # Hall -> Toilets
         elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16:
             self.door_info("Toilets")
@@ -708,6 +728,10 @@ class Game:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
+            
+    
+    def second_floor_doors(self): pass
+        
                
     def locker(self):
         """
@@ -787,7 +811,11 @@ class Game:
 
         # First floor
         elif self.in_room == first_floor: self.first_floor_doors()
-                
+
+        # Second floor
+        elif self.in_room == second_floor: self.second_floor_doors()
+        
+        
     def basement(self):
         """
         Going into the basement
@@ -888,6 +916,27 @@ class Game:
                     sprite.rect.y -= 7 * TILE_SIZE
                 self.player.rect.x -= 120 * TILE_SIZE
                 self.player.rect.y += 8 * TILE_SIZE
+        
+        # First floor -> Second floor
+        elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
+            self.in_room = self.rooms[2]
+            self.create_tile_map()
+            
+            # Right stairs
+            if self.interacted[1] in (25, 26, 27, 28) and self.interacted[2] == 181: 
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 171 * TILE_SIZE
+                    sprite.rect.y -= 11 * TILE_SIZE
+            
+            # Left stairs
+            elif self.interacted[1] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[2] == 23:
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 39 * TILE_SIZE
+                    sprite.rect.y -= 7 * TILE_SIZE
+                self.player.rect.x -= 120 * TILE_SIZE
+                self.player.rect.y += 8 * TILE_SIZE
+                
+        # Second floor -> First floor (TO BE ADDED)
 
     def toilet(self):
         """
