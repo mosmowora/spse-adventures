@@ -456,8 +456,7 @@ class Game:
                     self.locked_changing_room = False
 
                 # No key
-                else: 
-                    self.talking(f"{self.player_name} can't find key to unlock the door.")
+                else: self.talking(f"{self.player_name} can't find key to unlock the door.")
                     
             # Door is unlocked
             else: 
@@ -985,14 +984,13 @@ class Game:
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
 
         # Hall -> 220
-        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 14:
-            self.door_info("216 - OUF (IV.C)")
-            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+        elif self.player.facing == "down" and self.interacted[2] == 139 and self.interacted[1] == 31:
+            self.door_info("220 - I.C")
+            for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
 
-
-        # Hall -> 216
-        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 14:
-            self.door_info("216 - OUF (IV.C)")
+        # 220 -> Hall
+        elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31:
+            self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
    
     def locker(self):
