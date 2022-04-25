@@ -17,6 +17,7 @@ quests:
 
 gameplay ideas:
     player can go up the level's doors according to his pass level he has (level 1, level 2, level 3 and level 4)
+    women's toilets... the player won't know what it is
 
 easter eggs:
     Kontura's vtipníček
