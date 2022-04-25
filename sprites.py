@@ -697,8 +697,8 @@ class Button:
         self.image.blit(self.text, self.text_rect)
 
     def is_pressed(self, pos: tuple[int, int], pressed: tuple[bool, bool, bool]):
-        """
-        Pressing button
-        """
-
+        """ 
+        Pressing button 
+        """ 
+        
         return True if self.rect.collidepoint(pos) and pressed[0] else False

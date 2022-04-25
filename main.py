@@ -1,6 +1,5 @@
 # Import
-import time
-import pygame
+import pygame, time
 from sprites import *; from config import *
 
 class Game:
@@ -1111,6 +1110,7 @@ class Game:
                 if "locker key" in self.inv:
                     self.talking(f"{self.player_name} unlocked the locker.")
                     self.locked_locker = False
+                    self.inv.remove("locker key")
 
                 # No key
                 else: self.talking("Locked locker.")
@@ -1163,6 +1163,7 @@ class Game:
         key = pygame.image.load("img/changing_room key.png")
         key_rect = key.get_rect(x=185, y=155)
 
+        # Button
         back_button = Button(500, 400, 120, 50, WHITE, BLACK, "Back out", 32)
         
         while looking:
@@ -1197,14 +1198,14 @@ class Game:
                 
                 # Boots
                 elif boots_rect.collidepoint(event.pos) and self.locker_stuff["boots"]: 
-                    self.locker_stuff['boots'] = False
-                    self.locker_stuff['crocs'] = True
+                    self.locker_stuff['boots'] = not self.locker_stuff['boots']
+                    self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
                 
                 # Crocs
                 elif crocs_rect.collidepoint(event.pos) and self.locker_stuff['crocs']:
-                    self.locker_stuff['crocs'] = False
-                    self.locker_stuff['boots'] = True
-
+                    self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
+                    self.locker_stuff['boots'] = not self.locker_stuff['boots']
+                    
                 time.sleep(0.25)
 
             # Button
