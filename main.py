@@ -34,7 +34,7 @@ class Game:
         # Window icon and title (not final)
         icon = pygame.image.load('img/spselogo.png')
         pygame.display.set_icon(icon)
-        pygame.display.set_caption('SPŠE ADVENTURE')
+        pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
@@ -689,37 +689,47 @@ class Game:
         """
 
         # Hall -> 122/1
-        if self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] in (11, 12):
+        if self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] in (12, 13):
             self.door_info("122/1 -  LIT 1 (III.SA)")
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 122/1 -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] in (11, 12):
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] in (12, 13):
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 122/1 -> 122/2
-        elif self.player.facing == "up" and self.interacted[2] == 177 and self.interacted[1] == 7:
+        elif self.player.facing == "up" and self.interacted[2] == 177 and self.interacted[1] == 8:
             self.door_info("122/2 -  LIT 2 (IV.SA)")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 122/2 -> 122/1
-        elif self.player.facing == "down" and self.interacted[2] == 177 and self.interacted[1] == 7:
+        elif self.player.facing == "down" and self.interacted[2] == 177 and self.interacted[1] == 8:
             self.door_info("122/1 -  LIT 1 (III.SA)")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
             
         # Hall -> Kabinet pri 122/1
-        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 17:
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 18:
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
             self.center_player_after_doors()
             
         # Kabinet pri 122/1 -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 17:
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 18:
             for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
+        # Hall -> Kabinet HED, MIT
+        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 7:
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
+            self.center_player_after_doors()
+            
+        # 122/2 -> Kabinet HED, MIT
+        elif self.player.facing == "left" and self.interacted[2] == 169 and self.interacted[1] == 7:
+            for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
             
         # Hall -> Kabinet HED, MIT
@@ -733,119 +743,119 @@ class Game:
             self.center_player_after_doors()
             
         # Hall -> Toilets
-        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16:
+        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12:
             self.door_info("Toilets")
             for sprite in self.all_sprites: sprite.rect.x += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Toilets -> Stall
-        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 17:
+        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13:
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
 
         # Stall -> Toilets
-        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 17:
+        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 13:
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
 
         # Toilets -> Hall
-        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 16:
+        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 12:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 117
-        elif self.player.facing == "up" and self.interacted[2] == 155 and self.interacted[1] == 23:
+        elif self.player.facing == "up" and self.interacted[2] == 155 and self.interacted[1] == 24:
             self.door_info("117 - III.B")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 117 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 155 and self.interacted[1] == 23:
+        elif self.player.facing == "down" and self.interacted[2] == 155 and self.interacted[1] == 24:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 115
-        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 23:
+        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 24:
             self.door_info("115 - IV.SB")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 115 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 23:
+        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 24:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 113
-        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 23:
+        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 24:
             self.door_info("113 - III.C")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 113 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 23:
+        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 24:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 112
-        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 23:
+        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 24:
             self.door_info("112 - LELM 1")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 112 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 23:
+        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 24:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 124
-        elif self.player.facing == "down" and self.interacted[2] == 160 and self.interacted[1] == 29:
+        elif self.player.facing == "down" and self.interacted[2] == 160 and self.interacted[1] == 30:
             self.door_info("124 - LELM 2")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 124 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 160 and self.interacted[1] == 29:
+        elif self.player.facing == "up" and self.interacted[2] == 160 and self.interacted[1] == 30:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 126
-        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 29:
+        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 30:
             self.door_info("126 - LSIE 2")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 126 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 29:
+        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 30:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 127
-        elif self.player.facing == "down" and self.interacted[2] == 126 and self.interacted[1] == 29:
+        elif self.player.facing == "down" and self.interacted[2] == 126 and self.interacted[1] == 30:
             self.door_info("127 - LIOT")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 127 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 126 and self.interacted[1] == 29:
+        elif self.player.facing == "up" and self.interacted[2] == 126 and self.interacted[1] == 30:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # Hall -> 130
-        elif self.player.facing == "down" and self.interacted[2] == 104 and self.interacted[1] == 29:
+        elif self.player.facing == "down" and self.interacted[2] == 104 and self.interacted[1] == 30:
             self.door_info("130 - CZV")
             for sprite in self.all_sprites: sprite.rect.y -= 2 * TILE_SIZE
             self.center_player_after_doors()
         
         # 130 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 29:
+        elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 30:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
@@ -1022,7 +1032,7 @@ class Game:
             self.create_tile_map()
 
             # Right stairs
-            if self.interacted[1] in (20, 21, 22, 23) and self.interacted[2] == 181:
+            if self.interacted[1] in (21, 22, 23, 24) and self.interacted[2] == 181:
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 173 * TILE_SIZE
                     sprite.rect.y -= 11 * TILE_SIZE
@@ -1030,7 +1040,7 @@ class Game:
                 self.player.rect.y += 11 * TILE_SIZE
 
             # Left stairs
-            elif self.interacted[1] == 23 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
+            elif self.interacted[1] == 24 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 39 * TILE_SIZE
                     sprite.rect.y -= 7 * TILE_SIZE
@@ -1043,18 +1053,18 @@ class Game:
             self.create_tile_map()
             
             # Right stairs
-            if self.interacted[1] in (25, 26, 27, 28) and self.interacted[2] == 181: 
+            if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 171 * TILE_SIZE
                     sprite.rect.y -= 11 * TILE_SIZE
             
             # Left stairs
-            elif self.interacted[1] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[2] == 23:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 39 * TILE_SIZE
-                    sprite.rect.y -= 7 * TILE_SIZE
-                self.player.rect.x -= 120 * TILE_SIZE
-                self.player.rect.y += 8 * TILE_SIZE
+            elif self.interacted[1] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[2] == 24:
+                # for sprite in self.all_sprites:
+                    # sprite.rect.x -= 120
+                    # sprite.rect.y += 20 * TILE_SIZE
+                # self.player.rect.x -= 134 * TILE_SIZE
+                # self.player.rect.y += 2 * TILE_SIZE
                 
         # Second floor -> First floor (TO BE ADDED)
 

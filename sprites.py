@@ -653,7 +653,7 @@ class Interact(pygame.sprite.Sprite):
 
                     # Stairs
                     elif self.interactive[hits[0]] in ("S" + str(i) + str(j), "Z" + str(i) + str(j)): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
-                    elif self.interactive[hits[0]] == ("s" + str(i) + str(j), "z" + str(i) + str(j)): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] in ("s" + str(i) + str(j), "`z" + str(i) + str(j)): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
 
                     # Basement
                     elif self.interactive[hits[0]] in ("b" + str(i) + str(j), "d" + str(i) + str(j)): self.game.interacted = ["Basement", i, j]
