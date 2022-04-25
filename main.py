@@ -1,5 +1,5 @@
 # Import
-import pygame, time
+import pygame
 from sprites import *; from config import *
 
 class Game:
@@ -55,7 +55,6 @@ class Game:
         self.key_in_trash = True
         self.locked_locker = True
         self.locked_changing_room = True
-        self.key_in_locker = True
         self.kokosky_in_locker = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
@@ -1110,20 +1109,13 @@ class Game:
                 if "locker key" in self.inv:
                     self.talking(f"{self.player_name} unlocked the locker.")
                     self.locked_locker = False
-                    self.inv.remove("locker key")
 
                 # No key
                 else: self.talking("Locked locker.")
 
             # Unlocked
-            else:
+            else: self.in_locker()
 
-                # Key in locker
-                if self.key_in_locker: self.in_locker()
-
-                # Locker empty
-                else: self.talking("It's empty.")
-        
         # Locker with kokosky
         elif self.interacted[1] == 4 and self.interacted[2] == 165:
 
@@ -1142,7 +1134,7 @@ class Game:
         else: 
             
             # Key in inventory
-            if "locker key" in self.inv and self.key_in_locker: self.talking("Wrong locker.")
+            if "locker key" in self.inv and self.locked_locker: self.talking("Wrong locker.")
             
             # No key
             else: self.talking("Locked locker.")
@@ -1164,16 +1156,10 @@ class Game:
         key_rect = key.get_rect(x=185, y=155)
 
         # Button
-        back_button = Button(500, 400, 120, 50, WHITE, BLACK, "Back out", 32)
+        back_button = Button(500, 400, 120, 50, WHITE, BLACK, "Back", 32)
         
         while looking:
     
-            # Events
-            for event in pygame.event.get():
-
-                # Close button
-                if event.type == pygame.QUIT: looking = self.game_running = False
-
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -1187,26 +1173,30 @@ class Game:
 
             # Key
             if self.locker_stuff["key"]: self.screen.blit(key, key_rect)
+            
+            # Events
+            for event in pygame.event.get():
 
-            # Clicking
-            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Close button
+                if event.type == pygame.QUIT: looking = self.game_running = False
 
-                # Key
-                if key_rect.collidepoint(event.pos): 
-                    self.locker_stuff['key'] = False
-                    self.inv.append("changing_room key")
-                
-                # Boots
-                elif boots_rect.collidepoint(event.pos) and self.locker_stuff["boots"]: 
-                    self.locker_stuff['boots'] = not self.locker_stuff['boots']
-                    self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
-                
-                # Crocs
-                elif crocs_rect.collidepoint(event.pos) and self.locker_stuff['crocs']:
-                    self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
-                    self.locker_stuff['boots'] = not self.locker_stuff['boots']
+                # Clicking
+                if event.type == pygame.MOUSEBUTTONDOWN:
+
+                    # Key
+                    if key_rect.collidepoint(event.pos): 
+                        self.locker_stuff['key'] = False
+                        self.inv.append("changing_room key")
                     
-                time.sleep(0.25)
+                    # Boots
+                    elif boots_rect.collidepoint(event.pos) and self.locker_stuff["boots"]: 
+                        self.locker_stuff['boots'] = not self.locker_stuff['boots']
+                        self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
+                    
+                    # Crocs
+                    elif crocs_rect.collidepoint(event.pos) and self.locker_stuff['crocs']:
+                        self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
+                        self.locker_stuff['boots'] = not self.locker_stuff['boots']
 
             # Button
             self.screen.blit(back_button.image, back_button.rect)
