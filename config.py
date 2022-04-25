@@ -17,7 +17,7 @@ BLOCK_LAYER: int = 2
 GROUND_LAYER: int = 1
 
 # Speeds
-PLAYER_SPEED: int = 13
+PLAYER_SPEED: int = 5
 NPC_SPEED: int = 5
 
 # Colors

@@ -1,4 +1,5 @@
 # Import
+import time
 import pygame
 from sprites import *; from config import *
 
@@ -40,7 +41,7 @@ class Game:
         self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
-        self.inv: List[str] = ["locker key", "changing_room key", "light"]
+        self.inv: List[str] = []
 
         # Objects you can interact with
         self.interacted: List[str] = ["", "", "", "", ""]
@@ -57,6 +58,7 @@ class Game:
         self.locked_changing_room = True
         self.key_in_locker = True
         self.kokosky_in_locker = True
+        self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
         """
@@ -859,8 +861,7 @@ class Game:
             self.door_info("Hall")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
-            
-    
+               
     def second_floor_doors(self): 
         """
         Doors on the second floor
@@ -1094,12 +1095,7 @@ class Game:
             self.door_info("216 - OUF (IV.C)")
             for sprite in self.all_sprites: sprite.rect.y += 2 * TILE_SIZE
             self.center_player_after_doors()
-
-
-
-
-        
-               
+   
     def locker(self):
         """
         Unlocking the locker
@@ -1123,10 +1119,7 @@ class Game:
             else:
 
                 # Key in locker
-                if self.key_in_locker:
-                    self.inv.append("changing_room key")
-                    self.talking("There's a key. It seems to be the key from this room.")
-                    self.key_in_locker = False
+                if self.key_in_locker: self.in_locker()
 
                 # Locker empty
                 else: self.talking("It's empty.")
@@ -1154,6 +1147,72 @@ class Game:
             # No key
             else: self.talking("Locked locker.")
 
+    def in_locker(self):
+        """
+        Player is looking in locker
+        """
+
+        looking = True
+
+        # Images
+        locker = pygame.image.load("img/in_locker.png")
+        crocs = pygame.image.load("img/crocs.png")
+        crocs_rect = crocs.get_rect(x=195, y=232)
+        boots = pygame.image.load("img/boots.png")
+        boots_rect = boots.get_rect(x=196, y=229)
+        key = pygame.image.load("img/changing_room key.png")
+        key_rect = key.get_rect(x=185, y=155)
+
+        back_button = Button(500, 400, 120, 50, WHITE, BLACK, "Back out", 32)
+        
+        while looking:
+    
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: looking = self.game_running = False
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            # Background
+            self.screen.blit(locker, (0, 0))
+
+            # Crocs/Boots
+            if self.locker_stuff["crocs"]: self.screen.blit(crocs, crocs_rect)
+            else: self.screen.blit(boots, boots_rect)
+
+            # Key
+            if self.locker_stuff["key"]: self.screen.blit(key, key_rect)
+
+            # Clicking
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+                # Key
+                if key_rect.collidepoint(event.pos): 
+                    self.locker_stuff['key'] = False
+                    self.inv.append("changing_room key")
+                
+                # Boots
+                elif boots_rect.collidepoint(event.pos) and self.locker_stuff["boots"]: 
+                    self.locker_stuff['boots'] = False
+                    self.locker_stuff['crocs'] = True
+                
+                # Crocs
+                elif crocs_rect.collidepoint(event.pos) and self.locker_stuff['crocs']:
+                    self.locker_stuff['crocs'] = False
+                    self.locker_stuff['boots'] = True
+
+                time.sleep(0.25)
+
+            # Button
+            self.screen.blit(back_button.image, back_button.rect)
+            if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
     def bench(self):
         """
         Sitting on the bench

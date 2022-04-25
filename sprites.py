@@ -663,7 +663,7 @@ class Button:
     Class for button
     """
 
-    def __init__(self, x, y, width, height, fg, bg, content, fontsize):
+    def __init__(self, x: int, y: int, width: int, height: int, fg: tuple, bg: tuple, content: str, fontsize: int):
         """
         Initialization
         """
@@ -696,7 +696,7 @@ class Button:
         self.text_rect = self.text.get_rect(center=(self.width / 2, self.height / 2)) 
         self.image.blit(self.text, self.text_rect)
 
-    def is_pressed(self, pos, pressed):
+    def is_pressed(self, pos: tuple[int, int], pressed: tuple[bool, bool, bool]):
         """
         Pressing button
         """
