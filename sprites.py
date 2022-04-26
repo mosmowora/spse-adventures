@@ -103,9 +103,11 @@ class Player(pygame.sprite.Sprite):
         # Collision
         if not self.player_sitting: 
             self.collide_blocks("x")
-            self.collide_npc("x")
+            self.collide_cleaner("x")
+            # self.collide_npc("x")
             self.collide_blocks("y")
-            self.collide_npc("y")
+            self.collide_cleaner("y")
+            # self.collide_npc("y")
         
         # Sitting
         if self.player_sitting:
@@ -141,6 +143,21 @@ class Player(pygame.sprite.Sprite):
             self.y_change += PLAYER_SPEED
             self.facing = "down"
 
+    def collide_cleaner(self, direction: str):
+        """
+        Colliding with cleaner
+        """
+
+        # Moving left and right
+        if direction == "x":
+            hits = pygame.sprite.spritecollide(self, self.game.cleaner, False)
+            if hits: self.game.shoes_on()
+        
+        # Moving down and up
+        elif direction == "y":
+            hits = pygame.sprite.spritecollide(self, self.game.cleaner, False)
+            if hits: self.game.shoes_on()
+
     def collide_npc(self, direction: str):
         """
         Colliding with Npcs
@@ -149,7 +166,7 @@ class Player(pygame.sprite.Sprite):
         # Moving left and right
         if direction == "x":
             hits = pygame.sprite.spritecollide(self, self.game.npcs, False)
-            if hits:
+            if hits: 
 
                 # Moving right
                 if self.x_change > 0: 
@@ -274,14 +291,16 @@ class Npc(pygame.sprite.Sprite):
     Class for Npcs
     """
 
-    def __init__(self, game, x: int, y: int):
+    def __init__(self, game, x: int, y: int, type: str):
         """
         Initialization for NPCs
         """
 
+        self.type = type
         self.game = game
         self._layer = NPC_LAYER
-        self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
+        if self.type == "C": self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible, self.game.cleaner
+        else: self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x * TILE_SIZE
@@ -297,7 +316,9 @@ class Npc(pygame.sprite.Sprite):
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
 
-        self.color = r.choice([0, 99, 198, 297, 396, 495, 594, 693, 792])
+        colors = [0, 99, 198, 297, 396, 495, 594, 693, 792]
+        if self.type == "C": self.color = colors[-1]
+        else: self.color = r.choice(colors) 
 
         self.image = self.game.npcs_spritesheet.get_sprite(self.color, 2, self.width, self.height)
 
@@ -410,27 +431,34 @@ class Npc(pygame.sprite.Sprite):
         Colliding with Player
         """
 
-        # Moving left and right
-        if direction == "x":
+        # Cleaner
+        if self.type == "C": 
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits:
-                
-                # Moving right
-                if self.x_change > 0: self.rect.x = hits[0].rect.left - self.rect.width
+            if hits: self.game.shoes_on()
 
-                # Moving left
-                if self.x_change < 0: self.rect.x = hits[0].rect.right
-        
-        # Moving down and up
-        elif direction == "y":
-            hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits:
-                
-                # Moving down
-                if self.y_change > 0: self.rect.y = hits[0].rect.top - self.rect.height
+        else:
 
-                # Moving up
-                if self.y_change < 0: self.rect.y = hits[0].rect.bottom
+            # Moving left and right
+            if direction == "x":
+                hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+                if hits: 
+                        
+                    # Moving right
+                    if self.x_change > 0: self.rect.x = hits[0].rect.left - self.rect.width
+
+                    # Moving left
+                    if self.x_change < 0: self.rect.x = hits[0].rect.right
+                
+            # Moving down and up
+            elif direction == "y":
+                hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+                if hits:
+                    
+                    # Moving down
+                    if self.y_change > 0: self.rect.y = hits[0].rect.top - self.rect.height
+
+                    # Moving up
+                    if self.y_change < 0: self.rect.y = hits[0].rect.bottom
 
     def animate(self):
         """

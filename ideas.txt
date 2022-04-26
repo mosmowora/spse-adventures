@@ -10,10 +10,16 @@ vujcik jumpscare
 storyline ideas:
     pov you wake up in šatňa
     goal: get out of school 
-    you win watching eastern shows in the other building
+    epilogue: you win watching eastern shows in the other building
     
 quests:
     find suplovanie
+    don't get caught not wearing shoes
+    bench press record (spamming)
+    english practice with Mrs. GAJ (working with lists of words) 10 words
+    clicking items on ping-pong table (Tomas must publish a real photo of it)
+    LROB (where we have PRO) find an easy bug and fix it
+    CISCO classroom (where we have SIE) ask KUL if you can go home earlier
 
 gameplay ideas:
     player can go up the level's doors according to his pass level he has (level 1, level 2, level 3 and level 4)

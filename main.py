@@ -44,10 +44,10 @@ class Game:
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, basement] # Rooms where player can go
-        self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
+        self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
 
         # Inventory
-        self.inv: List[str] = ["changing_room key"]
+        self.inv: List[str] = []
 
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
@@ -104,7 +104,8 @@ class Game:
                 elif column == "ř": self.interactive[Block(self, j, i, "ř")] = "ř" + str(i) + str(j) # Rails ground_floor
                 elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
                 elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
-                elif column == "N": self.npc.append(Npc(self, j, i)) # NPC
+                elif column == "N": self.npc.append(Npc(self, j, i, "")) # NPC
+                elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
     def new(self):
         """
@@ -121,6 +122,7 @@ class Game:
         self.npcs = pygame.sprite.LayeredUpdates()
         self.interacts = pygame.sprite.LayeredUpdates()
         self.interactible = pygame.sprite.LayeredUpdates()
+        self.cleaner = pygame.sprite.LayeredUpdates()
 
         # Tilemap
         self.create_tile_map()
@@ -871,6 +873,13 @@ class Game:
         # Cabinet -> Hall
         elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall"); self.center_player_after_doors()
         
+    def shoes_on(self):
+        """
+        Checks if player has shoes on
+        """
+
+        if not self.locker_stuff['boots']: self.game_over()
+               
     def locker(self):
         """
         Unlocking the locker
@@ -1196,6 +1205,7 @@ class Game:
 g = Game()
 g.intro_screen().new()
 
-while g.game_running: g.main().game_over()
+while g.game_running: 
+    g.main().game_over()
 
 pygame.quit()
