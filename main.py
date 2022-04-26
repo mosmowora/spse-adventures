@@ -2,6 +2,13 @@
 import pygame
 from sprites import *; from config import *
 
+GROUND_FLOOR = 0
+FIRST_FLOOR = 1
+SECOND_FLOOR = 2
+THIRD_FLOOR = 3
+FOURTH_FLOOR = 4
+BASEMENT_FLOOR = -1
+
 class Game:
     """
     Main class for game
@@ -13,7 +20,7 @@ class Game:
         """
 
         # Pygame initialization
-        pygame.init() 
+        pygame.init()
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -36,7 +43,7 @@ class Game:
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
-        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, basement] # Rooms where player can go
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[0] # Room where player is rn (starting point)
 
         # Inventory
@@ -683,7 +690,6 @@ class Game:
         # 130 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors()
         
-        self.font.render("First floor", True, WHITE)
                
     def second_floor_doors(self): 
         """
@@ -804,8 +810,41 @@ class Game:
         # 220 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall")
         
-        self.font.render("Second floor", True, WHITE)
-   
+        
+    def third_floor_doors(self):
+        # Hall -> GYM changing rooms
+        if self.player.facing in ("up", "left") and self.interacted[2] == 102 and self.interacted[1] == 8: self.door_info("GYM - changing rooms"); self.center_player_after_doors()
+        
+        # GYM changing rooms -> Hall
+        elif self.player.facing in ("down", "right") and self.interacted[2] == 102 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
+        
+        # GYM changing rooms -> GYM
+        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] == 4: self.door_info("302 - GYM"); self.center_player_after_doors()
+
+        # GYM -> GYM changing rooms
+        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] == 4: self.door_info("GYM - changing rooms"); self.center_player_after_doors()
+        
+        # Hall -> Pain room (for most ppl)
+        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] in (11, 12): self.door_info("gym"); self.center_player_after_doors()
+        
+        # Hall -> Pain room (for most ppl)
+        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] in (11, 12): self.door_info("Hall"); self.center_player_after_doors()
+        
+        # Hall -> Pain room (for most ppl) changing room
+        elif self.player.facing == "down" and self.interacted[2] == 106 and self.interacted[1] == 18: self.door_info("Changing rooms"); self.center_player_after_doors()
+        
+        # Pain room (for most ppl) changing room -> Hall
+        elif self.player.facing == "up" and self.interacted[2] == 106 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
+        
+        # changing room -> Pain room (for most ppl) 
+        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] == 23: self.door_info("gym"); self.center_player_after_doors()
+        
+        # Pain room (for most ppl) -> changing room
+        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] == 23: self.door_info("Changing rooms"); self.center_player_after_doors()
+        
+        
+        
+        
     def locker(self):
         """
         Unlocking the locker
@@ -944,6 +983,9 @@ class Game:
         # Second floor
         elif self.in_room == second_floor: self.second_floor_doors()  
         
+        # Third floor
+        elif self.in_room == third_floor: self.third_floor_doors()
+        
         
     def basement(self):
         """
@@ -957,7 +999,7 @@ class Game:
             if self.interacted[1] == 17 and self.interacted[2] in (192, 193):
                 self.talking("I got light with me.")
                 self.talking("I'll be able to see now.")
-                self.in_room = self.rooms[-1] # Basement
+                self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
                 for sprite in self.all_sprites: sprite.rect.x -= 15 * TILE_SIZE
 
@@ -965,7 +1007,7 @@ class Game:
             elif self.interacted[1] in (26, 27) and self.interacted[2] == 116:
                 self.talking("I got light with me.")
                 self.talking("I'll be able to see now.")
-                self.in_room = self.rooms[-1] # Basement
+                self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
                 for sprite in self.all_sprites: sprite.rect.x += 8 * TILE_SIZE
                 self.player.rect.x -= 24 * TILE_SIZE
@@ -988,7 +1030,7 @@ class Game:
 
             # From right
             if self.interacted[1] in (6, 7) and self.interacted[2] == 26:
-                self.in_room = self.rooms[0] # Ground floor
+                self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
                 self.create_tile_map()
                 for sprite in self.all_sprites: 
                     sprite.rect.x -= 182 * TILE_SIZE
@@ -998,7 +1040,7 @@ class Game:
 
             # From left
             if self.interacted[1] in (6, 7) and self.interacted[2] == 0:
-                self.in_room = self.rooms[0] # Ground floor
+                self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
                 self.create_tile_map()
                 for sprite in self.all_sprites: 
                     sprite.rect.x -= 106 * TILE_SIZE
@@ -1008,7 +1050,7 @@ class Game:
 
         # Ground floor -> 1st floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == ground_floor:
-            self.in_room = self.rooms[1] # First floor
+            self.in_room = self.rooms[FIRST_FLOOR] # First floor
             self.create_tile_map()
 
             # Right stairs
@@ -1029,7 +1071,7 @@ class Game:
                 
         # 1st floor -> Ground floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == first_floor:
-            self.in_room = self.rooms[0] # Ground floor
+            self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
             self.create_tile_map()
 
             # Right stairs
@@ -1052,7 +1094,7 @@ class Game:
         
         # First floor -> Second floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
-            self.in_room = self.rooms[2]
+            self.in_room = self.rooms[SECOND_FLOOR] # Second floor
             self.create_tile_map()
             
             # Right stairs
@@ -1073,7 +1115,7 @@ class Game:
                 
         # Second floor -> First floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
-            self.in_room = self.rooms[1] # First floor
+            self.in_room = self.rooms[FIRST_FLOOR] # First floor
             self.create_tile_map()
 
             # Right stairs
@@ -1092,7 +1134,29 @@ class Game:
                 self.player.rect.y += 2 * TILE_SIZE
                 
             self.door_info("First floor")
+        
+        elif self.interacted[0] == "Stairs_up" and self.in_room == second_floor:
+            self.in_room = self.rooms[THIRD_FLOOR]
+            self.create_tile_map()
+            
+            if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 101 * TILE_SIZE
+                    sprite.rect.y -= 3 * TILE_SIZE
 
+            self.door_info("Third floor")
+            
+        elif self.interacted[0] == "Stairs_down" and self.in_room == third_floor:
+            self.in_room = self.rooms[SECOND_FLOOR]
+            self.create_tile_map()
+            
+            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 111:
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 171 * TILE_SIZE
+                    sprite.rect.y -= 16 * TILE_SIZE
+                    
+            self.door_info("Second floor")
+                
     def toilet(self):
         """
         PeePeePooPoo time
