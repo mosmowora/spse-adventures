@@ -50,7 +50,7 @@ class Game:
         self.inv: List[str] = ["changing_room key"]
 
         # Objects you can interact with
-        self.interacted: List[str] = ["", "", "", "", ""]
+        self.interacted: List[str, int] = ["", "", "", "", ""]
         self.interactive= {}
 
         # Player name
@@ -91,6 +91,7 @@ class Game:
                 elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
                 elif column == "z": self.interactive[Block(self, j, i, "z")] = "z" + str(i) + str(j) # Stairs down
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
+                elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
                 elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
@@ -812,38 +813,63 @@ class Game:
         
         
     def third_floor_doors(self):
-        # Hall -> GYM changing rooms
-        if self.player.facing in ("up", "left") and self.interacted[2] == 102 and self.interacted[1] == 8: self.door_info("GYM - changing rooms"); self.center_player_after_doors()
-        
-        # GYM changing rooms -> Hall
-        elif self.player.facing in ("down", "right") and self.interacted[2] == 102 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
-        
-        # GYM changing rooms -> GYM
-        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] == 4: self.door_info("302 - GYM"); self.center_player_after_doors()
+        """
+        Doors on the third floor
+        """
 
-        # GYM -> GYM changing rooms
-        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] == 4: self.door_info("GYM - changing rooms"); self.center_player_after_doors()
+        # Hall -> Gym changing rooms
+        if self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
         
-        # Hall -> Pain room (for most ppl)
-        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] in (11, 12): self.door_info("gym"); self.center_player_after_doors()
+        # Gym changing rooms -> Hall
+        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
+
+        # Gym changing rooms -> Toielet
+        elif self.player.facing == "left" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Toilets"); self.center_player_after_doors()
+
+        # Toilet -> Gym changing rooms
+        elif self.player.facing == "right" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
         
-        # Hall -> Pain room (for most ppl)
-        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] in (11, 12): self.door_info("Hall"); self.center_player_after_doors()
+        # Gym changing rooms -> Gym
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("302 - Gym"); self.center_player_after_doors()
+
+        # Gym -> Gym changing rooms
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
+
+        # Gym -> Gymnasium
+        elif self.player.facing == "down" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("304 - Gymnasium"); self.center_player_after_doors()
+
+        # Gymnasium -> Gym
+        elif self.player.facing == "up" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("302 - Gym"); self.center_player_after_doors()
         
-        # Hall -> Pain room (for most ppl) changing room
-        elif self.player.facing == "down" and self.interacted[2] == 106 and self.interacted[1] == 18: self.door_info("Changing rooms"); self.center_player_after_doors()
+        # Hall -> 304
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("304 - Gymnasium"); self.center_player_after_doors()
         
-        # Pain room (for most ppl) changing room -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 106 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
+        # 304 -> Hall
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("Hall"); self.center_player_after_doors()
         
-        # changing room -> Pain room (for most ppl) 
-        elif self.player.facing == "left" and self.interacted[2] == 93 and self.interacted[1] == 23: self.door_info("gym"); self.center_player_after_doors()
+        # Hall -> Gymnasium changing room
+        elif self.player.facing == "down" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Gymnasium - Changing rooms"); self.center_player_after_doors()
         
-        # Pain room (for most ppl) -> changing room
-        elif self.player.facing == "right" and self.interacted[2] == 93 and self.interacted[1] == 23: self.door_info("Changing rooms"); self.center_player_after_doors()
+        # Gymnasium changing room -> Hall
+        elif self.player.facing == "up" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
         
+        # Gymnasium changing room -> Gymnasium
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("304 - Gymnasium"); self.center_player_after_doors()
         
+        # Gymnasium -> Gymnasium changing room
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing rooms"); self.center_player_after_doors()
+
+        # Gymnasium changing room -> Showers
+        elif self.player.facing == "left" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Showers"); self.center_player_after_doors()
+
+        # Showers -> Gymnasium changing room
+        elif self.player.facing == "right" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing room"); self.center_player_after_doors()
+
+        # Hall -> Cabinet
+        elif self.player.facing == "right" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Cabinet"); self.center_player_after_doors()
         
+        # Cabinet -> Hall
+        elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall"); self.center_player_after_doors()
         
     def locker(self):
         """
@@ -1057,7 +1083,7 @@ class Game:
             if self.interacted[1] in (16, 17, 18, 19) and self.interacted[2] == 183:
                 for sprite in self.all_sprites: 
                     sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 14 * TILE_SIZE
+                    sprite.rect.y -= 17 * TILE_SIZE
             
             # Left stairs
             elif self.interacted[1] == 13 and self.interacted[2] in (45, 46, 47, 48, 49, 50, 51):
@@ -1101,7 +1127,7 @@ class Game:
             if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 16 * TILE_SIZE
+                    sprite.rect.y -= 18 * TILE_SIZE
             
             # Left stairs
             elif self.interacted[2] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[1] == 24:
@@ -1135,25 +1161,28 @@ class Game:
                 
             self.door_info("First floor")
         
+        # Second floor -> Third floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == second_floor:
             self.in_room = self.rooms[THIRD_FLOOR]
             self.create_tile_map()
             
             if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
                 for sprite in self.all_sprites:
-                    sprite.rect.x -= 101 * TILE_SIZE
-                    sprite.rect.y -= 3 * TILE_SIZE
+                    sprite.rect.x -= 62 * TILE_SIZE
+                    sprite.rect.y -= 4 * TILE_SIZE
 
             self.door_info("Third floor")
             
+        # Third floor -> Second floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == third_floor:
             self.in_room = self.rooms[SECOND_FLOOR]
             self.create_tile_map()
             
-            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 111:
+            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 16 * TILE_SIZE
+                    sprite.rect.y -= 20 * TILE_SIZE
+                self.player.rect.y += 4 * TILE_SIZE
                     
             self.door_info("Second floor")
                 

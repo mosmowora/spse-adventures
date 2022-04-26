@@ -96,13 +96,16 @@ class Player(pygame.sprite.Sprite):
         if not self.player_sitting: self.movement()
         self.animate()
 
-        # Collision
+        # Movement
         self.rect.x += self.x_change
-        self.collide_blocks("x")
-        self.collide_npc("x")
         self.rect.y += self.y_change
-        self.collide_blocks("y")
-        self.collide_npc("y")
+
+        # Collision
+        if not self.player_sitting: 
+            self.collide_blocks("x")
+            self.collide_npc("x")
+            self.collide_blocks("y")
+            self.collide_npc("y")
         
         # Sitting
         if self.player_sitting:
@@ -197,7 +200,7 @@ class Player(pygame.sprite.Sprite):
         elif direction == "y":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
-                
+
                 # Moving down
                 if self.y_change > 0:
                     for sprite in self.game.all_sprites: sprite.rect.y += PLAYER_SPEED
@@ -260,18 +263,10 @@ class Player(pygame.sprite.Sprite):
             self.x_change = x
         elif not sit: 
             self.x_change = self.y_change = 0
-            if self.facing == "up": 
-                for sprite in self.game.all_sprites: sprite.rect.y += PLAYER_SPEED
-                self.y_change += TILE_SIZE
-            elif self.facing == "down": 
-                for sprite in self.game.all_sprites: sprite.rect.y -= PLAYER_SPEED
-                self.y_change -= TILE_SIZE
-            elif self.facing == "left": 
-                for sprite in self.game.all_sprites: sprite.rect.x += PLAYER_SPEED
-                self.x_change += TILE_SIZE
-            elif self.facing == "right": 
-                for sprite in self.game.all_sprites: sprite.rect.x -= PLAYER_SPEED
-                self.x_change -= TILE_SIZE
+            if self.facing == "up": self.rect.y = y + TILE_SIZE
+            elif self.facing == "down": self.rect.y = y - TILE_SIZE
+            elif self.facing == "left": self.rect.x = x + TILE_SIZE
+            elif self.facing == "right": self.rect.x = x - TILE_SIZE
             self.player_sitting = False
 
 class Npc(pygame.sprite.Sprite):
@@ -489,7 +484,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -515,6 +510,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "z": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
         elif type == "w": self.image = self.game.terrain_spritesheet.get_sprite(70, 36, self.width, self.height)
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
+        elif type == "G": self.image = self.game.terrain_spritesheet.get_sprite(172, 104, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
         elif type == "T": self.image = self.game.terrain_spritesheet.get_sprite(2, 104, self.width, self.height)
@@ -645,7 +641,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] == "D" + str(i) + str(j): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
+                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
 
                     # Locker
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
