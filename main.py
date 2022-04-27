@@ -48,7 +48,7 @@ class Game:
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
 
         # Inventory
-        self.inv: List[str] = ["changing_room key"]
+        self.inv: List[str] = []
 
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
@@ -380,7 +380,7 @@ class Game:
         
         opened = True
         slider_back = Button(470, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
-        slider = Button(520, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.music_on else Button(470, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
+        slider = Button(520, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0) if self.music_on else Button(470, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
         slider_inside = Button(532.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.music_on else Button(482.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
         back_out = Button(WIN_WIDTH - 220, 20, 200, 50, fg=WHITE, bg=GRAY, content="Back", fontsize=32)
         do_something = self.font.render("Sound", True, WHITE)
@@ -403,18 +403,22 @@ class Game:
             if back_out.is_pressed(mouse_pos, mouse_pressed): opened = False
             
             if slider.is_pressed(mouse_pos, mouse_pressed) and self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.music_on:
-                for _ in range(25):
-                    slider.rect.x -= 2
-                    slider_inside.rect.x -= 2
+                for _ in range(15):
+                    slider.rect.x -= 50 / 18
+                    slider_inside.rect.x -= 50 / 17
                     self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
-                self.music_on = False
+                self.music_on = not self.music_on
+                slider_inside.rect.x -= 3
+                slider = Button(470, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
                 
             elif slider.is_pressed(mouse_pos, mouse_pressed) and not self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and not self.music_on:
-                for _ in range(25):
-                    slider.rect.x += 2
-                    slider_inside.rect.x += 2
+                for _ in range(15):
+                    slider.rect.x += 50 / 15
+                    slider_inside.rect.x += 50 / 15
                     self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
-                self.music_on = True
+                self.music_on = not self.music_on
+                slider_inside.rect.x += 3
+                slider = Button(520, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0)
                     
             # Diplaying background, title, buttons
             self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
@@ -445,7 +449,7 @@ class Game:
         Displays info about the room the character is entering/exiting
         """
 
-        for _ in range(35):
+        for _ in range(45):
             text = self.font.render(msg_content, True, WHITE)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
