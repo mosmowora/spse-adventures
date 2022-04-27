@@ -54,7 +54,7 @@ class Game:
         self.interacted: List[str, int] = ["", "", "", "", ""]
         self.interactive= {}
         self.without_light = 0
-        self.turned_on = True
+        self.music_on = True
 
         # Player name
         self.player_name: str = ""
@@ -373,7 +373,6 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.flip()
     
-
     def settings(self):
         """
         Opens settings window
@@ -381,13 +380,13 @@ class Game:
         
         opened = True
         slider_back = Button(470, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
-        slider = Button(520, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.turned_on else Button(470, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
-        slider_inside = Button(533.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.turned_on else Button(480.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
-        back_out = Button(20, 20, 200, 50, fg=WHITE, bg=NEARLY_BLACK, content="Back", fontsize=32)
-        do_something = self.font.render("Nothing yet", True, WHITE)
-        do_something_rect = do_something.get_rect(x=460, y=100)
+        slider = Button(520, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.music_on else Button(470, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
+        slider_inside = Button(532.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.music_on else Button(482.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
+        back_out = Button(WIN_WIDTH - 220, 20, 200, 50, fg=WHITE, bg=GRAY, content="Back", fontsize=32)
+        do_something = self.font.render("Sound", True, WHITE)
+        do_something_rect = do_something.get_rect(x=490, y=100)
         title = self.settings_font.render("Settings", True, WHITE)
-        title_rect = title.get_rect(x=250, y=10)
+        title_rect = title.get_rect(x=10, y=10)
         
         while opened:
             
@@ -403,26 +402,37 @@ class Game:
             
             if back_out.is_pressed(mouse_pos, mouse_pressed): opened = False
             
-            if slider.is_pressed(mouse_pos, mouse_pressed) and self.turned_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.turned_on:
-                slider.rect.x -= 50
-                slider_inside.rect.x -= 53
-                self.turned_on = False
+            if slider.is_pressed(mouse_pos, mouse_pressed) and self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.music_on:
+                for _ in range(25):
+                    slider.rect.x -= 2
+                    slider_inside.rect.x -= 2
+                    self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+                self.music_on = False
                 
-            elif slider.is_pressed(mouse_pos, mouse_pressed) and not self.turned_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and not self.turned_on:
-                slider.rect.x += 50
-                slider_inside.rect.x += 53
-                self.turned_on = True
+            elif slider.is_pressed(mouse_pos, mouse_pressed) and not self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and not self.music_on:
+                for _ in range(25):
+                    slider.rect.x += 2
+                    slider_inside.rect.x += 2
+                    self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+                self.music_on = True
                     
             # Diplaying background, title, buttons
-            self.screen.blit(self.settings_background, (0, 0))
-            self.screen.blit(title, title_rect)
-            self.screen.blit(do_something, do_something_rect)
-            self.screen.blit(slider_back.image, slider_back.rect)
-            self.screen.blit(slider.image, slider.rect)
-            self.screen.blit(slider_inside.image, slider_inside.rect)
-            self.screen.blit(back_out.image, back_out.rect)
-            self.clock.tick(FPS)
-            pygame.display.update()
+            self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+
+    def _settings_animation(self, title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out):
+        """
+        Animation for settings sliders
+        """
+
+        self.screen.blit(self.settings_background, (0, 0))
+        self.screen.blit(title, title_rect)
+        self.screen.blit(do_something, do_something_rect)
+        self.screen.blit(slider_back.image, slider_back.rect)
+        self.screen.blit(slider.image, slider.rect)
+        self.screen.blit(slider_inside.image, slider_inside.rect)
+        self.screen.blit(back_out.image, back_out.rect)
+        self.clock.tick(FPS)
+        pygame.display.update()
 
     def leaderboard(self):
         """
