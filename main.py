@@ -54,6 +54,7 @@ class Game:
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
         self.interactive= {}
+        self.turned_on = True
 
         # Player name
         self.player_name: str = ""
@@ -276,7 +277,7 @@ class Game:
             if play_button.is_pressed(mouse_pos, mouse_pressed): self.start(); break
 
             # Settings button was pressed
-            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings(); break
+            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
             
             # Leadboard button was pressed
             if leaderboard_button.is_pressed(mouse_pos, mouse_pressed): self.leaderboard()
@@ -374,10 +375,9 @@ class Game:
         """
         
         opened = True
-        turned_on = True
         slider_back = Button(70, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
-        slider = Button(120, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
-        slider_inside = Button(133.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
+        slider = Button(120, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.turned_on else Button(70, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
+        slider_inside = Button(133.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.turned_on else Button(80.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
         back_out = Button(20, 20, 200, 50, fg=WHITE, bg=NEARLY_BLACK, content="Back", fontsize=32)
         do_something = self.font.render("Nothing yet", True, WHITE)
         do_something_rect = do_something.get_rect(x=60, y=100)
@@ -398,20 +398,17 @@ class Game:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
             
-            if back_out.is_pressed(mouse_pos, mouse_pressed):
-                opened = False
-                self.intro_screen()
-                break
+            if back_out.is_pressed(mouse_pos, mouse_pressed): opened = False
             
-            if slider.is_pressed(mouse_pos, mouse_pressed) and turned_on:
+            if slider.is_pressed(mouse_pos, mouse_pressed) and self.turned_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.turned_on:
                 slider.rect.x -= 50
                 slider_inside.rect.x -= 53
-                turned_on = not turned_on
+                self.turned_on = False
                 
-            elif slider.is_pressed(mouse_pos, mouse_pressed) and not turned_on:
+            elif slider.is_pressed(mouse_pos, mouse_pressed) and not self.turned_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and not self.turned_on:
                 slider.rect.x += 50
                 slider_inside.rect.x += 53
-                turned_on = not turned_on
+                self.turned_on = True
                                 
             # Diplaying background, title, buttons
             self.screen.blit(self.settings_background, (0, 0))

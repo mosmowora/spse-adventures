@@ -12,7 +12,7 @@
 
 ## **What's SPŠE ADVENTURES?**
 <hr style="background-color: lightgreen; border-radius: 3px">
-
+=
 - ~~**100%**~~ **99.7%** Replica of the real <a class="b">***SPŠE***</a> in Prešov
 
 - Exciting <a class="y">***storylines***</a> and quests
