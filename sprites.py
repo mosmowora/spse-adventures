@@ -689,7 +689,7 @@ class Button:
     Class for button
     """
 
-    def __init__(self, x: int, y: int, width: int, height: int, fg: tuple, bg: tuple, content: str, fontsize: int):
+    def __init__(self, x: int, y: int, width: int, height: int, /,  fg: tuple, bg: tuple, content: str, fontsize: int):
         """
         Initialization
         """

@@ -27,6 +27,7 @@ NEARLY_BLACK: tuple =   (  1,   1,   1)
 RED: tuple =            (255,   0,   0)
 BLUE: tuple =           (  0,   0, 255)
 GRAY: tuple =           ( 64,  64,  64)
+DIM_GRAY: tuple =       (105, 105, 105)
 
 basement: List[str]  = [
     "???????????????????????????",

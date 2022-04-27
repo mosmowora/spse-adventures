@@ -28,6 +28,7 @@ class Game:
         self.game_running = True
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
         self.font = pygame.font.Font("Roboto.ttf", 22)
+        self.settings_font = pygame.font.Font("Caveat.ttf", 45)
 
         # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -36,6 +37,7 @@ class Game:
 
         # Into and Game Over backgrounds
         self.intro_background = pygame.image.load("img/intro_background.png")
+        self.settings_background = pygame.image.load("img/settings_bg.jpg")
         self.game_over_background = pygame.image.load("img/game_over_background.png")
         
         # Window icon and title (not final)
@@ -249,13 +251,13 @@ class Game:
         made_rect = made.get_rect(x=490, y=450)
 
         # Start button
-        play_button = Button(10, 60, 180, 50, WHITE, BLACK, "Play", 32)
+        play_button = Button(10, 60, 180, 50, fg=WHITE, bg=BLACK, content="Play", fontsize=32)
 
         # Settings button
-        settings_button = Button(10, 120, 180, 50, WHITE, BLACK, "Settings", 32)
+        settings_button = Button(10, 120, 180, 50, fg=WHITE, bg=BLACK, content="Settings", fontsize=32)
 
         # Leaderboard button
-        leaderboard_button = Button(10, 180, 180, 50, WHITE, BLACK, "Leaderboard", 32)
+        leaderboard_button = Button(10, 180, 180, 50, fg=WHITE, bg=BLACK, content="Leaderboard", fontsize=32)
 
         # Main loop for intro
         while intro:
@@ -264,7 +266,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: intro = self.game_running = False
+                if event.type == pygame.QUIT: intro = self.game_running = False; quit()
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -274,7 +276,7 @@ class Game:
             if play_button.is_pressed(mouse_pos, mouse_pressed): self.start(); break
 
             # Settings button was pressed
-            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
+            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings(); break
             
             # Leadboard button was pressed
             if leaderboard_button.is_pressed(mouse_pos, mouse_pressed): self.leaderboard()
@@ -320,8 +322,7 @@ class Game:
             for event in pygame.event.get():
       
                 # Quit
-                if event.type == pygame.QUIT:
-                    pygame.quit()
+                if event.type == pygame.QUIT: quit()
         
                 # Click
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -371,7 +372,54 @@ class Game:
         """
         Opens settings window
         """
-        print("If we had one")
+        
+        opened = True
+        turned_on = True
+        slider_back = Button(70, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
+        slider = Button(120, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
+        slider_inside = Button(133.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
+        back_out = Button(20, 20, 200, 50, fg=WHITE, bg=NEARLY_BLACK, content="Back", fontsize=32)
+        do_something = self.font.render("Nothing yet", True, WHITE)
+        do_something_rect = do_something.get_rect(x=60, y=100)
+        title = self.settings_font.render("Settings", True, WHITE)
+        title_rect = title.get_rect(x=250, y=10)
+        
+        while opened:
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: 
+                    opened = self.game_running = False
+                    quit()
+                
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            if back_out.is_pressed(mouse_pos, mouse_pressed): self.intro_screen()
+            
+            if slider.is_pressed(mouse_pos, mouse_pressed) and turned_on:
+                slider.rect.x -= 50
+                slider_inside.rect.x -= 53
+                turned_on = not turned_on
+                
+            elif slider.is_pressed(mouse_pos, mouse_pressed) and not turned_on:
+                slider.rect.x += 50
+                slider_inside.rect.x += 53
+                turned_on = not turned_on
+                                
+            # Diplaying background, title, buttons
+            self.screen.blit(self.settings_background, (0, 0))
+            self.screen.blit(title, title_rect)
+            self.screen.blit(do_something, do_something_rect)
+            self.screen.blit(slider_back.image, slider_back.rect)
+            self.screen.blit(slider.image, slider.rect)
+            self.screen.blit(slider_inside.image, slider_inside.rect)
+            self.screen.blit(back_out.image, back_out.rect)
+            self.clock.tick(20)
+            pygame.display.update()
 
     def leaderboard(self):
         """
@@ -942,7 +990,7 @@ class Game:
         key_rect = key.get_rect(x=185, y=155)
 
         # Button
-        back_button = Button(500, 400, 120, 50, WHITE, BLACK, "Back", 32)
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
         
         while looking:
     
