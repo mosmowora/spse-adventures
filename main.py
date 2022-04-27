@@ -38,7 +38,6 @@ class Game:
         # Into and Game Over backgrounds
         self.intro_background = pygame.image.load("img/intro_background.png")
         self.settings_background = pygame.image.load("img/settings_bg.jpg")
-        self.game_over_background = pygame.image.load("img/game_over_background.png")
         
         # Window icon and title (not final)
         icon = pygame.image.load('img/spselogo.png')
@@ -49,11 +48,12 @@ class Game:
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
 
         # Inventory
-        self.inv: List[str] = []
+        self.inv: List[str] = ["changing_room key"]
 
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
         self.interactive= {}
+        self.without_light = 0
         self.turned_on = True
 
         # Player name
@@ -142,9 +142,9 @@ class Game:
             self.events()
             self.update()
             self.draw()
-        
-        return self
 
+        return self
+    
     def events(self):
         """
         Events for the game loop
@@ -154,7 +154,7 @@ class Game:
         for event in pygame.event.get():
 
             # Close button
-            if event.type == pygame.QUIT: self.playing = self.game_running = False
+            if event.type == pygame.QUIT: quit()
 
             # Pressed E
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
@@ -180,7 +180,6 @@ class Game:
                 # Reset
                 self.interacted = ["", "", ""]
 
-
     def update(self):
         """
         Updates for the game loop
@@ -199,17 +198,20 @@ class Game:
         self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
 
-    def game_over(self):
+    def game_over(self, img):
         """
         Game over screen
         """
+
+        self.game_over_background = pygame.image.load(img)
 
         # Creates text
         text = self.big_font.render("Game Over", True, BLACK)
         text_rect = text.get_rect(center = (75, 50))
 
         # Creates button
-        restart_button = Button(10, WIN_HEIGHT - 60, 120, 50, WHITE, BLACK, "Restart", 32)
+        restart_button = Button(10, WIN_HEIGHT - 60, 130, 50, WHITE, BLACK, "Restart", 32)
+        iamdone_button = Button(10, WIN_HEIGHT - 120, 130, 50, WHITE, BLACK, "I'm done", 32)
 
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -219,7 +221,7 @@ class Game:
 
             # Close button
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: self.game_running = False
+                if event.type == pygame.QUIT: quit()
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -229,10 +231,13 @@ class Game:
                 self.new()
                 self.main()
 
+            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): quit()
+            
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
             self.screen.blit(text, text_rect)
             self.screen.blit(restart_button.image, restart_button.rect)
+            self.screen.blit(iamdone_button.image, iamdone_button.rect)
             self.clock.tick(FPS // 2)
             pygame.display.update()
 
@@ -267,7 +272,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: intro = self.game_running = False; quit()
+                if event.type == pygame.QUIT: quit()
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -375,12 +380,12 @@ class Game:
         """
         
         opened = True
-        slider_back = Button(70, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
-        slider = Button(120, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.turned_on else Button(70, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
-        slider_inside = Button(133.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.turned_on else Button(80.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
+        slider_back = Button(470, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
+        slider = Button(520, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0) if self.turned_on else Button(470, 140, 50, 50, fg=BLACK, bg=WHITE, content="", fontsize=0)
+        slider_inside = Button(533.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.turned_on else Button(480.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
         back_out = Button(20, 20, 200, 50, fg=WHITE, bg=NEARLY_BLACK, content="Back", fontsize=32)
         do_something = self.font.render("Nothing yet", True, WHITE)
-        do_something_rect = do_something.get_rect(x=60, y=100)
+        do_something_rect = do_something.get_rect(x=460, y=100)
         title = self.settings_font.render("Settings", True, WHITE)
         title_rect = title.get_rect(x=250, y=10)
         
@@ -390,9 +395,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: 
-                    opened = self.game_running = False
-                    quit()
+                if event.type == pygame.QUIT: quit()
                 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -409,7 +412,7 @@ class Game:
                 slider.rect.x += 50
                 slider_inside.rect.x += 53
                 self.turned_on = True
-                                
+                    
             # Diplaying background, title, buttons
             self.screen.blit(self.settings_background, (0, 0))
             self.screen.blit(title, title_rect)
@@ -418,7 +421,7 @@ class Game:
             self.screen.blit(slider.image, slider.rect)
             self.screen.blit(slider_inside.image, slider_inside.rect)
             self.screen.blit(back_out.image, back_out.rect)
-            self.clock.tick(20)
+            self.clock.tick(FPS)
             pygame.display.update()
 
     def leaderboard(self):
@@ -740,8 +743,7 @@ class Game:
         
         # 130 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors()
-        
-               
+             
     def second_floor_doors(self): 
         """
         Doors on the second floor
@@ -861,7 +863,6 @@ class Game:
         # 220 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall")
         
-        
     def third_floor_doors(self):
         """
         Doors on the third floor
@@ -926,7 +927,7 @@ class Game:
         Checks if player has shoes on
         """
 
-        if not self.locker_stuff['boots']: self.game_over()
+        if not self.locker_stuff['boots']: self.game_over("img/caught.png")
                
     def locker(self):
         """
@@ -1012,7 +1013,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: looking = self.game_running = False
+                if event.type == pygame.QUIT: quit()
 
                 # Clicking
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1097,9 +1098,16 @@ class Game:
 
         # No light
         else:
-            self.talking("No way I am going down there without light.")
-            self.talking("I don't want to get lost in school.")
-            self.talking("I'll go there when I have some light with me.")
+
+            if self.without_light < 3:
+                self.talking("No way I am going down there without light.")
+                self.talking("I don't want to get lost in school.")
+                self.talking("I'll go there when I have some light with me.")
+                self.without_light += 1
+            else:
+                self.talking("Welp, you really want me to go down there?")
+                self.talking("Let's see.")
+                self.game_over("img/lost.png")
 
     def stairs(self):
         """
@@ -1253,7 +1261,6 @@ class Game:
 g = Game()
 g.intro_screen().new()
 
-while g.game_running: 
-    g.main().game_over()
+while g.game_running: g.main()
 
 pygame.quit()
