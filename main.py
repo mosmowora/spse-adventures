@@ -398,7 +398,10 @@ class Game:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
             
-            if back_out.is_pressed(mouse_pos, mouse_pressed): self.intro_screen()
+            if back_out.is_pressed(mouse_pos, mouse_pressed):
+                opened = False
+                self.intro_screen()
+                break
             
             if slider.is_pressed(mouse_pos, mouse_pressed) and turned_on:
                 slider.rect.x -= 50
