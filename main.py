@@ -223,13 +223,15 @@ class Game:
         return_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Return", fontsize=32)
         settings_button = Button(WIN_WIDTH // 2 + 5, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Settings", fontsize=32)
         sq_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 5, 310, 40, fg=WHITE, bg=BLACK, content="Save & Quit", fontsize=32)
-
+        exit_pause: bool = False
         while True:
 
             # Close button
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
 
+            if exit_pause: break
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -1106,7 +1108,7 @@ class Game:
         """
 
         if self.locker_stuff["crocs"] and self.caught <= 3: 
-            self.caught += 1
+            self.caught += 2
             self.game_over("img/caught.png")
         elif self.locker_stuff["crocs"] and self.caught > 3: self.game_over("img/you_never_learn.png")
                
