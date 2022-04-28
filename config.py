@@ -25,11 +25,21 @@ WHITE: tuple =          (255, 255, 255)
 BLACK: tuple =          (  0,   0,   0)
 NEARLY_BLACK: tuple =   (  1,   1,   1)
 RED: tuple =            (255,   0,   0)
-GREEN: tuple =           (  0,   255,   0)
+GREEN: tuple =          (  0, 255,   0)
 BLUE: tuple =           (  0,   0, 255)
 GRAY: tuple =           ( 64,  64,  64)
 DIM_GRAY: tuple =       (105, 105, 105)
+DARK_GRAY: tuple =      ( 32,  32,  32)
 
+# Floors
+GROUND_FLOOR = 0
+FIRST_FLOOR = 1
+SECOND_FLOOR = 2
+THIRD_FLOOR = 3
+FOURTH_FLOOR = 4
+BASEMENT_FLOOR = -1
+
+# Basement
 basement: List[str]  = [
     "???????????????????????????",
     "???????????????????????????",
@@ -45,8 +55,8 @@ basement: List[str]  = [
 # HeHeHeHa
 ground_floor: List[str] = [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWwwwWWW______________________",
-    "W.l..l..ll.W.ll..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W.l..l..l..l..l..l.l.W..l..l..l..l..l..l.Wl....llll....lW..l..l..l..l..l..l..l.W..l..l..l..l..l..l...WĽ..B..LW______________________",
     "W.l..l..l!!W.ll..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W.l..l..l..l..l..l.l.W..l..l..l..l..l..l.Wl....llll....lW..l..l..l..l..l..l..l.W..l..l..l..l..l..l...WĽ.....LW______________________",
+    "W.l..l..ll.W.ll..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W.l..l..l..l..l..l.l.W..l..l..l..l..l..l.Wl....llll....lW..l..l..l..l..l..l..l.W..l..l..l..l..l..l...WĽ..B..LW______________________",
     "W.l..l..l..W..l..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W....................W...................Wl....llll....lW......................W.....................WĽ..B..LW______________________",
     "W.l..l..l..W..l..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W....................W...................Wl....llll....lW......................W.....................WĽ..B..LW______________________",
     "W.l..l..l..W..l..l..l.Wl..llll..lWl..llll..lWZZZZZZZř!!!!!!!!!!W.l..l..l..l..l..l...W..l..l..l..l..l....Wl....llll....lW..l..l..l..l..l..l....W..l..l..l..l..l......WĽ..B..LW______________________",
@@ -57,7 +67,7 @@ ground_floor: List[str] = [
     "W.l..l..l..W..l..l..l.Wl........lWl........lWZZZZZZZř!!!!!!!!!!W.l..l..l..l..l..l...W..l..l..l..l..l....W..............W..l..l..l..l..l..l....W..l..l..l..l..l......WB..B..LW......................W",
     "W..........W..........W..........WĽ........LWZZZZZZZř!!!!!!!!!!W....................W...................WĽ.............W......................W.....................WB..B..LW......................W",
     "W..........W..........W..........WĽ.........WZZZZZZZř!!!!!!!!!!W....................W...................WĽ............LW......................W.....................W......LW......................W",
-    "W..........W..........W..........Wt.........WZZZZZZZř!!!!!!!!!!W...................tWt..................Wt............LW.....................tW....................tWt...NNLW......................W",
+    "W..........W..........W..........Wt.........WZZZZZZZř!!!!!!!!!!W...................tWt..................Wt............LW.....................tW....................tWt.....LW......................W",
     "WWWWWWWWWDWWWWWWWWWWDWWWDWWWWWWWWWWDWWWWWWWWW..................WWWWWWWWWWWWWWWWDWWWWWWWWDWWWWWWWWWWWWWWWWWWWWWWWWWDWWWWWWWWWWWWWWWWWWWWDWWWWWWWWWWWWWWWWWWWWWWWDWWWWWWWDWWWWW......................W",
     "W..........W............................................................................................................................................................................ŘŘŘŘŘŘŘŘ!..W",
     "Wjjj.......W............................................................................................................................................................................SSSSSSSS!..W",
@@ -65,12 +75,12 @@ ground_floor: List[str] = [
     "Wjjjjjjj...W............................................................................................................................................................................SSSSSSSS!bbW",
     "W..........W............................................................................................................................................................................SSSSSSSS!??W",
     "W..........WWWWWWWWDWWWWWDWWWWWWWDWWWWWWW...................................WWWWWWWWWWWWDWWWWWWWDWWWWWWWWW...............WWDWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWWWWWDWWWWWWDWWWWWWWWWDWWWWWWWWWWWWWWWWWWW",
-    "Wjjjjjjj...W!jjjjjj..tW.......tW....WTWTW...................................W.......W.......Wt...J.J.J.J.W...............W......Wt.....l.l.l.l.l.l...W......W......W.........W...............Ľ..C..W",
+    "Wjjjjjjj...W!jjjjjj..tW.......tW....WTWTW...................................W.......W.......Wt...U.U.U.U.W...............W......Wt.....l.l.l.l.l.l...W......W......W.........W...............Ľ..C..W",
     "W..........Wl.........W........W....W.W.W...................................W.......W.......W....J.J.J.J.W...............W......W......l.l.l.l.l.l...W......W......W.........W...............Ľ.....W",
     "W..........Wl.........W........W....W.W.W...................................W.......W.......W............W...............W......W....................W......W......W.........W...............!!!!..W",
     "Wjjjjjjj...Wl.......l.W........W....WDWDW...................................W.......W.......W............W....ľľľľľľľľľľľW......W....................W......W......W.........W..................l..W",
     "W..........Wl.......l.W........W........W...................................D.......W.......W............W....WWWWWWWWWWWW......W......l.l.l.l.l.l...W......W......W.........W..................l..W",
-    "W..........Wl.......l.W........W........W...................................W.......W.......W.l..J.J.J.J.W...........dd??W......W..l...l.l.l.l.l.l...W......W......W.........W...ll...ll...ll...l..W",
+    "W..........Wl.......l.W........W........W...................................W.......W.......W.l..U.U.U.U.W...........dd??W......W..l...l.l.l.l.l.l...W......W......W.........W...ll...ll...ll...l..W",
     "W..........W!jjjjjjj!.W........W........W...................................W.......W.......W.l..J.J.J.J.W...........dd??W......W..l...l.l.l.l.l.l...W......W......W.........W...ll...ll...ll...l..W",
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWwWWwWWwWWwWWwWWWWwWWwWWWwWWWwwWWwwWWwwWWwwWWWwwwWWWWwWWwWWWwWwWwWwWWWwwWwwWwwWwwWwwWwwWwWW"
 ]

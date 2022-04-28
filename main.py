@@ -2,13 +2,6 @@
 import pygame
 from sprites import *; from config import *
 
-GROUND_FLOOR = 0
-FIRST_FLOOR = 1
-SECOND_FLOOR = 2
-THIRD_FLOOR = 3
-FOURTH_FLOOR = 4
-BASEMENT_FLOOR = -1
-
 class Game:
     """
     Main class for game
@@ -46,26 +39,40 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
-
-        # Inventory
-        self.inv: List[str] = ["changing_room key"]
-
-        # Objects you can interact with
-        self.interacted: List[str, int] = ["", "", "", "", ""]
-        self.interactive= {}
-        self.without_light = 0
-        self.music_on = True
+        
+        # Settings
+        self.music_on: bool = True
+        self.talking_speed_number: int = 90
 
         # Player name
         self.player_name: str = ""
 
+        # Npc list
         self.npc = []
     
+        self.reseting_game_values()
+
+    def reseting_game_values(self):
+        """
+        When player wants to restart
+        """
+
+        # Objects you can interact with
+        self.interacted: List[str, int] = ["", "", "", "", ""]
+        self.interactive = {}
+
+        # Inventory
+        self.inv: List[str] = []
+
+        # Variables for endings
+        self.without_light: int = 0
+        self.caught: int = 0
+
         # Variables for finding items/doing stuff
-        self.key_in_trash = True
-        self.locked_locker = True
-        self.locked_changing_room = True
-        self.kokosky_in_locker = True
+        self.key_in_trash: bool = True
+        self.locked_locker: bool = True
+        self.locked_changing_room: bool = True
+        self.kokosky_in_locker: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -97,6 +104,7 @@ class Game:
                 elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk
+                elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
                 elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
                 elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Horizontal Desk
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
@@ -136,6 +144,8 @@ class Game:
         self.create_tile_map()
 
         for sprite in self.all_sprites: sprite.rect.x -= 158 * TILE_SIZE
+
+        return self
     
     def main(self):
         """
@@ -159,7 +169,7 @@ class Game:
         for event in pygame.event.get():
 
             # Close button
-            if event.type == pygame.QUIT: quit()
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
 
             # Pressed E
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
@@ -203,11 +213,68 @@ class Game:
         self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
 
+    def exiting(self):
+        """
+        After player presses Close button
+        """
+
+        # Buttons
+        bg = pygame.image.load("img/exiting.png")
+        return_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Return", fontsize=32)
+        settings_button = Button(WIN_WIDTH // 2 + 5, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Settings", fontsize=32)
+        sq_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 5, 310, 40, fg=WHITE, bg=BLACK, content="Save & Quit", fontsize=32)
+
+        while True:
+
+            # Close button
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: quit()
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Settings button was pressed
+            if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
+
+            # Return button was pressed
+            if return_button.is_pressed(mouse_pos, mouse_pressed): break
+
+            # Save % Quit button was pressed
+            if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game()
+
+            # BG
+            self.screen.blit(bg, (0, 0))
+
+            # Buttons
+            self.screen.blit(return_button.image, return_button.rect)
+            self.screen.blit(settings_button.image, settings_button.rect)
+            self.screen.blit(sq_button.image, sq_button.rect)
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
+    def save_game(self):
+        """
+        Saves game to file by player name
+        """
+
+        print("SAVED")
+        quit()
+
     def game_over(self, img):
         """
         Game over screen
         """
 
+        # Ending
+        endings = ["img/lost.png", "img/you_never_learn.png"]
+
+        # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
+        end = True if img in endings else False
+
+        # BG
         self.game_over_background = pygame.image.load(img)
 
         # Creates text
@@ -215,8 +282,8 @@ class Game:
         text_rect = text.get_rect(center = (75, 50))
 
         # Creates button
-        restart_button = Button(10, WIN_HEIGHT - 60, 130, 50, WHITE, BLACK, "Restart", 32)
-        iamdone_button = Button(10, WIN_HEIGHT - 120, 130, 50, WHITE, BLACK, "I'm done", 32)
+        restart_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Main menu", 32) if end else Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Try again", 32)
+        iamdone_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "I'm done", 32)
 
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -233,8 +300,13 @@ class Game:
             mouse_pressed = pygame.mouse.get_pressed()
 
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
-                self.new()
-                self.main()
+                if end: 
+                    self.reseting_game_values()
+                    self.intro_screen().new()
+                    self.main()
+                else: 
+                    self.new()
+                    self.main()
 
             elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): quit()
             
@@ -243,7 +315,7 @@ class Game:
             self.screen.blit(text, text_rect)
             self.screen.blit(restart_button.image, restart_button.rect)
             self.screen.blit(iamdone_button.image, iamdone_button.rect)
-            self.clock.tick(FPS // 2)
+            self.clock.tick(FPS)
             pygame.display.update()
 
     def intro_screen(self):
@@ -284,7 +356,8 @@ class Game:
             mouse_pressed = pygame.mouse.get_pressed()
 
             # Play button was pressed
-            if play_button.is_pressed(mouse_pos, mouse_pressed): self.start(); break
+            if play_button.is_pressed(mouse_pos, mouse_pressed): intro = self.start(intro)
+            if not intro: break
 
             # Settings button was pressed
             if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
@@ -304,14 +377,16 @@ class Game:
 
         return self
     
-    
-    def start(self):
+    def start(self, intro):
         """
         Starting the game
         """
 
         picking_name = True
         active = False
+
+        # Button
+        back = Button(10, WIN_HEIGHT - 60, 200, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
 
         # Title
         title = self.big_font.render("SPSE ADVENTURE", True, BLACK)
@@ -348,10 +423,16 @@ class Game:
                     
                     # Enter
                     elif event.key == pygame.K_RETURN: 
-                        if len(self.player_name) > 0: picking_name = False
+                        if len(self.player_name) > 0: picking_name = intro = False; break
 
                     # Unicode
                     elif active: self.player_name += event.unicode
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            if back.is_pressed(mouse_pos, mouse_pressed): picking_name = False
 
             # Background
             self.screen.blit(self.intro_background, (0, 0))
@@ -365,18 +446,23 @@ class Game:
             # Input rectangle
             pygame.draw.rect(self.screen, color, input_rect)
     
-            # Text
+            # Input Text
             text_surface = self.font.render(self.player_name, True, (255, 255, 255))
             self.screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
 
             # Width of rectangle
             input_rect.w = max(200, text_surface.get_width()+10)
 
-            # Other
+            # Button
+            self.screen.blit(back.image, back.rect)
+
+            # Text
             self.screen.blit(made, made_rect)
             self.screen.blit(title, title_rect)
             self.clock.tick(FPS)
             pygame.display.flip()
+
+        return intro
     
     def settings(self):
         """
@@ -384,12 +470,29 @@ class Game:
         """
         
         opened = True
-        slider_back = Button(470, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
-        slider = Button(520, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0) if self.music_on else Button(470, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
-        slider_inside = Button(532.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.music_on else Button(482.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
-        back_out = Button(WIN_WIDTH - 220, 20, 200, 50, fg=WHITE, bg=GRAY, content="Back", fontsize=32)
-        do_something = self.font.render("Sound", True, WHITE)
-        do_something_rect = do_something.get_rect(x=490, y=100)
+
+        # Slider
+        slider_back = Button(250, 155, 100, 20, fg=BLACK, bg=DIM_GRAY, content="", fontsize=0)
+        slider = Button(300, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0) if self.music_on else Button(250, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
+        slider_inside = Button(312.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.music_on else Button(262.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
+
+        # Talking speed
+        slow = Button(225, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="SLOW", fontsize=32) if self.talking_speed_number == 105 else Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
+        medium = Button(365, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="MEDIUM", fontsize=32) if self.talking_speed_number == 90 else Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
+        fast = Button(505, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="FAST", fontsize=32) if self.talking_speed_number == 75 else Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
+
+        # Button
+        back = Button(10, WIN_HEIGHT - 60, 200, 50, fg=WHITE, bg=GRAY, content="Back", fontsize=32)
+
+        # Sound
+        sound_effects = self.font.render("Sound", True, WHITE)
+        sound_effects_rect = sound_effects.get_rect(x=265, y=100)
+
+        # Sound
+        talking_speed = self.font.render("Talking speed", True, WHITE)
+        talking_speed_rect = sound_effects.get_rect(x=365, y=220)
+
+        # Title
         title = self.settings_font.render("Settings", True, WHITE)
         title_rect = title.get_rect(x=10, y=10)
         
@@ -405,41 +508,68 @@ class Game:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
             
-            if back_out.is_pressed(mouse_pos, mouse_pressed): opened = False
+            if back.is_pressed(mouse_pos, mouse_pressed): opened = False
             
-            if slider.is_pressed(mouse_pos, mouse_pressed) and self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.music_on:
-                for _ in range(15):
-                    slider.rect.x -= 50 / 18
-                    slider_inside.rect.x -= 50 / 17
-                    self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+            # From on (right) to off (left)
+            elif slider.is_pressed(mouse_pos, mouse_pressed) and self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.music_on:
+                for _ in range(12):
+                    slider.rect.x -= 4
+                    slider_inside.rect.x -= 4
+                    self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
                 self.music_on = not self.music_on
-                slider_inside.rect.x -= 3
-                slider = Button(470, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
+                slider_inside.rect.x -= 2
+                slider = Button(250, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
                 
+            # From off (left) to on (right)
             elif slider.is_pressed(mouse_pos, mouse_pressed) and not self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and not self.music_on:
-                for _ in range(15):
-                    slider.rect.x += 50 / 15
-                    slider_inside.rect.x += 50 / 15
-                    self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+                for _ in range(12):
+                    slider.rect.x += 4
+                    slider_inside.rect.x += 4
+                    self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
                 self.music_on = not self.music_on
-                slider_inside.rect.x += 3
-                slider = Button(520, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0)
+                slider_inside.rect.x += 2
+                slider = Button(300, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0)
+
+            # Talking speed - Slow
+            elif slow.is_pressed(mouse_pos, mouse_pressed):
+                self.talking_speed_number = 105
+                slow = Button(225, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="SLOW", fontsize=32)
+                medium = Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
+                fast = Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
+
+            # Talking speed - Medium
+            elif medium.is_pressed(mouse_pos, mouse_pressed):
+                self.talking_speed_number = 90
+                slow = Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
+                medium = Button(365, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="MEDIUM", fontsize=32)
+                fast = Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
+
+            # Talking speed - Fast
+            elif fast.is_pressed(mouse_pos, mouse_pressed):
+                self.talking_speed_number = 75
+                slow = Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
+                medium = Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
+                fast = Button(505, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="FAST", fontsize=32)
                     
             # Diplaying background, title, buttons
-            self._settings_animation(title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out)
+            self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
 
-    def _settings_animation(self, title, title_rect, do_something, do_something_rect, slider_back, slider, slider_inside, back_out):
+    def _settings_animation(self, title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast):
         """
         Animation for settings sliders
         """
 
         self.screen.blit(self.settings_background, (0, 0))
         self.screen.blit(title, title_rect)
-        self.screen.blit(do_something, do_something_rect)
+        self.screen.blit(sound_effects, sound_effects_rect)
+        self.screen.blit(talking_speed, talking_speed_rect)
         self.screen.blit(slider_back.image, slider_back.rect)
         self.screen.blit(slider.image, slider.rect)
         self.screen.blit(slider_inside.image, slider_inside.rect)
-        self.screen.blit(back_out.image, back_out.rect)
+        self.screen.blit(slow.image, slow.rect)
+        self.screen.blit(medium.image, medium.rect)
+        self.screen.blit(fast.image, fast.rect)
+        self.screen.blit(back.image, back.rect)
         self.clock.tick(FPS)
         pygame.display.update()
 
@@ -468,7 +598,7 @@ class Game:
         When character is talking
         """
 
-        for _ in range(95):
+        for _ in range(self.talking_speed_number):
             text = self.font.render(msg_content, True, WHITE)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
@@ -948,6 +1078,9 @@ class Game:
         elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall"); self.center_player_after_doors()
         
     def fourth_floor_doors(self):
+        """
+        Doors on the fourth floor
+        """
         
         # Hall -> LSIE
         if self.player.facing == "down" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("403 - LSIE"); self.center_player_after_doors()
@@ -972,7 +1105,10 @@ class Game:
         Checks if player has shoes on
         """
 
-        if not self.locker_stuff['boots']: self.game_over("img/caught.png")
+        if self.locker_stuff["crocs"] and self.caught <= 3: 
+            self.caught += 1
+            self.game_over("img/caught.png")
+        elif self.locker_stuff["crocs"] and self.caught > 3: self.game_over("img/you_never_learn.png")
                
     def locker(self):
         """
@@ -1117,8 +1253,7 @@ class Game:
         
         # Third floor
         elif self.in_room == fourth_floor: self.fourth_floor_doors()
-        
-        
+               
     def basement(self):
         """
         Going into the basement
@@ -1147,7 +1282,7 @@ class Game:
         # No light
         else:
 
-            if self.without_light < 3:
+            if self.without_light <= 3:
                 self.talking("No way I am going down there without light.")
                 self.talking("I don't want to get lost in school.")
                 self.talking("I'll go there when I have some light with me.")
@@ -1332,8 +1467,5 @@ class Game:
         
 
 g = Game()
-g.intro_screen().new()
-
-while g.game_running: g.main()
-
+g.intro_screen().new().main()
 pygame.quit()

@@ -21,6 +21,7 @@ quests:
     LROB (where we have PRO) find an easy bug and fix it
     CISCO classroom (where we have SIE) ask KUL if you can go home earlier
     vyvetraj na DSY
+    player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess))
 
 gameplay ideas:
     player can go up the level's doors according to his pass level he has (level 1, level 2, level 3 and level 4)
