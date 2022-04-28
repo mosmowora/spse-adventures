@@ -44,11 +44,11 @@ class Game:
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
-        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, basement] # Rooms where player can go
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
 
         # Inventory
-        self.inv: List[str] = []
+        self.inv: List[str] = ["changing_room key"]
 
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
@@ -96,6 +96,9 @@ class Game:
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
+                elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk
+                elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
+                elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Horizontal Desk
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
                 elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
                 elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
@@ -105,6 +108,8 @@ class Game:
                 elif column == "Ŕ": self.interactive[Block(self, j, i, "Ŕ")] = "Ŕ" + str(i) + str(j) # Rails second_floor
                 elif column == "ŕ": self.interactive[Block(self, j, i, "ŕ")] = "ŕ" + str(i) + str(j) # Rails second_floor
                 elif column == "ř": self.interactive[Block(self, j, i, "ř")] = "ř" + str(i) + str(j) # Rails ground_floor
+                elif column == "/": self.interactive[Block(self, j, i, "/")] = "/" + str(i) + str(j) # Rails fourth_floor
+                elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
                 elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
                 elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
                 elif column == "N": self.npc.append(Npc(self, j, i, "")) # NPC
@@ -613,7 +618,7 @@ class Game:
         elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("006 - LIT 9"); self.center_player_after_doors()
 
         # 006 -> 007
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("007 - LIT 10"); self.center_player_after_doors()
 
         # Hall -> 004
         elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: self.door_info("004 - LIT 8"); self.center_player_after_doors()
@@ -687,10 +692,10 @@ class Game:
         elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
             
         # 122/2 -> Kabinet HED, MIT
-        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("Cabinet"); self.center_player_after_doors()
             
         # Kabinet HED, MIT -> 122/2 
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("122/2 -  LIT 2 (IV.SA)"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("122/2 -  LIT 2 (IV.SA)"); self.center_player_after_doors()
             
         # Hall -> Kabinet HED, MIT
         elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 7: self.door_info("Cabinet"); self.center_player_after_doors()
@@ -727,6 +732,12 @@ class Game:
         
         # 113 -> Hall
         elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        
+        # 113 -> Cabinet LIA
+        elif self.player.facing == "right" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("Cabinet LIA"); self.center_player_after_doors()
+        
+        # Cabinet LIA -> 113
+        elif self.player.facing == "left" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("113 - III.C"); self.center_player_after_doors()
         
         # Hall -> 112
         elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 24: self.door_info("112 - LELM 1"); self.center_player_after_doors()
@@ -936,6 +947,26 @@ class Game:
         # Cabinet -> Hall
         elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall"); self.center_player_after_doors()
         
+    def fourth_floor_doors(self):
+        
+        # Hall -> LSIE
+        if self.player.facing == "down" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("403 - LSIE"); self.center_player_after_doors()
+        
+        # LSIE -> Hall
+        elif self.player.facing == "up" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("Hall"); self.center_player_after_doors()
+        
+        # Hall -> LROB (predsien)
+        elif self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("402 - LROB hallway"); self.center_player_after_doors()
+
+        # LROB (predsien) -> Hall
+        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
+
+        # LROB (predsien) -> LROB
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB"); self.center_player_after_doors()
+
+        # LROB -> LROB (predsien)
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway"); self.center_player_after_doors()
+
     def shoes_on(self):
         """
         Checks if player has shoes on
@@ -1084,6 +1115,9 @@ class Game:
         # Third floor
         elif self.in_room == third_floor: self.third_floor_doors()
         
+        # Third floor
+        elif self.in_room == fourth_floor: self.fourth_floor_doors()
+        
         
     def basement(self):
         """
@@ -1159,7 +1193,7 @@ class Game:
             self.create_tile_map()
 
             # Right stairs
-            if self.interacted[1] in (16, 17, 18, 19) and self.interacted[2] == 183:
+            if self.interacted[1] in (16, 17, 18, 19) and self.interacted[2] == 184:
                 for sprite in self.all_sprites: 
                     sprite.rect.x -= 171 * TILE_SIZE
                     sprite.rect.y -= 17 * TILE_SIZE
@@ -1264,6 +1298,31 @@ class Game:
                 self.player.rect.y += 4 * TILE_SIZE
                     
             self.door_info("Second floor")
+            
+        # Fourth floor -> Third floor
+        elif self.interacted[0] == "Stairs_down" and self.in_room == fourth_floor:
+            self.in_room = self.rooms[THIRD_FLOOR]
+            self.create_tile_map()
+            
+            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 62 * TILE_SIZE
+                    sprite.rect.y -= 7 * TILE_SIZE
+                self.player.rect.y += 4 * TILE_SIZE
+                    
+            self.door_info("Third floor")
+            
+        # Third floor -> Fourth floor
+        elif self.interacted[0] == "Stairs_up" and self.in_room == third_floor:
+            self.in_room = self.rooms[FOURTH_FLOOR]
+            self.create_tile_map()
+            
+            if self.interacted[1] in (13, 14, 15, 16) and self.interacted[2] == 72: 
+                for sprite in self.all_sprites:
+                    sprite.rect.x -= 62 * TILE_SIZE
+                    sprite.rect.y -= 4 * TILE_SIZE
+
+            self.door_info("Fourth floor")
                 
     def toilet(self):
         """

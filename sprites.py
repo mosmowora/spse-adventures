@@ -547,11 +547,16 @@ class Block(pygame.sprite.Sprite):
         elif type == "Ŕ": self.image = self.game.terrain_spritesheet.get_sprite(206, 36, self.width, self.height)
         elif type == "ŕ": self.image = self.game.terrain_spritesheet.get_sprite(206, 70, self.width, self.height)
         elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
+        elif type == "l": self.image = self.game.terrain_spritesheet.get_sprite(243, 104, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
         elif type == "ř": self.image = self.game.terrain_spritesheet.get_sprite(70, 70, self.width, self.height)
         elif type == "b": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
         elif type == "d": self.image = self.game.terrain_spritesheet.get_sprite(104, 70, self.width, self.height)
         elif type == "!": self.image = self.game.terrain_spritesheet.get_sprite(138, 2, self.width, self.height)
+        elif type == "J": self.image = self.game.terrain_spritesheet.get_sprite(240, 104, self.width, self.height)
+        elif type == "j": self.image = self.game.terrain_spritesheet.get_sprite(206, 104, self.width, self.height)
+        elif type == "/": self.image = self.game.terrain_spritesheet.get_sprite(241, 70, self.width, self.height)
+        elif type == "|": self.image = self.game.terrain_spritesheet.get_sprite(241, 36, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
