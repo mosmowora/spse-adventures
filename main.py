@@ -1,6 +1,7 @@
 # Import
 from numpy import number
 import pygame
+from save_progress import SaveProgress
 from sprites import *; from config import *
 
 class Game:
@@ -40,18 +41,59 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
+        self.saved_room_data: str = ""
         
         # Settings
         self.music_on: bool = True
         self.talking_speed_number: int = 90
+        self.reseting_game_values()
 
         # Player name
         self.player_name: str = ""
 
         # Npc list
         self.npc = []
-    
-        self.reseting_game_values()
+        
+    def set_level_camera(self, level: List[str]):
+        """
+        Moves camera and player to stairs
+        """
+        
+        # Ground floor
+        if level == ground_floor:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 39 * TILE_SIZE
+                sprite.rect.y -= 7 * TILE_SIZE
+            self.player.rect.x -= 120 * TILE_SIZE
+            self.player.rect.y += 8 * TILE_SIZE
+        
+        # First floor
+        elif level == first_floor:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 47 * TILE_SIZE
+                sprite.rect.y -= 17 * TILE_SIZE
+            self.player.rect.x -= 124 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
+        
+        # Second floor
+        elif level == second_floor:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 47 * TILE_SIZE
+                sprite.rect.y -= 19 * TILE_SIZE
+            self.player.rect.x -= 124 * TILE_SIZE
+            self.player.rect.y += 2 * TILE_SIZE
+        
+        # Third floor
+        elif level == third_floor:
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 62 * TILE_SIZE
+                sprite.rect.y -= 4 * TILE_SIZE
+                
+        # Fourth floor
+        elif level == fourth_floor: 
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 62 * TILE_SIZE
+                sprite.rect.y -= 4 * TILE_SIZE
 
     def reseting_game_values(self):
         """
@@ -141,10 +183,41 @@ class Game:
         self.interactible = pygame.sprite.LayeredUpdates()
         self.cleaner = pygame.sprite.LayeredUpdates()
 
-        # Tilemap
-        self.create_tile_map()
 
-        for sprite in self.all_sprites: sprite.rect.x -= 158 * TILE_SIZE
+        data = SaveProgress.load_data(self.player_name)
+        
+        if data is not None:
+
+            # Level
+            self.in_room = self.rooms[data["level"]]
+
+            # Inventory
+            self.inv = data["inventory"]
+
+            # Variables for endings
+            self.without_light = data["quests"]["without_light"]
+            self.caught = data["quests"]["caught"]
+
+            # Variables for finding items/doing stuff
+            self.key_in_trash = data["quests"]["key_in_trash"]
+            self.locked_locker = data["quests"]["locked_locker"]
+            self.locked_changing_room = data["quests"]["locked_changing_room"]
+            self.kokosky_in_locker = data["quests"]["kokosky_in_locker"]
+            self.locker_stuff = data["quests"]["locker_stuff"]
+
+            # Tile map
+            self.create_tile_map()
+
+            # Moving camera/player
+            self.set_level_camera(self.in_room)
+
+        else: 
+            
+            # Tilemap
+            self.create_tile_map()
+
+            # Moving camera
+            for sprite in self.all_sprites: sprite.rect.x -= 158 * TILE_SIZE
 
         return self
     
@@ -317,12 +390,25 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
-
+        
     def save_game(self):
         """
         Saves game to file by player name
         """
-
+        self.database = SaveProgress(self.player_name, 
+                                    self.inv,
+                                        {   "key_in_trash": self.key_in_trash, 
+                                            "locked_locker": self.locked_locker, 
+                                            "locked_changing_room": self.locked_changing_room, 
+                                            "kokosky_in_locker": self.kokosky_in_locker, 
+                                            "locker_stuff": self.locker_stuff, 
+                                            "without_light": self.without_light, 
+                                            "caught": self.caught
+                                        },
+                                        self.rooms.index(self.in_room),
+                                        self.saved_room_data
+                                    )
+        self.database.save()
         print("SAVED")
         quit()
 
@@ -371,7 +457,7 @@ class Game:
                     self.new()
                     self.main()
 
-            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): quit()
+            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): self.save_game()
             
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
@@ -642,7 +728,7 @@ class Game:
         """
         print("If we had one")
 
-    def door_info(self, msg_content: str):
+    def door_info(self, msg_content: str, room_number: str):
         """
         Displays info about the room the character is entering/exiting
         """
@@ -655,6 +741,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
+        self.saved_room_data = room_number
               
     def talking(self, msg_content: str):
         """
@@ -740,7 +827,7 @@ class Game:
             elif not self.locked_changing_room: self.center_player_after_doors()
                     
         # Hall -> Changing room
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.door_info("Don't forget to change yo shoes"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.talking("Don't forget to change yo shoes"); self.center_player_after_doors()
 
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
@@ -748,118 +835,118 @@ class Game:
             self.talking("Sadly it's closed now.")
 
         # Hall -> 020
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166:self.door_info("020 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166:self.door_info("020 - not a classroom", "020")
 
         # Hall -> 021
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: self.door_info("021 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: self.door_info("021 - not a classroom", "021")
 
         # Hall -> 022
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 152: self.door_info("022 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 152: self.door_info("022 - not a classroom", "022")
 
         # Hall -> 023
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 133: self.door_info("023 - LIT 3"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 133: self.door_info("023 - LIT 3", "023"); self.center_player_after_doors()
 
         # 023 -> Hall
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 133: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 133: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
         # Hall -> ???
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: self.door_info("??? - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: self.door_info("??? - not a classroom", "???")
 
                 # Hall -> 025
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("025 - LCUJ 4"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("025 - LCUJ 4", "025"); self.center_player_after_doors()
 
         # 025 -> Hall 
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 026
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: self.door_info("026 - not a classroom")
 
         # 026 -> Hall
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 88: self.door_info("026 - not a classroom")
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 88: self.door_info("026 - not a classroom", "026")
 
         # Hall -> 027
-        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.door_info("027 - not a classroom")
+        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.door_info("027 - not a classroom", "027")
 
         # Hall -> 010
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("010 - Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("010 - Toilets", "010"); self.center_player_after_doors()
 
         # 010 -> Hall
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Toilet room -> Stall
-        elif self.player.facing == "up" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.door_info("PeePeePooPoo time"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.talking("PeePeePooPoo time"); self.center_player_after_doors()
 
         # Stall -> Toilet room
-        elif self.player.facing == "down" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.door_info("Don't forget to wash yo hands"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
 
         # Hall -> 009
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: self.door_info("009 - not a classroom")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 25: self.door_info("009 - not a classroom", "009")
 
         # Hall -> 008
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 19: self.door_info("008 - DPXA 3"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 19: self.door_info("008 - DPXA 3", "008"); self.center_player_after_doors()
 
         # 008 -> Hall
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 19: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 19: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 007
-        elif self.player.facing == "left" and self.interacted[1] == 17 and self.interacted[2] == 11: self.door_info("007 - LIT 10"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[1] == 17 and self.interacted[2] == 11: self.door_info("007 - LIT 10", "007"); self.center_player_after_doors()
 
         # 007 -> Hall
-        elif self.player.facing == "right" and self.interacted[1] == 17 and self.interacted[2] == 11: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[1] == 17 and self.interacted[2] == 11: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # 007 -> 006
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("006 - LIT 9"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("006 - LIT 9", "006"); self.center_player_after_doors()
 
         # 006 -> 007
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("007 - LIT 10"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 9: self.door_info("007 - LIT 10", "007"); self.center_player_after_doors()
 
         # Hall -> 004
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: self.door_info("004 - LIT 8"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 20: self.door_info("004 - LIT 8", "004"); self.center_player_after_doors()
 
         # 004 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 20: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 20: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 003
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 24: self.door_info("003 - DPXA 2"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 24: self.door_info("003 - DPXA 2", "003"); self.center_player_after_doors()
 
         # 003 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 002
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 35: self.door_info("002 - DPXA 1"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 35: self.door_info("002 - DPXA 1", "002"); self.center_player_after_doors()
 
         # 002 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 35: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 35: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 012
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 79: self.door_info("012 - II.A"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 79: self.door_info("012 - II.A", "012"); self.center_player_after_doors()
 
         # 012 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 79: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 79: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 013
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 88: self.door_info("013 - II.B"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 88: self.door_info("013 - II.B", "013"); self.center_player_after_doors()
 
         # 013 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 88: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 88: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 014
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 114: self.door_info("014 - LAELE"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 114: self.door_info("014 - LAELE", "014"); self.center_player_after_doors()
         
         # 014 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 114: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 114: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 015
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 135: self.door_info("015 - II.C"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 135: self.door_info("015 - II.C", "015"); self.center_player_after_doors()
 
         # 015 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 135: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 135: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 016
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 159: self.door_info("016 - II.SA"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 159: self.door_info("016 - II.SA", "016"); self.center_player_after_doors()
                 
         # 016 -> Hall
-        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 159: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[1] == 14 and self.interacted[2] == 159: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
     def first_floor_doors(self):
         """
@@ -867,100 +954,100 @@ class Game:
         """
 
         # Hall -> 122/1
-        if self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] in (12, 13): self.door_info("122/1 -  LIT 1 (III.SA)"); self.center_player_after_doors()
+        if self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] in (12, 13): self.door_info("122/1 -  LIT 1 (III.SA)", "122/1"); self.center_player_after_doors()
         
         # 122/1 -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] in (12, 13): self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] in (12, 13): self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # 122/1 -> 122/2
-        elif self.player.facing == "up" and self.interacted[2] == 177 and self.interacted[1] == 8: self.door_info("122/2 -  LIT 2 (IV.SA)"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 177 and self.interacted[1] == 8: self.door_info("122/2 -  LIT 2 (IV.SA)", "122/2"); self.center_player_after_doors()
         
         # 122/2 -> 122/1
-        elif self.player.facing == "down" and self.interacted[2] == 177 and self.interacted[1] == 8: self.door_info("122/1 -  LIT 1 (III.SA)"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 177 and self.interacted[1] == 8: self.door_info("122/1 -  LIT 1 (III.SA)", "122/1"); self.center_player_after_doors()
             
         # Hall -> Kabinet pri 122/1
-        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 18: self.door_info("Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 18: self.talking("Cabinet"); self.center_player_after_doors()
             
         # Kabinet pri 122/1 -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 18: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
         # 122/2 -> Kabinet HED, MIT
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 6: self.talking("Cabinet"); self.center_player_after_doors()
             
         # Kabinet HED, MIT -> 122/2 
-        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("122/2 -  LIT 2 (IV.SA)"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 6: self.door_info("122/2 -  LIT 2 (IV.SA)", "122/2"); self.center_player_after_doors()
             
         # Hall -> Kabinet HED, MIT
-        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 7: self.door_info("Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 7: self.talking("Cabinet"); self.center_player_after_doors()
             
         # Kabinet HED, MIT -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 7: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 7: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
         # Hall -> Toilets
-        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12: self.talking("Toilets"); self.center_player_after_doors()
         
         # Toilets -> Stall
-        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13: self.door_info("PeePeePooPoo Time"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("PeePeePooPoo Time"); self.center_player_after_doors()
 
         # Stall -> Toilets
-        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 13: self.door_info("Don't forget to wash your hands"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("Don't forget to wash your hands"); self.center_player_after_doors()
 
         # Toilets -> Hall
-        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 117
-        elif self.player.facing == "up" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("117 - III.B"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("117 - III.B", "117"); self.center_player_after_doors()
         
         # 117 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 115
-        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 24: self.door_info("115 - IV.SB"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 24: self.door_info("115 - IV.SB", "115"); self.center_player_after_doors()
         
         # 115 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 113
-        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("113 - III.C"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("113 - III.C", "113"); self.center_player_after_doors()
         
         # 113 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # 113 -> Cabinet LIA
-        elif self.player.facing == "right" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("Cabinet LIA"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 97 and self.interacted[1] == 21: self.talking("Cabinet LIA"); self.center_player_after_doors()
         
         # Cabinet LIA -> 113
-        elif self.player.facing == "left" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("113 - III.C"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("113 - III.C", "113"); self.center_player_after_doors()
         
         # Hall -> 112
-        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 24: self.door_info("112 - LELM 1"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 24: self.door_info("112 - LELM 1", "112"); self.center_player_after_doors()
         
         # 112 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 24: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 124
-        elif self.player.facing == "down" and self.interacted[2] == 160 and self.interacted[1] == 30: self.door_info("124 - LELM 2"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 160 and self.interacted[1] == 30: self.door_info("124 - LELM 2", "124"); self.center_player_after_doors()
         
         # 124 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 160 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 160 and self.interacted[1] == 30: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 126
-        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 30: self.door_info("126 - LSIE 2"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 30: self.door_info("126 - LSIE 2", "126"); self.center_player_after_doors()
         
         # 126 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors() 
+        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 30: self.door_info("Hall", "Hall"); self.center_player_after_doors() 
         
         # Hall -> 127
-        elif self.player.facing == "down" and self.interacted[2] == 126 and self.interacted[1] == 30: self.door_info("127 - LIOT"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 126 and self.interacted[1] == 30: self.door_info("127 - LIOT", "127"); self.center_player_after_doors()
         
         # 127 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 126 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors()  
+        elif self.player.facing == "up" and self.interacted[2] == 126 and self.interacted[1] == 30: self.door_info("Hall", "Hall"); self.center_player_after_doors()  
         
         # Hall -> 130
-        elif self.player.facing == "down" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("130 - CZV"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("130 - CZV", "130"); self.center_player_after_doors()
         
         # 130 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 104 and self.interacted[1] == 30: self.door_info("Hall", "Hall"); self.center_player_after_doors()
              
     def second_floor_doors(self): 
         """
@@ -968,118 +1055,118 @@ class Game:
         """
 
         # Hall -> 203
-        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("203 - III.A"); self.center_player_after_doors()
+        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("203 - III.A", "203"); self.center_player_after_doors()
 
         # 203 -> Hall 
-        elif self.player.facing == "right" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 202
-        elif self.player.facing == "up" and self.interacted[2] == 23 and self.interacted[1] == 25: self.door_info("202 - I.SC"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 23 and self.interacted[1] == 25: self.door_info("202 - I.SC", "202"); self.center_player_after_doors()
 
         # 202 -> Hall 
-        elif self.player.facing == "down" and self.interacted[2] == 23 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 23 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 205
-        elif self.player.facing == "down" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("205 - III.A"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("205 - III.A", "205"); self.center_player_after_doors()
 
         # 205 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 201
-        elif self.player.facing == "up" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("201 - Goated place"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("201 - Goated place", "201"); self.center_player_after_doors()
 
         # 201 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
     
         # Hall -> Toilets
-        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.talking("Toilets"); self.center_player_after_doors()
 
         # Toilets -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Toilets -> Stall
-        elif self.player.facing == "up" and self.interacted[2] in (42, 44) and self.interacted[1] == 34: self.door_info("Stall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] in (42, 44) and self.interacted[1] == 34: self.talking("Stall"); self.center_player_after_doors()
 
         # Stall -> Toilets
-        elif self.player.facing == "down" and self.interacted[2] in (42, 44) and self.interacted[1] == 34: self.door_info("Don't forget to wash yo hands"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] in (42, 44) and self.interacted[1] == 34: self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
             
         # Hall -> 208
-        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 25: self.door_info("208 - I.A"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 76 and self.interacted[1] == 25: self.door_info("208 - I.A", "208"); self.center_player_after_doors()
             
         # 208 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 76 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
         # Hall -> 209
-        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("209 - I.B"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("209 - I.B", "209"); self.center_player_after_doors()
 
         # 209 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 299
-        elif self.player.facing == "up" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("299 - LRIS"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("299 - LRIS", "299"); self.center_player_after_doors()
 
         # 299 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 210
-        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("210 - III.SB"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("210 - III.SB", "210"); self.center_player_after_doors()
             
         # 210 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 211
-        elif self.player.facing == "up" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("211 - Coming soon")
+        elif self.player.facing == "up" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("211 - Coming soon", "211")
 
         # 211 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("Hall")
+        elif self.player.facing == "down" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("Hall", "Hall")
 
         # Hall -> 212
-        elif self.player.facing == "up" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("212 - IV.A"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("212 - IV.A", "212"); self.center_player_after_doors()
 
         # 212 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> Toilets
-        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16: self.door_info("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16: self.talking("Toilets"); self.center_player_after_doors()
 
         # Toilets -> Hall
-        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 16: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 16: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Toilets -> Stall
-        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 16: self.door_info("Stall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 16: self.talking("Stall"); self.center_player_after_doors()
 
         # Stall -> Toilets
-        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 16: self.door_info("Don't forget to wash yo hands"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 16: self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
 
         # Hall -> 216
-        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 14: self.door_info("216 - OUF (IV.C)"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 169 and self.interacted[1] == 14: self.door_info("216 - OUF (IV.C)", "216"); self.center_player_after_doors()
             
         # 216 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 14: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 14: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 217
-        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("217 - Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("217 - Cabinet", "217"); self.center_player_after_doors()
 
         # 217 -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 218
-        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("218 - I.SB"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("218 - I.SB", "218"); self.center_player_after_doors()
 
         # 218 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 219
-        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("219 = I.SA"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("219 = I.SA", "219"); self.center_player_after_doors()
 
         # 219 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 220
-        elif self.player.facing == "down" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("220 - I.C")
+        elif self.player.facing == "down" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("220 - I.C", "220"); self.center_player_after_doors()
 
         # 220 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall")
+        elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
     def third_floor_doors(self):
         """
@@ -1087,58 +1174,58 @@ class Game:
         """
 
         # Hall -> Gym changing rooms
-        if self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
+        if self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Gym - Changing rooms", "Gym - chr"); self.center_player_after_doors()
         
         # Gym changing rooms -> Hall
-        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Gym changing rooms -> Toielet
-        elif self.player.facing == "left" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Toilets", "Toilets"); self.center_player_after_doors()
 
         # Toilet -> Gym changing rooms
-        elif self.player.facing == "right" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Gym - Changing rooms", "Gym - chr"); self.center_player_after_doors()
         
         # Gym changing rooms -> Gym
-        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("302 - Gym"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("302 - Gym", "302"); self.center_player_after_doors()
 
         # Gym -> Gym changing rooms
-        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("Gym - Changing rooms"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("Gym - Changing rooms", "Gym - chr"); self.center_player_after_doors()
 
         # Gym -> Gymnasium
-        elif self.player.facing == "down" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("304 - Gymnasium"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("304 - Gymnasium", "304"); self.center_player_after_doors()
 
         # Gymnasium -> Gym
-        elif self.player.facing == "up" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("302 - Gym"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] in (16, 17) and self.interacted[1] == 6: self.door_info("302 - Gym", "302"); self.center_player_after_doors()
         
         # Hall -> 304
-        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("304 - Gymnasium"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("304 - Gymnasium", "304"); self.center_player_after_doors()
         
         # 304 -> Hall
-        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] in (11, 12): self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> Gymnasium changing room
-        elif self.player.facing == "down" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Gymnasium - Changing rooms"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Gymnasium - Changing rooms", "Gymnasium - chr"); self.center_player_after_doors()
         
         # Gymnasium changing room -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 67 and self.interacted[1] == 18: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Gymnasium changing room -> Gymnasium
-        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("304 - Gymnasium"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("304 - Gymnasium", "304"); self.center_player_after_doors()
         
         # Gymnasium -> Gymnasium changing room
-        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing rooms"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing rooms", "Gymnasium - chr"); self.center_player_after_doors()
 
         # Gymnasium changing room -> Showers
-        elif self.player.facing == "left" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Showers"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Showers", "Showers"); self.center_player_after_doors()
 
         # Showers -> Gymnasium changing room
-        elif self.player.facing == "right" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing room"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing room", "Gymnasium - chr"); self.center_player_after_doors()
 
         # Hall -> Cabinet
-        elif self.player.facing == "right" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Cabinet"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Cabinet", "Tsv - Cabinet"); self.center_player_after_doors()
         
         # Cabinet -> Hall
-        elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
     def fourth_floor_doors(self):
         """
@@ -1146,32 +1233,32 @@ class Game:
         """
         
         # Hall -> LSIE
-        if self.player.facing == "down" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("403 - LSIE"); self.center_player_after_doors()
+        if self.player.facing == "down" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("403 - LSIE", "403"); self.center_player_after_doors()
         
         # LSIE -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 62 and self.interacted[1] == 17: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> LROB (predsien)
-        elif self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("402 - LROB hallway"); self.center_player_after_doors()
+        elif self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
         # LROB (predsien) -> Hall
-        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall"); self.center_player_after_doors()
+        elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # LROB (predsien) -> LROB
-        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB", "4"); self.center_player_after_doors()
 
         # LROB -> LROB (predsien)
-        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
     def shoes_on(self):
         """
         Checks if player has shoes on
         """
 
-        if self.locker_stuff["crocs"] and self.caught <= 3: 
-            self.caught += 2
+        if self.locker_stuff["crocs"] and self.caught >= 3: self.game_over("img/you_never_learn.png")
+        elif self.locker_stuff["crocs"] and self.caught < 3: 
+            self.caught += 1
             self.game_over("img/caught.png")
-        elif self.locker_stuff["crocs"] and self.caught > 3: self.game_over("img/you_never_learn.png")
                
     def locker(self):
         """
@@ -1404,7 +1491,7 @@ class Game:
                 self.player.rect.x -= 124 * TILE_SIZE
                 self.player.rect.y += 2 * TILE_SIZE
             
-            self.door_info("First floor")
+            self.door_info("First floor", "Hall")
                 
         # 1st floor -> Ground floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == first_floor:
@@ -1427,7 +1514,7 @@ class Game:
                 self.player.rect.x -= 120 * TILE_SIZE
                 self.player.rect.y += 8 * TILE_SIZE
                 
-            self.door_info("Ground floor")
+            self.door_info("Ground floor", "Hall")
         
         # First floor -> Second floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
@@ -1448,7 +1535,7 @@ class Game:
                 self.player.rect.x -= 124 * TILE_SIZE
                 self.player.rect.y += 2 * TILE_SIZE
             
-            self.door_info("Second floor")
+            self.door_info("Second floor", "Hall")
                 
         # Second floor -> First floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
@@ -1470,7 +1557,7 @@ class Game:
                 self.player.rect.x -= 132 * TILE_SIZE
                 self.player.rect.y += 2 * TILE_SIZE
                 
-            self.door_info("First floor")
+            self.door_info("First floor", "Hall")
         
         # Second floor -> Third floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == second_floor:
@@ -1482,7 +1569,7 @@ class Game:
                     sprite.rect.x -= 62 * TILE_SIZE
                     sprite.rect.y -= 4 * TILE_SIZE
 
-            self.door_info("Third floor")
+            self.door_info("Third floor", "Hall")
             
         # Third floor -> Second floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == third_floor:
@@ -1495,7 +1582,7 @@ class Game:
                     sprite.rect.y -= 20 * TILE_SIZE
                 self.player.rect.y += 4 * TILE_SIZE
                     
-            self.door_info("Second floor")
+            self.door_info("Second floor", "Hall")
             
         # Fourth floor -> Third floor
         elif self.interacted[0] == "Stairs_down" and self.in_room == fourth_floor:
@@ -1508,7 +1595,7 @@ class Game:
                     sprite.rect.y -= 7 * TILE_SIZE
                 self.player.rect.y += 4 * TILE_SIZE
                     
-            self.door_info("Third floor")
+            self.door_info("Third floor", "Hall")
             
         # Third floor -> Fourth floor
         elif self.interacted[0] == "Stairs_up" and self.in_room == third_floor:
@@ -1520,7 +1607,7 @@ class Game:
                     sprite.rect.x -= 62 * TILE_SIZE
                     sprite.rect.y -= 4 * TILE_SIZE
 
-            self.door_info("Fourth floor")
+            self.door_info("Fourth floor", "Hall")
                 
     def toilet(self):
         """

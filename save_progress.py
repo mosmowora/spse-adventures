@@ -1,15 +1,17 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import List
 import json
 
+class UserAlreadyExistsError(Exception): pass
+
 @dataclass
-class SaveProgress:
+class SaveProgress(UserAlreadyExistsError):
     name: str
-    inventory: List[str]
+    inventory: dict[str]
     quests: List[str]
+    level: List[str]
+    room_number: str
     file_dest: str = "Database/progress.json"
-    data: List[dict[str, Any]] = []
-    
     #   ↑     ↑       ↑        ↑          ↑
     # def __init__(self, name: str, inventory: List[str], quests: List[str], file_dest: str = "Database/progress.json"):
     #     self.name = name
@@ -17,22 +19,45 @@ class SaveProgress:
     #     self.quests = quests
     #     self.file_dest = file_dest
     
-    
     @staticmethod
-    def load_data():
+    def load_data(name: str):
         """
-        Isn't finished
+        Loads data for player if he has profile
         """
-        if len(SaveProgress.data) != 1:
-            with open(SaveProgress.file_dest) as file:
-                content = file.read()
-                print(content)
-            
-    def save(self):
-        _file = open(self.file_dest).read()
-        with open(self.file_dest) as destination_file:
-            destination_file.write(json.dumps(_file))
     
+        # Data from file
+        loaded_data: List = json.load(open(SaveProgress.file_dest))
+
+        for i in range(len(loaded_data)):
+            if loaded_data[i]["name"] == name: return loaded_data[i]
+              
+    def save(self):
+        """
+        Saves/rewrites data to file
+        """
+
+        # Data from file
+        loaded_data: List = json.load(open(SaveProgress.file_dest))
+        # New data
+        write_data = {"name": self.name, "inventory": self.inventory, "quests": self.quests, "level": self.level, "room_number": self.room_number}
+
+        has_profile = False
+
+        # User already has profile
+        for i in range(len(loaded_data)):
+            
+            # Check whether user already has profile, if so then overwrite his currect data
+            if write_data["name"] == loaded_data[i]["name"]: 
+                loaded_data[i] = write_data
+                has_profile = True
+
+        # No profile for u big man
+        if not has_profile: 
+            loaded_data.append(write_data)
+
+        # Writing to file 
+        with open(self.file_dest, "w") as destination_file: json.dump(loaded_data, destination_file, indent=4)
     
     @staticmethod
     def print_database(): return json.load(open(SaveProgress.file_dest).read())
+            

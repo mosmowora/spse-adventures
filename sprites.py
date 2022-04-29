@@ -675,7 +675,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
+                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]
 
                     # Locker
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
@@ -684,8 +684,8 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
-                    elif self.interactive[hits[0]] in ("S" + str(i) + str(j), "Z" + str(i) + str(j)): self.game.interacted = ["Stairs_up", i, j]; print(j, i)
-                    elif self.interactive[hits[0]] in ("s" + str(i) + str(j), "z" + str(i) + str(j)): self.game.interacted = ["Stairs_down", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] in ("S" + str(i) + str(j), "Z" + str(i) + str(j)): self.game.interacted = ["Stairs_up", i, j]
+                    elif self.interactive[hits[0]] in ("s" + str(i) + str(j), "z" + str(i) + str(j)): self.game.interacted = ["Stairs_down", i, j]
 
                     # Basement
                     elif self.interactive[hits[0]] in ("b" + str(i) + str(j), "d" + str(i) + str(j)): self.game.interacted = ["Basement", i, j]
