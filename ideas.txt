@@ -21,6 +21,9 @@ quests:
     LROB (where we have PRO) find an easy bug and fix it
     CISCO classroom (where we have SIE) ask KUL if you can go home earlier
     vyvetraj na DSY
+    quests from teachers (give/recieve) - too abstract I know
+    buy a secret item from Amper (2.5% chance to get it)
+    get chalks for a certain teacher
     player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess))
 
 gameplay ideas:
