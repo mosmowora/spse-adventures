@@ -1,4 +1,5 @@
 # Import
+from numpy import number
 import pygame
 from sprites import *; from config import *
 
@@ -62,7 +63,7 @@ class Game:
         self.interactive = {}
 
         # Inventory
-        self.inv: List[str] = []
+        self.inv: dict[str, str] = {}
 
         # Variables for endings
         self.without_light: int = 0
@@ -168,8 +169,13 @@ class Game:
         # Events
         for event in pygame.event.get():
 
-            # Close button
+            # Close button/Esc
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
+
+            # Pressed I
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_i: 
+                pygame.image.save(self.screen, "img/screen.png")
+                self.inventory() 
 
             # Pressed E
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
@@ -257,6 +263,61 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
+    def inventory(self):
+        """
+        Opens/Closes inventory
+        """
+
+        open_inventory = True
+        
+        # Screen of the game
+        bg = pygame.image.load("img/screen.png")
+
+        # Inventory
+        fg = pygame.image.load("img/inv_fg.png")
+
+        # Min/Max items
+        min_items = 0
+        max_items = 7
+
+        while open_inventory:
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Esc/I
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == pygame.K_i: open_inventory = False; break
+
+                # Right arrow
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7
+
+                # Left arrow
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: max_items -= 7; min_items -= 7
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            # Inv items
+            n = 0
+            m = 0
+            for i in self.inv:
+                if n >= min_items:
+                    fg_rect = fg.get_rect(x=10 + 85 * m, y=10)
+                    img = pygame.image.load(self.inv[i])
+                    rect = img.get_rect(x=10 + 85 * m, y=10)
+                    self.screen.blit(fg, fg_rect)
+                    self.screen.blit(img, rect)
+                    m += 1
+                n += 1
+                if n == max_items: break
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
     def save_game(self):
         """
         Saves game to file by player name
@@ -265,7 +326,7 @@ class Game:
         print("SAVED")
         quit()
 
-    def game_over(self, img):
+    def game_over(self, img: str):
         """
         Game over screen
         """
@@ -379,7 +440,7 @@ class Game:
 
         return self
     
-    def start(self, intro):
+    def start(self, intro: bool):
         """
         Starting the game
         """
@@ -479,9 +540,9 @@ class Game:
         slider_inside = Button(312.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0) if self.music_on else Button(262.5, 152.5, 25, 25, fg=BLACK, bg=BLACK, content="", fontsize=0)
 
         # Talking speed
-        slow = Button(225, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="SLOW", fontsize=32) if self.talking_speed_number == 105 else Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
+        slow = Button(225, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="SLOW", fontsize=32) if self.talking_speed_number == 120 else Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
         medium = Button(365, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="MEDIUM", fontsize=32) if self.talking_speed_number == 90 else Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
-        fast = Button(505, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="FAST", fontsize=32) if self.talking_speed_number == 75 else Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
+        fast = Button(505, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="FAST", fontsize=32) if self.talking_speed_number == 60 else Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
 
         # Button
         back = Button(10, WIN_HEIGHT - 60, 200, 50, fg=WHITE, bg=GRAY, content="Back", fontsize=32)
@@ -534,7 +595,7 @@ class Game:
 
             # Talking speed - Slow
             elif slow.is_pressed(mouse_pos, mouse_pressed):
-                self.talking_speed_number = 105
+                self.talking_speed_number = 120
                 slow = Button(225, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="SLOW", fontsize=32)
                 medium = Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
                 fast = Button(505, 260, 130, 50, fg=BLACK, bg=WHITE, content="FAST", fontsize=32)
@@ -548,7 +609,7 @@ class Game:
 
             # Talking speed - Fast
             elif fast.is_pressed(mouse_pos, mouse_pressed):
-                self.talking_speed_number = 75
+                self.talking_speed_number = 60
                 slow = Button(225, 260, 130, 50, fg=BLACK, bg=WHITE, content="SLOW", fontsize=32)
                 medium = Button(365, 260, 130, 50, fg=BLACK, bg=WHITE, content="MEDIUM", fontsize=32)
                 fast = Button(505, 260, 130, 50, fg=BLACK, bg=DIM_GRAY, content="FAST", fontsize=32)
@@ -556,7 +617,7 @@ class Game:
             # Diplaying background, title, buttons
             self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
 
-    def _settings_animation(self, title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast):
+    def _settings_animation(self, title: pygame.Surface, title_rect: pygame.Rect, sound_effects: pygame.Surface, sound_effects_rect: pygame.Rect, talking_speed: pygame.Surface, talking_speed_rect: pygame.Rect, slider_back: Button, slider: Button, slider_inside: Button, back: Button, slow: Button, medium: Button, fast: Button):
         """
         Animation for settings sliders
         """
@@ -621,7 +682,7 @@ class Game:
 
             # Key in trash
             if self.key_in_trash: 
-                self.inv.append("locker key")
+                self.inv["locker key"] = "img/locker key.png"
                 self.key_in_trash = False
                 self.talking(f"{self.player_name} found a key in the trashcan. It says AR.")
 
@@ -1204,7 +1265,7 @@ class Game:
                     # Key
                     if key_rect.collidepoint(event.pos): 
                         self.locker_stuff['key'] = False
-                        self.inv.append("changing_room key")
+                        self.inv["changing_room key"] = "img/changing_room key.png"
                     
                     # Boots
                     elif boots_rect.collidepoint(event.pos) and self.locker_stuff["boots"]: 
