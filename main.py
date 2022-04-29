@@ -726,7 +726,7 @@ class Game:
         """
         Opens leaderboard window
         """
-        print("If we had one")
+        print(SaveProgress.print_database())
 
     def door_info(self, msg_content: str, room_number: str):
         """

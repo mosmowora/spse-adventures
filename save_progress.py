@@ -59,5 +59,5 @@ class SaveProgress(UserAlreadyExistsError):
         with open(self.file_dest, "w") as destination_file: json.dump(loaded_data, destination_file, indent=4)
     
     @staticmethod
-    def print_database(): return json.load(open(SaveProgress.file_dest).read())
+    def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)
             
