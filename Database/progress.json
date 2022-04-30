@@ -7,20 +7,20 @@
         },
         "quests": {
             "key_in_trash": true,
-            "locked_locker": true,
-            "locked_changing_room": true,
+            "locked_locker": false,
+            "locked_changing_room": false,
             "kokosky_in_locker": true,
-            "vtipnicek": false,
+            "vtipnicek": true,
             "locker_stuff": {
-                "crocs": true,
-                "boots": false,
+                "crocs": false,
+                "boots": true,
                 "key": true
             },
             "without_light": 0,
-            "caught": 0
+            "caught": 1
         },
         "level": 0,
-        "room_number": ""
+        "room_number": "017"
     },
     {
         "name": "Tomas",
@@ -44,5 +44,28 @@
         },
         "level": 0,
         "room_number": "004"
+    },
+    {
+        "name": "Anton Bernolak",
+        "inventory": {
+            "locker key": "img/locker key.png",
+            "changing_room key": "img/changing_room key.png"
+        },
+        "quests": {
+            "key_in_trash": true,
+            "locked_locker": true,
+            "locked_changing_room": true,
+            "kokosky_in_locker": true,
+            "vtipnicek": true,
+            "locker_stuff": {
+                "crocs": true,
+                "boots": false,
+                "key": true
+            },
+            "without_light": 1,
+            "caught": 0
+        },
+        "level": 4,
+        "room_number": "403"
     }
 ]

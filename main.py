@@ -40,24 +40,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
-        self.saved_room_data: str = ""
-        self.key_in_trash: bool = True
-        self.locked_locker: bool = True
-        self.locked_changing_room: bool = True
-        self.kokosky_in_locker: bool = True
-        self.vtipnicek: bool = False
-        self.without_light: int = 0
-        self.caught: int = 0
-        self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
-        self.quests = {  "key_in_trash": self.key_in_trash, 
-                        "locked_locker": self.locked_locker, 
-                        "locked_changing_room": self.locked_changing_room, 
-                        "kokosky_in_locker": self.kokosky_in_locker, 
-                        "vtipnicek": self.vtipnicek,
-                        "locker_stuff": self.locker_stuff, 
-                        "without_light": self.without_light, 
-                        "caught": self.caught
-                        }
+        self.saved_room_data: str = "017"
         
         # Settings
         self.music_on: bool = True
@@ -132,7 +115,7 @@ class Game:
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
         self.kokosky_in_locker: bool = True
-        self.vtipnicek: bool = False
+        self.vtipnicek: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -188,7 +171,7 @@ class Game:
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
-    def new(self):
+    def new(self, t):
         """
         A new game starts
         """
@@ -205,10 +188,11 @@ class Game:
         self.interactible = pygame.sprite.LayeredUpdates()
         self.cleaner = pygame.sprite.LayeredUpdates()
 
-
+        # Loads data
         data = SaveProgress.load_data(self.player_name)
         
-        if data is not None:
+        # Has profile
+        if data is not None and t == "new":
 
             # Level
             self.in_room = self.rooms[data["level"]]
@@ -233,6 +217,7 @@ class Game:
             # Moving camera/player
             self.set_level_camera(self.in_room)
 
+        # New player
         else: 
             
             # Tilemap
@@ -420,6 +405,19 @@ class Game:
         """
         Saves game to file by player name
         """
+
+        # Quests
+        self.quests = { "key_in_trash": self.key_in_trash, 
+                        "locked_locker": self.locked_locker, 
+                        "locked_changing_room": self.locked_changing_room, 
+                        "kokosky_in_locker": self.kokosky_in_locker, 
+                        "vtipnicek": self.vtipnicek,
+                        "locker_stuff": self.locker_stuff, 
+                        "without_light": self.without_light, 
+                        "caught": self.caught
+                        }
+        
+        # Saving
         self.database = SaveProgress(self.player_name, 
                                     self.inv,
                                     self.quests,
@@ -469,11 +467,8 @@ class Game:
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
                     self.reseting_game_values()
-                    self.intro_screen().new()
-                    self.main()
-                else: 
-                    self.new()
-                    self.main()
+                    self.intro_screen().new("new").main()
+                else: self.new("old").main()
 
             elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): self.save_game()
             
@@ -1634,7 +1629,7 @@ class Game:
                     elif eight_rect.collidepoint(event.pos) and len(code) <= 10: code += "8"
                     elif nine_rect.collidepoint(event.pos) and len(code) <= 10: code += "9"
                     elif enter_rect.collidepoint(event.pos):
-                        if not self.quests['vtipnicek']:
+                        if self.vtipnicek:
                             if code == "3906241": self.open_iot_safe()
                             else: code = ""
                         else: self.info("I already have vtipnicek.")
@@ -1726,8 +1721,10 @@ class Game:
 
                 # Close button
                 if event.type == pygame.QUIT: self.exiting()
+
+                # Click on vtipnicek
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if vtipnicek_rect.collidepoint(event.pos): self.quests['vtipnicek'] = True
+                    if vtipnicek_rect.collidepoint(event.pos): self.vtipnicek = False
 
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): searching = False
@@ -1736,7 +1733,8 @@ class Game:
             self.screen.blit(bg, (0, 0))
 
             self.screen.blit(back_button.image, back_button.rect)
-            if not self.quests['vtipnicek']: self.screen.blit(vtipnicek, vtipnicek_rect)
+            if self.vtipnicek: self.screen.blit(vtipnicek, vtipnicek_rect)
+
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -1916,5 +1914,5 @@ class Game:
         
 
 g = Game()
-g.intro_screen().new().main()
+g.intro_screen().new("new").main()
 pygame.quit()

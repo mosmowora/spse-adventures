@@ -156,7 +156,7 @@ second_floor: List[str] = [
     "WWWWWWWWDWWW.............W..................WZZZZZZZŔzzzzzzzW..................W.................W................W..................W.........W................WWWWWWW..............sssssssssssW",
     "W..........W..l..l..l....W.l..l..l..l..l....WZZZZZZZŔzzzzzzzW.l..l..l..l..l....W..l..l..l..l.....W................W..l..l..l..l......W.........W.l..l..l..l.....W.....W..............sssssssssssW",
     "Wjjj.......W..l..l..l....W.l..l..l..l..l....WZZZZZZZŔzzzzzzzW.l..l..l..l..l...tW..l..l..l..l....tW...............tW..l..l..l..l.....tW.........W.l..l..l..l.....W.... W.............PsssssssssssW",
-    "W..........WWWWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWŘŘŘŘŘŘŘŕzzzzzzzWWWWWWWWWWWWWWWWDWWWWWWWWWWWWWWWWDWWWWGGGGGGGGGGDDGGGGWWWWWWWWWWWWWWDWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWWWWWWWWt.............sssssssssssW",
+    "W..........WWWWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWŘŘŘŘŘŘŘŕzzzzzzzWWWWWWWWWWWWWWWWDWWWWWWWWWWWWWWWWDWWWWwwwwwwwwwwGGwwwwWWWWWWWWWWWWWWDWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWWWWWWWWt.............sssssssssssW",
     "W..........W.........................................................................................................................................................................RRRRRRRRRRRW",
     "wjj.....jj.W.........................................................................................................................................................................SSSSSSSSSSSw",
     "w..........D.........................................................................................................................................................................SSSSSSSSSSSW",
