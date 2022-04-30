@@ -1630,7 +1630,9 @@ class Game:
                     elif nine_rect.collidepoint(event.pos) and len(code) <= 10: code += "9"
                     elif enter_rect.collidepoint(event.pos):
                         if self.vtipnicek:
-                            if code == "3906241": self.open_iot_safe()
+                            if code == "3906241": 
+                                self.open_iot_safe()
+                                self.inv["vtipnicek"] = "img/vtipnicek.png"
                             else: code = ""
                         else: self.info("I already have vtipnicek.")
                     elif zero_rect.collidepoint(event.pos) and len(code) <= 10: code += "0"

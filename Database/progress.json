@@ -49,7 +49,8 @@
         "name": "Anton Bernolak",
         "inventory": {
             "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
+            "changing_room key": "img/changing_room key.png",
+            "vtipnicek": "img/vtipnicek.png"
         },
         "quests": {
             "key_in_trash": true,
@@ -65,7 +66,7 @@
             "without_light": 1,
             "caught": 0
         },
-        "level": 4,
-        "room_number": "403"
+        "level": 0,
+        "room_number": "017"
     }
 ]
