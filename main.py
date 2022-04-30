@@ -163,7 +163,7 @@ class Game:
                 elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
                 elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
                 elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
-                elif column == "N": self.npc.append(Npc(self, j, i, "")) # NPC
+                elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
     def new(self):
@@ -257,8 +257,8 @@ class Game:
                 match self.player.facing:
                     case "up": Interact(self, self.player.rect.x, self.player.rect.y - TILE_SIZE, self.interactive)
                     case "down": Interact(self, self.player.rect.x, self.player.rect.y + TILE_SIZE, self.interactive)
-                    case "left": Interact(self, self.player.rect.x - TILE_SIZE, self.player.rect.y, self.interactive)
-                    case "right": Interact(self, self.player.rect.x + TILE_SIZE, self.player.rect.y, self.interactive) 
+                    case "left": Interact(self, (self.player.rect.x - TILE_SIZE), self.player.rect.y, self.interactive)
+                    case "right": Interact(self, (self.player.rect.x + TILE_SIZE), self.player.rect.y, self.interactive) 
                 
                 # What was clicked
                 match self.interacted[0].capitalize():
@@ -270,6 +270,7 @@ class Game:
                     case "Stairs_down": self.stairs()
                     case "Basement": self.basement()
                     case "Toilet": self.toilet()
+                    case "Teacher": self.talking_with_teachers()
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -1250,6 +1251,13 @@ class Game:
         # LROB -> LROB (predsien)
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
+    def talking_with_teachers(self):
+        
+        if self.interacted[0] == "Teacher":
+            # LIA
+            if self.interacted[2] == 100 and self.interacted[1] == 19: 
+                self.talking("LIA is just standing here")
+                self.talking("MENACINGLY")
     def shoes_on(self):
         """
         Checks if player has shoes on

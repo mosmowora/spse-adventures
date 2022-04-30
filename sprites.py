@@ -119,6 +119,13 @@ class Player(pygame.sprite.Sprite):
         else: 
             self.x_change = 0
             self.y_change = 0
+            
+    def get_facing(self):
+        """
+        Returns the facing of the player
+        """
+
+        return self.facing
 
     def movement(self):
         """
@@ -353,6 +360,17 @@ class Npc(pygame.sprite.Sprite):
             self.game.npcs_spritesheet.get_sprite(self.color + 35, 66, self.width, self.height),
             self.game.npcs_spritesheet.get_sprite(self.color + 67, 66, self.width, self.height)
         ]
+        
+    def look_at_player(self):
+        """
+        NPC looks at player\n
+        TODO: needs to be placed in correct method, but it works
+        """
+
+        if self.game.player.x > self.x: self.facing = "right"
+        elif self.game.player.x < self.x: self.facing = "left"
+        elif self.game.player.y > self.y: self.facing = "down"
+        elif self.game.player.y < self.y: self.facing = "up"
 
     def update(self):
         """
@@ -360,9 +378,9 @@ class Npc(pygame.sprite.Sprite):
         """
 
         # Moving
-        self.movement()
+        if self.type == "C": self.movement()
         self.animate()
-
+        
         # Collision
         self.rect.x += self.x_change
         self.collide_blocks("x")
@@ -689,6 +707,8 @@ class Interact(pygame.sprite.Sprite):
 
                     # Basement
                     elif self.interactive[hits[0]] in ("b" + str(i) + str(j), "d" + str(i) + str(j)): self.game.interacted = ["Basement", i, j]
+                    
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(j, i)
 
 class Button:
     """
