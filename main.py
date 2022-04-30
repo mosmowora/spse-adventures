@@ -1544,7 +1544,7 @@ class Game:
 
         # Note
         note = pygame.image.load("img/safe_note.png")
-        note_rect = note.get_rect(x=10, y=87)
+        note_rect = note.get_rect(x=141, y=3)
 
         # Number buttons
         one = pygame.image.load("img/b_one.png")
