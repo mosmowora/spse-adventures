@@ -1,5 +1,4 @@
 # Import
-from turtle import back
 import pygame
 from save_progress import SaveProgress
 from sprites import *; from config import *
