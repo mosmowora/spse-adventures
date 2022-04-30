@@ -41,6 +41,23 @@ class Game:
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
         self.saved_room_data: str = ""
+        self.key_in_trash: bool = True
+        self.locked_locker: bool = True
+        self.locked_changing_room: bool = True
+        self.kokosky_in_locker: bool = True
+        self.vtipnicek: bool = False
+        self.without_light: int = 0
+        self.caught: int = 0
+        self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
+        self.quests = {  "key_in_trash": self.key_in_trash, 
+                        "locked_locker": self.locked_locker, 
+                        "locked_changing_room": self.locked_changing_room, 
+                        "kokosky_in_locker": self.kokosky_in_locker, 
+                        "vtipnicek": self.vtipnicek,
+                        "locker_stuff": self.locker_stuff, 
+                        "without_light": self.without_light, 
+                        "caught": self.caught
+                        }
         
         # Settings
         self.music_on: bool = True
@@ -115,6 +132,7 @@ class Game:
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
         self.kokosky_in_locker: bool = True
+        self.vtipnicek: bool = False
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -404,16 +422,9 @@ class Game:
         """
         self.database = SaveProgress(self.player_name, 
                                     self.inv,
-                                        {   "key_in_trash": self.key_in_trash, 
-                                            "locked_locker": self.locked_locker, 
-                                            "locked_changing_room": self.locked_changing_room, 
-                                            "kokosky_in_locker": self.kokosky_in_locker, 
-                                            "locker_stuff": self.locker_stuff, 
-                                            "without_light": self.without_light, 
-                                            "caught": self.caught
-                                        },
-                                        self.rooms.index(self.in_room),
-                                        self.saved_room_data
+                                    self.quests,
+                                    self.rooms.index(self.in_room),
+                                    self.saved_room_data
                                     )
         self.database.save()
         print("SAVED")
@@ -1623,8 +1634,10 @@ class Game:
                     elif eight_rect.collidepoint(event.pos) and len(code) <= 10: code += "8"
                     elif nine_rect.collidepoint(event.pos) and len(code) <= 10: code += "9"
                     elif enter_rect.collidepoint(event.pos):
-                        if code == "3906241": self.open_iot_safe()
-                        else: code = ""
+                        if not self.quests['vtipnicek']:
+                            if code == "3906241": self.open_iot_safe()
+                            else: code = ""
+                        else: self.info("I already have vtipnicek.")
                     elif zero_rect.collidepoint(event.pos) and len(code) <= 10: code += "0"
                     elif back_rect.collidepoint(event.pos): code = code[:-1]
 
@@ -1688,14 +1701,16 @@ class Game:
 
     def open_iot_safe(self):
         """
-        Inside IoT safe\n
-        TODO: add Vtipnicek here after I make it
+        Inside IoT safe
         """
 
         searching = True
 
         # Background
         bg = pygame.image.load("img/iot_safe_opened.png")
+        # vtipnicek
+        vtipnicek = pygame.image.load("img/vtipnicek.png")
+        vtipnicek_rect = vtipnicek.get_rect(x=140, y=105)
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Close", fontsize=32)
@@ -1711,6 +1726,8 @@ class Game:
 
                 # Close button
                 if event.type == pygame.QUIT: self.exiting()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if vtipnicek_rect.collidepoint(event.pos): self.quests['vtipnicek'] = True
 
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): searching = False
@@ -1719,7 +1736,7 @@ class Game:
             self.screen.blit(bg, (0, 0))
 
             self.screen.blit(back_button.image, back_button.rect)
-
+            if not self.quests['vtipnicek']: self.screen.blit(vtipnicek, vtipnicek_rect)
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
