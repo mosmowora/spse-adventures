@@ -1,5 +1,5 @@
 # Import
-from numpy import number
+from turtle import back
 import pygame
 from save_progress import SaveProgress
 from sprites import *; from config import *
@@ -147,6 +147,7 @@ class Game:
                 elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
                 elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk
+                elif column == "ĺ": self.interactive[Block(self, j, i, "ĺ")] = "ĺ" + str(i) + str(j) # Desk
                 elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
                 elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
                 elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Horizontal Desk
@@ -163,6 +164,10 @@ class Game:
                 elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
                 elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
                 elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
+                elif column == "O": self.interactive[Block(self, j, i, "O")] = "O" + str(i) + str(j) # Bookshelf
+                elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
+                elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
+                elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
@@ -271,6 +276,8 @@ class Game:
                     case "Basement": self.basement()
                     case "Toilet": self.toilet()
                     case "Teacher": self.talking_with_teachers()
+                    case "Bookshelf": self.bookshelf()
+                    case "Desk": self.desk()
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -757,6 +764,19 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
+
+    def info(self, msg_content: str):
+        """
+        When character is talking but without the update and draw\n
+        Good in some situations
+        """
+
+        for _ in range(self.talking_speed_number):
+            text = self.font.render(msg_content, True, WHITE)
+            text_rect = text.get_rect(x=10, y=10)
+            self.screen.blit(text, text_rect)
+            self.clock.tick(FPS)
+            pygame.display.update()
 
     def trashcan(self):
         """
@@ -1258,6 +1278,7 @@ class Game:
             if self.interacted[2] == 100 and self.interacted[1] == 19: 
                 self.talking("LIA is just standing here")
                 self.talking("MENACINGLY")
+                
     def shoes_on(self):
         """
         Checks if player has shoes on
@@ -1449,6 +1470,260 @@ class Game:
                 self.talking("Welp, you really want me to go down there?")
                 self.talking("Let's see.")
                 self.game_over("img/lost.png")
+
+    def bookshelf(self):
+        """
+        Searching bookshelfs
+        """
+
+        self.talking("There is a lot of books.")
+        if self.interacted[1] in (34, 35, 36) and self.interacted[2] == 85: self.otec_iot()
+
+    def otec_iot(self):
+        """
+        Looking at boot: Otec_IoT
+        """
+
+        self.talking("Huh what is this?")
+
+        looking = True
+
+        # Background
+        bg = pygame.image.load("img/otec_iot.png")
+
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+
+        self.talking("It's a book from Honoré de Balzac.")
+        self.talking("Otec Goriot but the Gor is badly crossed out.")
+
+        while looking:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: quit()
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            # Button
+            self.screen.blit(back_button.image, back_button.rect)
+            if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
+    def desk(self):
+        """
+        Searching desk (some desks are special)
+        """
+        
+        
+        if self.interacted[1] == 11 and self.interacted[2] == 3: self.iot_safe()
+
+    def iot_safe(self):
+        """
+        IoT safe\n
+        Normal button are too fast so I used images :upside_down:
+        """
+
+        looking = True
+
+        # Background
+        bg = pygame.image.load("img/iot_safe_closed.png")
+        self.talking("A safe?")
+
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+
+        # Note
+        note = pygame.image.load("img/safe_note.png")
+        note_rect = note.get_rect(x=10, y=87)
+
+        # Number buttons
+        one = pygame.image.load("img/b_one.png")
+        one_rect = one.get_rect(x=200, y=130)
+        two = pygame.image.load("img/b_two.png")
+        two_rect = two.get_rect(x=280, y=130)
+        three = pygame.image.load("img/b_three.png")
+        three_rect = three.get_rect(x=360, y=130)
+
+        four = pygame.image.load("img/b_four.png")
+        four_rect = four.get_rect(x=200, y=210)
+        five = pygame.image.load("img/b_five.png")
+        five_rect = five.get_rect(x=280, y=210)
+        six = pygame.image.load("img/b_six.png")
+        six_rect = six.get_rect(x=360, y=210)
+
+        seven = pygame.image.load("img/b_seven.png")
+        seven_rect = seven.get_rect(x=200, y=290)
+        eight = pygame.image.load("img/b_eight.png")
+        eight_rect = eight.get_rect(x=280, y=290)
+        nine = pygame.image.load("img/b_nine.png")
+        nine_rect = nine.get_rect(x=360, y=290)
+
+        enter = pygame.image.load("img/b_enter.png")
+        enter_rect = enter.get_rect(x=200, y=370)
+        zero = pygame.image.load("img/b_zero.png")
+        zero_rect = zero.get_rect(x=280, y=370)
+        back = pygame.image.load("img/b_back.png")
+        back_rect = back.get_rect(x=360, y=370)
+        #one = Button(200, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="1", fontsize=20)
+        #two = Button(280, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="2", fontsize=20)
+        #three = Button(360, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="3", fontsize=20)
+
+        #four = Button(200, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="4", fontsize=20)
+        #five = Button(280, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="5", fontsize=20)
+        #six = Button(360, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="6", fontsize=20)
+
+        #seven = Button(200, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="7", fontsize=20)
+        #eight = Button(280, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="8", fontsize=20)
+        #nine = Button(360, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="9", fontsize=20)
+
+        #enter = Button(200, 370, 75, 75, fg=GREEN, bg=DIM_GRAY, content="->", fontsize=20)
+        #zero = Button(280, 370, 75, 75, fg=WHITE, bg=DIM_GRAY, content="0", fontsize=20)
+        #back = Button(360, 370, 75, 75, fg=WHITE, bg=DIM_GRAY, content="<-", fontsize=20)
+
+        # Input rectangle
+        code_input = pygame.Rect(245, 60, 150, 32)
+
+        # Code
+        code = ""
+
+        while looking:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Clicking
+                if event.type == pygame.MOUSEBUTTONDOWN:
+
+                    # Button
+                    if note_rect.collidepoint(event.pos): self.info("Note. Maybe a hint to the code.") # to the code OR for the code OR something different? IDK
+                    elif one_rect.collidepoint(event.pos) and len(code) <= 10: code += "1"
+                    elif two_rect.collidepoint(event.pos) and len(code) <= 10: code += "2"
+                    elif three_rect.collidepoint(event.pos) and len(code) <= 10: code += "3"
+                    elif four_rect.collidepoint(event.pos) and len(code) <= 10: code += "4"
+                    elif five_rect.collidepoint(event.pos) and len(code) <= 10: code += "5"
+                    elif six_rect.collidepoint(event.pos) and len(code) <= 10: code += "6"
+                    elif seven_rect.collidepoint(event.pos) and len(code) <= 10: code += "7"
+                    elif eight_rect.collidepoint(event.pos) and len(code) <= 10: code += "8"
+                    elif nine_rect.collidepoint(event.pos) and len(code) <= 10: code += "9"
+                    elif enter_rect.collidepoint(event.pos):
+                        if code == "3906241": self.open_iot_safe()
+                        else: code = ""
+                    elif zero_rect.collidepoint(event.pos) and len(code) <= 10: code += "0"
+                    elif back_rect.collidepoint(event.pos): code = code[:-1]
+
+            if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
+            #elif one.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "1"
+            #elif two.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "2"
+            #elif three.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "3"
+            #elif four.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "4"
+            #elif five.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "5"
+            #elif six.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "6"
+            #elif seven.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "7"
+            #elif eight.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "8"
+            #elif nine.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "9"
+            #elif enter.is_pressed(mouse_pos, mouse_pressed):
+            #    if code == "3906241": print("For now print")
+            #    else: code = ""
+            #elif zero.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "0"
+            #elif back.is_pressed(mouse_pos, mouse_pressed): code = code[:-1]
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            # Input rectangle
+            pygame.draw.rect(self.screen, BLACK, code_input)
+
+            # Input Text
+            text_surface = self.font.render(code, True, GREEN)
+            self.screen.blit(text_surface, (code_input.x+5, code_input.y+5))
+
+            # Buttons
+            self.screen.blit(back_button.image, back_button.rect)
+            self.screen.blit(one, one_rect)
+            self.screen.blit(two, two_rect)
+            self.screen.blit(three, three_rect)
+            self.screen.blit(four, four_rect)
+            self.screen.blit(five, five_rect)
+            self.screen.blit(six, six_rect)
+            self.screen.blit(seven, seven_rect)
+            self.screen.blit(eight, eight_rect)
+            self.screen.blit(nine, nine_rect)
+            self.screen.blit(enter, enter_rect)
+            self.screen.blit(zero, zero_rect)
+            self.screen.blit(back, back_rect)
+            self.screen.blit(note, note_rect)
+            #self.screen.blit(one.image, one.rect)
+            #self.screen.blit(two.image, two.rect)
+            #self.screen.blit(three.image, three.rect)
+            #self.screen.blit(four.image, four.rect)
+            #self.screen.blit(five.image, five.rect)
+            #self.screen.blit(six.image, six.rect)
+            #self.screen.blit(seven.image, seven.rect)
+            #self.screen.blit(eight.image, eight.rect)
+            #self.screen.blit(nine.image, nine.rect)
+            #self.screen.blit(enter.image, enter.rect)
+            #self.screen.blit(zero.image, zero.rect)
+            #self.screen.blit(back.image, back.rect)
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
+    def open_iot_safe(self):
+        """
+        Inside IoT safe\n
+        TODO: add Vtipnicek here after I make it
+        """
+
+        searching = True
+
+        # Background
+        bg = pygame.image.load("img/iot_safe_opened.png")
+
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Close", fontsize=32)
+
+        while searching:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+            # Back button
+            if back_button.is_pressed(mouse_pos, mouse_pressed): searching = False
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            self.screen.blit(back_button.image, back_button.rect)
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
 
     def stairs(self):
         """
