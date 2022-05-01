@@ -113,7 +113,7 @@ class Player(pygame.sprite.Sprite):
         if self.player_sitting:
             self.rect.x = self.x_change
             self.rect.y = self.y_change
-            self.image = self.game.character_spritesheet.get_sprite(102, 2, self.width, self.height)
+            self.image = self.game.character_spritesheet.get_sprite(102, 2, self.width, self.height) if self.facing != "right" else self.game.character_spritesheet.get_sprite(102, 34, self.width, self.height)
 
         # Not sitting
         else: 

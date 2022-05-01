@@ -216,7 +216,7 @@ class Game:
             self.kokosky_in_locker = data["quests"]["kokosky_in_locker"]
             self.locker_stuff = data["quests"]["locker_stuff"]
             self.vtipnicek = data["quests"]["vtipnicek"]
-            self.dumbbell_lifted = data["quests"]["dumbbell_lifted"]
+            self.dumbbell_lifted = data["quests"]["dumbbells"]
 
             # Tile map
             self.create_tile_map()
@@ -360,6 +360,7 @@ class Game:
         """
 
         open_inventory = True
+        inventory_coords: dict[str, pygame.Rect] = {}
         
         # Screen of the game
         bg = pygame.image.load("img/screen.png")
@@ -372,6 +373,31 @@ class Game:
         max_items = 7
 
         while open_inventory:
+
+            
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            # Inv items
+            n = 0
+            m = 0
+            for i in self.inv:
+                if n >= min_items:
+                    fg_rect = fg.get_rect(x=10 + 85 * m, y=10)
+                    img = pygame.image.load(self.inv[i])
+                    rect = img.get_rect(x=10 + 85 * m, y=10)
+
+                    # Display items
+                    self.screen.blit(fg, fg_rect)
+                    self.screen.blit(img, rect)
+                    
+                    # Inventory coords for items
+                    inventory_coords[self.inv[i]] = rect
+
+                    m += 1
+                n += 1
+                if n == max_items: break
 
             # Events
             for event in pygame.event.get():
@@ -387,28 +413,66 @@ class Game:
 
                 # Left arrow
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: max_items -= 7; min_items -= 7
-
-            # Background
-            self.screen.blit(bg, (0, 0))
-
-            # Inv items
-            n = 0
-            m = 0
-            for i in self.inv:
-                if n >= min_items:
-                    fg_rect = fg.get_rect(x=10 + 85 * m, y=10)
-                    img = pygame.image.load(self.inv[i])
-                    rect = img.get_rect(x=10 + 85 * m, y=10)
-                    self.screen.blit(fg, fg_rect)
-                    self.screen.blit(img, rect)
-                    m += 1
-                n += 1
-                if n == max_items: break
+                
+                # Items in inv
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for i in inventory_coords:
+                        if inventory_coords[i].collidepoint(event.pos): self.inventory_item_info(i); break
 
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+            
+            
+    def inventory_item_info(self, img: str):
+        """
+        Player talks about item in inventory
+        """
         
+        match img:
+            
+            case "img/locker key.png": self.info("A key from my locker. It's 5th from the door.", BLACK) # Locker key
+            case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BLACK) # Changing room key
+            case "img/vtipnicek_small.png": self.info("I can read you.", BLACK); self.open_vtipnicek() # Changing room key
+        
+    def open_vtipnicek(self):
+        """
+        Player can read funny jokes from vtipnicek (not a quest)\n
+        relaxation purposes only
+        """
+
+        open_vtipnicek = True
+
+        # Screen of the game
+        bg = pygame.image.load("img/screen.png")
+
+        # Vtipnicek
+        fg = pygame.image.load("img/vtipnicek_one.png")
+        fg_rect = fg.get_rect(x=WIN_WIDTH // 2 - 328 // 2, y=WIN_HEIGHT // 2 - 220 // 2)
+
+        # Events
+        while open_vtipnicek:
+
+            # Background
+            self.screen.blit(bg, (0, 0))
+
+            # Vtipnicek
+            self.screen.blit(fg, fg_rect)
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Esc/I
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == pygame.K_i: open_vtipnicek = not open_vtipnicek; break # BRUH
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+    
+    
     def save_game(self):
         """
         Saves game to file by player name
@@ -420,7 +484,7 @@ class Game:
                         "locked_changing_room": self.locked_changing_room, 
                         "kokosky_in_locker": self.kokosky_in_locker, 
                         "vtipnicek": self.vtipnicek,
-                        "dumbbell_lifted": self.dumbbell_lifted,
+                        "dumbbells": self.dumbbell_lifted,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light, 
                         "caught": self.caught
@@ -669,18 +733,22 @@ class Game:
         
         while opened:
             
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
             # Events
             for event in pygame.event.get():
 
                 # Close button
                 if event.type == pygame.QUIT: quit()
                 
-            # Position and click of the mouse
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_pressed = pygame.mouse.get_pressed()
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: opened = not opened
             
-            if back.is_pressed(mouse_pos, mouse_pressed): opened = False
-            
+            # Back button
+            if back.is_pressed(mouse_pos, mouse_pressed): opened = not opened
+        
             # From on (right) to off (left)
             elif slider.is_pressed(mouse_pos, mouse_pressed) and self.music_on or slider_inside.is_pressed(mouse_pos, mouse_pressed) and self.music_on:
                 for _ in range(12):
@@ -779,14 +847,14 @@ class Game:
         self.update()
         self.draw()
 
-    def info(self, msg_content: str):
+    def info(self, msg_content: str, color: tuple[int, int, int] = WHITE):
         """
         When character is talking but without the update and draw\n
         Good in some situations
         """
 
         for _ in range(self.talking_speed_number):
-            text = self.font.render(msg_content, True, WHITE)
+            text = self.font.render(msg_content, True, color)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
@@ -1417,15 +1485,16 @@ class Game:
         """
         Sitting on the bench
         """
-
-        self.player.sit(True, self.interacted[1], self.interacted[2])
-        self.update()
-        self.draw()
-        self.talking("You sit on a bench.")
-        self.talking("Sitting is really interesting.")
-        self.talking("You enjoyed this sitting session.")
-        self.talking("But now it's time to continue your journey.")
-        self.player.sit(False, self.interacted[1], self.interacted[2])
+        
+        if self.player.facing not in ("up", "down"):
+            self.player.sit(True, self.interacted[1], self.interacted[2])
+            self.update()
+            self.draw()
+            self.talking("You sit on a bench.")
+            self.talking("Sitting is really interesting.")
+            self.talking("You enjoyed this sitting session.")
+            self.talking("But now it's time to continue your journey.")
+            self.player.sit(False, self.interacted[1], self.interacted[2])
 
     def door(self):
         """
@@ -1544,8 +1613,7 @@ class Game:
 
     def iot_safe(self):
         """
-        IoT safe\n
-        Normal button are too fast so I used images :upside_down:
+        IoT safe
         """
 
         looking = True
@@ -1589,21 +1657,6 @@ class Game:
         zero_rect = zero.get_rect(x=280, y=370)
         back = pygame.image.load("img/b_back.png")
         back_rect = back.get_rect(x=360, y=370)
-        #one = Button(200, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="1", fontsize=20)
-        #two = Button(280, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="2", fontsize=20)
-        #three = Button(360, 130, 75, 75, fg=WHITE, bg=DIM_GRAY, content="3", fontsize=20)
-
-        #four = Button(200, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="4", fontsize=20)
-        #five = Button(280, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="5", fontsize=20)
-        #six = Button(360, 210, 75, 75, fg=WHITE, bg=DIM_GRAY, content="6", fontsize=20)
-
-        #seven = Button(200, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="7", fontsize=20)
-        #eight = Button(280, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="8", fontsize=20)
-        #nine = Button(360, 290, 75, 75, fg=WHITE, bg=DIM_GRAY, content="9", fontsize=20)
-
-        #enter = Button(200, 370, 75, 75, fg=GREEN, bg=DIM_GRAY, content="->", fontsize=20)
-        #zero = Button(280, 370, 75, 75, fg=WHITE, bg=DIM_GRAY, content="0", fontsize=20)
-        #back = Button(360, 370, 75, 75, fg=WHITE, bg=DIM_GRAY, content="<-", fontsize=20)
 
         # Input rectangle
         code_input = pygame.Rect(245, 60, 150, 32)
@@ -1646,20 +1699,6 @@ class Game:
                     elif back_rect.collidepoint(event.pos): code = code[:-1]
 
             if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
-            #elif one.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "1"
-            #elif two.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "2"
-            #elif three.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "3"
-            #elif four.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "4"
-            #elif five.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "5"
-            #elif six.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "6"
-            #elif seven.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "7"
-            #elif eight.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "8"
-            #elif nine.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "9"
-            #elif enter.is_pressed(mouse_pos, mouse_pressed):
-            #    if code == "3906241": print("For now print")
-            #    else: code = ""
-            #elif zero.is_pressed(mouse_pos, mouse_pressed) and len(code) <= 10: code += "0"
-            #elif back.is_pressed(mouse_pos, mouse_pressed): code = code[:-1]
 
             # Background
             self.screen.blit(bg, (0, 0))
@@ -1686,18 +1725,6 @@ class Game:
             self.screen.blit(zero, zero_rect)
             self.screen.blit(back, back_rect)
             self.screen.blit(note, note_rect)
-            #self.screen.blit(one.image, one.rect)
-            #self.screen.blit(two.image, two.rect)
-            #self.screen.blit(three.image, three.rect)
-            #self.screen.blit(four.image, four.rect)
-            #self.screen.blit(five.image, five.rect)
-            #self.screen.blit(six.image, six.rect)
-            #self.screen.blit(seven.image, seven.rect)
-            #self.screen.blit(eight.image, eight.rect)
-            #self.screen.blit(nine.image, nine.rect)
-            #self.screen.blit(enter.image, enter.rect)
-            #self.screen.blit(zero.image, zero.rect)
-            #self.screen.blit(back.image, back.rect)
 
             # Updates
             self.clock.tick(FPS)

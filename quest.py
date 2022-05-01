@@ -1,6 +1,5 @@
 import pygame
 from config import *
-from save_progress import SaveProgress
 from sprites import Button
 
 class Quest:
@@ -17,7 +16,7 @@ class Quest:
         self.bench_done = bench_done
 
         # Already did bench press
-        if not self.bench_done: self.game.talking("I already done this."); return False
+        if not self.bench_done: self.game.talking("I already did this."); return False
         
         # Bench press quest for stronk bois
         background = pygame.image.load("img/bench_press.png").convert()
@@ -27,6 +26,7 @@ class Quest:
         looking: bool = True
         counter: int = 0
         push_strength: int = 20
+        weak: bool = True
         
         while looking and counter < 5:
             
