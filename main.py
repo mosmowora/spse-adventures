@@ -287,7 +287,7 @@ class Game:
                     case "Teacher": self.talking_with_teachers()
                     case "Bookshelf": self.bookshelf()
                     case "Desk": self.desk()
-                    case "Bench_press": self.quest.bench_press()
+                    case "Bench_press": self.dumbbell_lifted = self.quest.bench_press(self.dumbbell_lifted)
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -1639,9 +1639,7 @@ class Game:
                     elif nine_rect.collidepoint(event.pos) and len(code) <= 10: code += "9"
                     elif enter_rect.collidepoint(event.pos):
                         if self.vtipnicek:
-                            if code == "3906241": 
-                                self.open_iot_safe()
-                                self.inv["vtipnicek"] = "img/vtipnicek.png"
+                            if code == "3906241": self.open_iot_safe()
                             else: code = ""
                         else: self.info("I already have vtipnicek.")
                     elif zero_rect.collidepoint(event.pos) and len(code) <= 10: code += "0"
@@ -1716,7 +1714,7 @@ class Game:
         bg = pygame.image.load("img/iot_safe_opened.png")
         # vtipnicek
         vtipnicek = pygame.image.load("img/vtipnicek.png")
-        vtipnicek_rect = vtipnicek.get_rect(x=160, y=125)
+        vtipnicek_rect = vtipnicek.get_rect(x=193, y=75)
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Close", fontsize=32)
@@ -1735,7 +1733,7 @@ class Game:
 
                 # Click on vtipnicek
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if vtipnicek_rect.collidepoint(event.pos): self.vtipnicek = False
+                    if vtipnicek_rect.collidepoint(event.pos): self.inv["vtipnicek"] = "img/vtipnicek_small.png"; self.vtipnicek = False
 
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): searching = False
