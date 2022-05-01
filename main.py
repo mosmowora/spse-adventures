@@ -1,5 +1,6 @@
 # Import
 import pygame
+from quest import Quest
 from save_progress import SaveProgress
 from sprites import *; from config import *
 
@@ -41,6 +42,7 @@ class Game:
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
         self.saved_room_data: str = "017"
+        self.quest = Quest(self)
         
         # Settings
         self.music_on: bool = True
@@ -116,6 +118,7 @@ class Game:
         self.locked_changing_room: bool = True
         self.kokosky_in_locker: bool = True
         self.vtipnicek: bool = True
+        self.dumbbell_lifted: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -146,6 +149,8 @@ class Game:
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
                 elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
+                elif column == "y": self.interactive[Block(self, j, i, "y")] = "y" + str(i) + str(j) # Benchpress
+                elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
                 elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk
                 elif column == "ĺ": self.interactive[Block(self, j, i, "ĺ")] = "ĺ" + str(i) + str(j) # Desk
                 elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
@@ -171,7 +176,7 @@ class Game:
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
-    def new(self, t):
+    def new(self, t: str):
         """
         A new game starts
         """
@@ -210,6 +215,8 @@ class Game:
             self.locked_changing_room = data["quests"]["locked_changing_room"]
             self.kokosky_in_locker = data["quests"]["kokosky_in_locker"]
             self.locker_stuff = data["quests"]["locker_stuff"]
+            self.vtipnicek = data["quests"]["vtipnicek"]
+            self.dumbbell_lifted = data["quests"]["dumbbell_lifted"]
 
             # Tile map
             self.create_tile_map()
@@ -280,6 +287,7 @@ class Game:
                     case "Teacher": self.talking_with_teachers()
                     case "Bookshelf": self.bookshelf()
                     case "Desk": self.desk()
+                    case "Bench_press": self.quest.bench_press()
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -412,6 +420,7 @@ class Game:
                         "locked_changing_room": self.locked_changing_room, 
                         "kokosky_in_locker": self.kokosky_in_locker, 
                         "vtipnicek": self.vtipnicek,
+                        "dumbbell_lifted": self.dumbbell_lifted,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light, 
                         "caught": self.caught
@@ -1707,7 +1716,7 @@ class Game:
         bg = pygame.image.load("img/iot_safe_opened.png")
         # vtipnicek
         vtipnicek = pygame.image.load("img/vtipnicek.png")
-        vtipnicek_rect = vtipnicek.get_rect(x=140, y=105)
+        vtipnicek_rect = vtipnicek.get_rect(x=160, y=125)
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Close", fontsize=32)

@@ -1,39 +1,38 @@
 [
     {
-        "name": "Sam",
-        "inventory": {
-            "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
-        },
-        "quests": {
-            "key_in_trash": true,
-            "locked_locker": false,
-            "locked_changing_room": false,
-            "kokosky_in_locker": true,
-            "vtipnicek": true,
-            "locker_stuff": {
-                "crocs": false,
-                "boots": true,
-                "key": true
-            },
-            "without_light": 0,
-            "caught": 1
-        },
-        "level": 0,
-        "room_number": "017"
-    },
-    {
         "name": "Tomas",
         "inventory": {
             "locker key": "img/locker key.png",
             "changing_room key": "img/changing_room key.png"
         },
         "quests": {
+            "key_in_trash": false,
+            "locked_locker": false,
+            "locked_changing_room": false,
+            "kokosky_in_locker": true,
+            "vtipnicek": true,
+            "dumbbell_lifted": false,
+            "locker_stuff": {
+                "crocs": false,
+                "boots": true,
+                "key": false
+            },
+            "without_light": 0,
+            "caught": 0
+        },
+        "level": 3,
+        "room_number": "302"
+    },
+    {
+        "name": "Sam",
+        "inventory": {},
+        "quests": {
             "key_in_trash": true,
             "locked_locker": true,
             "locked_changing_room": true,
             "kokosky_in_locker": true,
-            "vtipnicek": false,
+            "vtipnicek": true,
+            "dumbbell_lifted": true,
             "locker_stuff": {
                 "crocs": true,
                 "boots": false,
@@ -42,31 +41,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
-        "room_number": "004"
-    },
-    {
-        "name": "Anton Bernolak",
-        "inventory": {
-            "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png",
-            "vtipnicek": "img/vtipnicek.png"
-        },
-        "quests": {
-            "key_in_trash": true,
-            "locked_locker": true,
-            "locked_changing_room": true,
-            "kokosky_in_locker": true,
-            "vtipnicek": true,
-            "locker_stuff": {
-                "crocs": true,
-                "boots": false,
-                "key": true
-            },
-            "without_light": 1,
-            "caught": 0
-        },
-        "level": 0,
-        "room_number": "017"
+        "level": 3,
+        "room_number": "302"
     }
 ]

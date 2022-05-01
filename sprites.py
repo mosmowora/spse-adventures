@@ -530,7 +530,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -581,6 +581,8 @@ class Block(pygame.sprite.Sprite):
         elif type == "o": self.image = self.game.terrain_spritesheet.get_sprite(172, 138, self.width, self.height)
         elif type == "ó": self.image = self.game.terrain_spritesheet.get_sprite(70, 138, self.width, self.height)
         elif type == "Ó": self.image = self.game.terrain_spritesheet.get_sprite(104, 138, self.width, self.height)
+        elif type == "y": self.image = self.game.terrain_spritesheet.get_sprite(240, 2, self.width, self.height)
+        elif type == "Y": self.image = self.game.terrain_spritesheet.get_sprite(274, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -704,7 +706,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
 
                     # Bench
-                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]; print(j, i)
 
                     # Stairs
                     elif self.interactive[hits[0]] in ("S" + str(i) + str(j), "Z" + str(i) + str(j)): self.game.interacted = ["Stairs_up", i, j]
@@ -715,6 +717,9 @@ class Interact(pygame.sprite.Sprite):
 
                     # Special desk
                     elif self.interactive[hits[0]] == "ĺ" + str(i) + str(j): self.game.interacted = ["Desk", i ,j]; print(j, i)
+                    
+                    # Bench press
+                    elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
                     elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(j, i)
