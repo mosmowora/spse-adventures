@@ -71,3 +71,14 @@ class Quest:
 
         # Return
         return weak
+    
+    
+    def function_to_bully_people(self):
+        """
+        This function needs your powers to fix it.
+        It's part of a class.
+        """
+
+        add_even_to_list = [item for item in range(11) if item % 2 == 0]
+        tuple_of_previous = tuple(add_even_to_list)
+        return (item + 1 for item in tuple_of_previous)

@@ -41,15 +41,18 @@ BASEMENT_FLOOR = -1
 
 # Basement
 basement: List[str]  = [
-    "???????????????????????????",
-    "???????????????????????????",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W!!W!!W!!W!!W!!W!!W!!W!!W.W",
-    "W!!W!!W!!W!!W!!W!!W!!W!!W.W",
-    "W.........................W",
-    "S.........................S",
-    "S........................PS",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W.........W............W...........W...........W.........W............W......W....W......W",
+    "W.........W............W...........W...........W.........W............W......W....W......W",
+    "W.........W............W...........W...........W.........W............W......W....W......W",
+    "WWWWWDWWWWWWWWWWDWWWWWWWWWWWWDWWWWWWWWWWWWWWWDWWWWWWWDWWWWWWWWWWDWWWWWWWWWDWWWWWDWWDWWWWWW",
+    "W........................................................................................S",
+    "W.......................................................................................PS",
+    "W.......WWWWDWWWWWWWWWDWWWWWWWWDWWWWWWWWWWDWWWWWWWDWWWWWWWWWWDWWWWWWWWWWDWWWWWWWWWWDWWWWWW",
+    "W.......W........W.........W........W.........W........W..........W..........W...........W",
+    "S.......W........W.........W........W.........W........W..........W..........W...........W",
+    "S.......W........W.........W........W.........W........W..........W..........W...........W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 ]
 
 # HeHeHeHa
@@ -177,7 +180,7 @@ second_floor: List[str] = [
 # Third floor
 third_floor: List[str] = [
     "WWWWWWWWWWWWWwwWWWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWWWWWwwwWWWWWWWWWWWWWWWWWWWWWWW",
-    "W..........W.............R............................WB.......BW..................W",
+    "W..........W..........................................WB.......BW..................W",
     "W..........W.............Y............................WB.......BW..................W",
     "W..........W.............y............................WB.......BW..................W",
     "W..........W..........................................WB.......BWWWWWWW............W",
@@ -210,7 +213,7 @@ third_floor: List[str] = [
 fourth_floor: List[str] = [
     "WWWWWWWWWWWWWwwWWWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWWWWWwwwWWWWWWWWWWWWWWWWWWWWWWW",
     "W..........W.!jj!....jjjjjjjjjjjjjjjjjjjjjjjjjjj..l...W.........W..................W",
-    "W..........W.l..l.................................l...W.........W..................W",
+    "W..........W.l..l.................................g...W.........W..................W",
     "W..........W.!jj!.....................................W.........W..................W",
     "W..........D..........................................W.........W..................W",
     "W..........W.........jjjjjjjjjjjjjjjjjjjjjjjjjjjjj....D.........W..................W",

@@ -24,6 +24,7 @@ class Game:
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
         self.font = pygame.font.Font("Roboto.ttf", 22)
         self.settings_font = pygame.font.Font("Caveat.ttf", 45)
+        self.lrob_font = pygame.font.Font("Roboto.ttf", 13)
 
         # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -106,7 +107,7 @@ class Game:
         self.interactive = {}
 
         # Inventory
-        self.inv: dict[str, str] = {}
+        self.inv: dict[str, str] = {"light": "img/vtipnicek_small.png", "changing_room key": "img/vtipnicek_small.png"}
 
         # Variables for endings
         self.without_light: int = 0
@@ -119,6 +120,7 @@ class Game:
         self.kokosky_in_locker: bool = True
         self.vtipnicek: bool = True
         self.dumbbell_lifted: bool = True
+        self.program_test: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -173,6 +175,7 @@ class Game:
                 elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
                 elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
                 elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
+                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Computer LROB
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
@@ -217,6 +220,11 @@ class Game:
             self.locker_stuff = data["quests"]["locker_stuff"]
             self.vtipnicek = data["quests"]["vtipnicek"]
             self.dumbbell_lifted = data["quests"]["dumbbells"]
+            self.program_test = data["quests"]["program"]
+
+            # Saved settings
+            self.music_on = data["settings"]["music"]
+            self.talking_speed_number = data["settings"]["talking_speed"]
 
             # Tile map
             self.create_tile_map()
@@ -287,6 +295,7 @@ class Game:
                     case "Teacher": self.talking_with_teachers()
                     case "Bookshelf": self.bookshelf()
                     case "Desk": self.desk()
+                    case "Computer": self.programming()
                     case "Bench_press": self.dumbbell_lifted = self.quest.bench_press(self.dumbbell_lifted)
 
                 # Reset
@@ -422,8 +431,7 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
-            
-            
+                  
     def inventory_item_info(self, img: str):
         """
         Player talks about item in inventory
@@ -431,7 +439,7 @@ class Game:
         
         match img:
             
-            case "img/locker key.png": self.info("A key from my locker. It's 5th from the door.", BLACK) # Locker key
+            case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", BLACK) # Locker key
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BLACK) # Changing room key
             case "img/vtipnicek_small.png": self.info("I can read you.", BLACK); self.open_vtipnicek() # Changing room key
         
@@ -472,7 +480,6 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
     
-    
     def save_game(self):
         """
         Saves game to file by player name
@@ -485,6 +492,7 @@ class Game:
                         "kokosky_in_locker": self.kokosky_in_locker, 
                         "vtipnicek": self.vtipnicek,
                         "dumbbells": self.dumbbell_lifted,
+                        "program": self.program_test,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light, 
                         "caught": self.caught
@@ -495,7 +503,11 @@ class Game:
                                     self.inv,
                                     self.quests,
                                     self.rooms.index(self.in_room),
-                                    self.saved_room_data
+                                    self.saved_room_data,
+                                    {
+                                        "music": self.music_on,
+                                        "talking_speed": self.talking_speed_number
+                                    }
                                     )
         self.database.save()
         print("SAVED")
@@ -653,8 +665,11 @@ class Game:
                 # Keyboard
                 if event.type == pygame.KEYDOWN:
       
+                    # Esc
+                    if event.key == pygame.K_ESCAPE: picking_name = False
+
                     # Check for backspace
-                    if event.key == pygame.K_BACKSPACE: self.player_name = self.player_name[:-1]
+                    elif event.key == pygame.K_BACKSPACE and active: self.player_name = self.player_name[:-1]
                     
                     # Enter
                     elif event.key == pygame.K_RETURN: 
@@ -1278,7 +1293,7 @@ class Game:
 
         # Hall -> Gym changing rooms
         if self.player.facing in ("up", "left") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Gym - Changing rooms", "Gym - chr"); self.center_player_after_doors()
-        
+
         # Gym changing rooms -> Hall
         elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
@@ -1475,6 +1490,9 @@ class Game:
                         self.locker_stuff['crocs'] = not self.locker_stuff['crocs']
                         self.locker_stuff['boots'] = not self.locker_stuff['boots']
 
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: looking = False
+
             # Button
             self.screen.blit(back_button.image, back_button.rect)
             if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
@@ -1525,21 +1543,22 @@ class Game:
         if "light" in self.inv:
 
             # From right
-            if self.interacted[1] == 17 and self.interacted[2] in (192, 193):
+            if self.interacted[1] == 17 and self.interacted[2] in (193, 194):
                 self.talking("I got light with me.")
                 self.talking("I'll be able to see now.")
                 self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
-                for sprite in self.all_sprites: sprite.rect.x -= 15 * TILE_SIZE
+                for sprite in self.all_sprites: sprite.rect.x -= 79 * TILE_SIZE
 
             # From left
-            elif self.interacted[1] in (26, 27) and self.interacted[2] == 116:
+            elif self.interacted[1] in (26, 27) and self.interacted[2] == 117:
                 self.talking("I got light with me.")
                 self.talking("I'll be able to see now.")
                 self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
-                for sprite in self.all_sprites: sprite.rect.x += 8 * TILE_SIZE
-                self.player.rect.x -= 24 * TILE_SIZE
+                for sprite in self.all_sprites: sprite.rect.x += 9 * TILE_SIZE; sprite.rect.y -= 3 * TILE_SIZE
+                self.player.rect.x -= 87 * TILE_SIZE
+                self.player.rect.y += 3 * TILE_SIZE
 
         # No light
         else:
@@ -1592,6 +1611,9 @@ class Game:
                 # Close button
                 if event.type == pygame.QUIT: quit()
 
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: looking = False
+
             # Background
             self.screen.blit(bg, (0, 0))
 
@@ -1602,12 +1624,142 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+            
+    def grade_program(self, text_def: str, text_self: str, text_item: str, text_even: str, text_tuple: str):
+        """
+        Grading player responses in pro quiz
+        """
+        
+        return all(item for item in zip(("def", "self", "item", "2 == 0", "tuple"), (text_def, text_self, text_item, text_even, text_tuple)) if item[0] == item[1])
+        
+    def programming(self):
+        """
+        Potitat 
+        """
+
+        # Potitat v LROB
+        if self.interacted[2] == 0 and self.interacted[1] == 25 and self.program_test:
+
+            in_potitat = True
+
+            # Background
+            bg = pygame.image.load("img/LROB.png")
+            
+            # active
+            active_def = False
+            active_self = False
+            active_item = False
+            active_even = False
+            active_tuple = False
+
+            # Color
+            color = DIM_GRAY
+
+            # To fill
+            fill_def = pygame.Rect(91, 90, 24, 13)
+            fill_self = pygame.Rect(291, 91, 29, 13)
+            fill_item = pygame.Rect(257, 233, 31, 12)
+            fill_even = pygame.Rect(509, 232, 46, 12)
+            fill_tuple = pygame.Rect(257, 257, 37, 13)
+            
+            # text
+            text_def = ""
+            text_self = ""
+            text_item = ""
+            text_even = ""
+            text_tuple = ""
+            
+            # Button
+            back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+            grade_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Grade", fontsize=32)
+
+            while in_potitat:
+
+                # Position and click of the mouse
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+
+                # Events
+                for event in pygame.event.get():
+
+                    # Close button
+                    if event.type == pygame.QUIT: self.exiting()
+
+                    # Click
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                        if fill_def.collidepoint(event.pos): active_def = True; active_self = False; active_item = False; active_even = False; active_tuple = False # Def
+                        elif fill_self.collidepoint(event.pos): active_def = False; active_self = True; active_item = False; active_even = False; active_tuple = False # Self
+                        elif fill_item.collidepoint(event.pos): active_def = False; active_self = False; active_item = True; active_even = False; active_tuple = False # Item
+                        elif fill_even.collidepoint(event.pos): active_def = False; active_self = False; active_item = False; active_even = True; active_tuple = False # Even
+                        elif fill_tuple.collidepoint(event.pos): active_def = False; active_self = False; active_item = False; active_even = False; active_tuple = True # Tuple
+                        
+                    # Keyboard
+                    if event.type == pygame.KEYDOWN:
+        
+                        # Esc
+                        if event.key == pygame.K_ESCAPE: in_potitat = False
+
+                        # Check for backspace
+                        elif event.key == pygame.K_BACKSPACE: 
+                            if active_def: text_def = text_def[:-1]
+                            elif active_self: text_self = text_self[:-1]
+                            elif active_item: text_item = text_item[:-1]
+                            elif active_even: text_even = text_even[:-1]
+                            elif active_tuple: text_tuple = text_tuple[:-1]
+                        
+                        elif active_def: text_def += event.unicode
+                        elif active_self: text_self += event.unicode
+                        elif active_item: text_item += event.unicode
+                        elif active_even: text_even += event.unicode
+                        elif active_tuple: text_tuple += event.unicode
+
+                # Back button
+                if back_button.is_pressed(mouse_pos, mouse_pressed): in_potitat = False
+
+                # Grade buttoin
+                if grade_button.is_pressed(mouse_pos, mouse_pressed): self.program_test = False; self.grade_program(text_def, text_self, text_item, text_even, text_tuple); in_potitat = False
+
+                # Background
+                self.screen.blit(bg, (0, 0))
+
+                # Button
+                self.screen.blit(back_button.image, back_button.rect)
+                self.screen.blit(grade_button.image, grade_button.rect)
+
+                # Def
+                pygame.draw.rect(self.screen, color, fill_def) if active_def else None
+                text_surface_def = self.lrob_font.render(text_def, True, (255, 255, 255))
+                self.screen.blit(text_surface_def, (fill_def.x+1, fill_def.y-1))
+
+                # Self
+                pygame.draw.rect(self.screen, color, fill_self) if active_self else None
+                text_surface_self = self.lrob_font.render(text_self, True, (255, 255, 255))
+                self.screen.blit(text_surface_self, (fill_self.x+1, fill_self.y-1))
+    
+                # Item
+                pygame.draw.rect(self.screen, color, fill_item) if active_item else None
+                text_surface_item = self.lrob_font.render(text_item, True, (255, 255, 255))
+                self.screen.blit(text_surface_item, (fill_item.x+1, fill_item.y-1))
+                
+                # Even
+                pygame.draw.rect(self.screen, color, fill_even) if active_even else None
+                text_surface_even = self.lrob_font.render(text_even, True, (255, 255, 255))
+                self.screen.blit(text_surface_even, (fill_even.x+1, fill_even.y-1))
+                
+                # Tuple
+                pygame.draw.rect(self.screen, color, fill_tuple) if active_tuple else None
+                text_surface_tuple = self.lrob_font.render(text_tuple, True, (255, 255, 255))
+                self.screen.blit(text_surface_tuple, (fill_tuple.x+1, fill_tuple.y-1))
+                
+                # Updates
+                self.clock.tick(FPS)
+                pygame.display.update()
 
     def desk(self):
         """
         Searching desk (some desks are special)
         """
-        
         
         if self.interacted[1] == 11 and self.interacted[2] == 3: self.iot_safe()
 
@@ -1698,6 +1850,9 @@ class Game:
                     elif zero_rect.collidepoint(event.pos) and len(code) <= 10: code += "0"
                     elif back_rect.collidepoint(event.pos): code = code[:-1]
 
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: looking = False
+
             if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
 
             # Background
@@ -1762,6 +1917,9 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if vtipnicek_rect.collidepoint(event.pos): self.inv["vtipnicek"] = "img/vtipnicek_small.png"; self.vtipnicek = False
 
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: searching = False
+
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): searching = False
 
@@ -1786,23 +1944,23 @@ class Game:
         if self.interacted[0] == "Stairs_up" and self.in_room == basement:
 
             # From right
-            if self.interacted[1] in (6, 7) and self.interacted[2] == 26:
+            if self.interacted[1] in (5, 6) and self.interacted[2] == 89:
                 self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
                 self.create_tile_map()
                 for sprite in self.all_sprites: 
-                    sprite.rect.x -= 182 * TILE_SIZE
+                    sprite.rect.x -= 185 * TILE_SIZE
                     sprite.rect.y -= 10 * TILE_SIZE
-                self.player.rect.x += 24 * TILE_SIZE
+                self.player.rect.x += 25 * TILE_SIZE
                 self.player.rect.y += 10 * TILE_SIZE
 
             # From left
-            if self.interacted[1] in (6, 7) and self.interacted[2] == 0:
+            if self.interacted[1] in (9, 10) and self.interacted[2] == 0:
                 self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
                 self.create_tile_map()
                 for sprite in self.all_sprites: 
-                    sprite.rect.x -= 106 * TILE_SIZE
+                    sprite.rect.x -= 107 * TILE_SIZE
                     sprite.rect.y -= 20 * TILE_SIZE
-                self.player.rect.x -= 53 * TILE_SIZE
+                self.player.rect.x -= 52 * TILE_SIZE
                 self.player.rect.y += 20 * TILE_SIZE
 
         # Ground floor -> 1st floor

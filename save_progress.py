@@ -11,7 +11,9 @@ class SaveProgress(UserAlreadyExistsError):
     quests: List[str]
     level: List[str]
     room_number: str
+    settings: dict[str, bool | int] = None
     file_dest: str = "Database/progress.json"
+    
     #   ↑     ↑       ↑        ↑          ↑
     # def __init__(self, name: str, inventory: List[str], quests: List[str], file_dest: str = "Database/progress.json"):
     #     self.name = name
@@ -39,7 +41,7 @@ class SaveProgress(UserAlreadyExistsError):
         # Data from file
         loaded_data: List = json.load(open(SaveProgress.file_dest))
         # New data
-        write_data = {"name": self.name, "inventory": self.inventory, "quests": self.quests, "level": self.level, "room_number": self.room_number}
+        write_data = {"name": self.name, "inventory": self.inventory, "quests": self.quests, "level": self.level, "room_number": self.room_number, "settings": self.settings}
 
         has_profile = False
 
