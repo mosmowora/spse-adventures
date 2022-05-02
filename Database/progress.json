@@ -1,34 +1,5 @@
 [
     {
-        "name": "Atnon",
-        "inventory": {
-            "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
-        },
-        "quests": {
-            "key_in_trash": false,
-            "locked_locker": false,
-            "locked_changing_room": false,
-            "kokosky_in_locker": true,
-            "vtipnicek": true,
-            "dumbbells": true,
-            "program": true,
-            "locker_stuff": {
-                "crocs": false,
-                "boots": true,
-                "key": false
-            },
-            "without_light": 0,
-            "caught": 0
-        },
-        "level": 3,
-        "room_number": "017",
-        "settings": {
-            "music": false,
-            "talking_speed": 120
-        }
-    },
-    {
         "name": "Tomas",
         "inventory": {
             "light": "img/vtipnicek_small.png",
@@ -41,7 +12,8 @@
             "kokosky_in_locker": true,
             "vtipnicek": true,
             "dumbbells": true,
-            "program": false,
+            "program": true,
+            "KUL_quest": false,
             "locker_stuff": {
                 "crocs": true,
                 "boots": false,
@@ -51,10 +23,11 @@
             "caught": 0
         },
         "level": 4,
-        "room_number": "4",
+        "room_number": "403",
+        "grades": {},
         "settings": {
             "music": true,
-            "talking_speed": 90
+            "talking_speed": 60
         }
     }
 ]

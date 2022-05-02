@@ -9,7 +9,7 @@ vujcik jumpscare
 
 storyline ideas:
     pov you wake up in šatňa
-    goal: get out of school 
+    goal: get out of school with grades from all lessons
     epilogue: you win watching eastern shows in the other building
     
 quests:
@@ -18,8 +18,8 @@ quests:
     bench press record (spamming) ✔️
     english practice with Mrs. GAJ (working with lists of words) 10 words
     clicking items on ping-pong table (Tomas must publish a real photo of it)
-    LROB (where we have PRO) find an easy bug and fix it
-    CISCO classroom (where we have SIE) ask KUL if you can go home earlier
+    LROB (where we have PRO) find an easy bug and fix it ✔️
+    CISCO classroom (where we have SIE) ask KUL if you can go home earlier ✔️
     vyvetraj na DSY
     quests from teachers (give/recieve) - too abstract I know
     buy a secret item from Amper (2.5% chance to get it)
@@ -27,7 +27,7 @@ quests:
     player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess))
     special desks on each floor with desk ball
     special window -> sans: the flowers are blooming...
-    specialer (totally a word) window -> jump out
+    specialer (totally a word) window -> jump out (immediate secret ending)
 
 gameplay ideas:
     women's toilets... the player won't know what it is
