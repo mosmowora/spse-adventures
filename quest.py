@@ -12,24 +12,36 @@ class Quest:
         self.game = game
     
     def bench_press(self, bench_done: bool):
-        
+        """
+        Tst quest - Bench press
+        """
+
         self.bench_done = bench_done
         grade: int = 5
+
         # Already did bench press
         if not self.bench_done: self.game.talking("I already did this."); return False
         
+        # Music
+        if self.game.music_on: pygame.mixer.Sound.stop(self.game.theme); pygame.mixer.Sound.play(self.game.tsv_theme, -1)
+
         # Bench press quest for stronk bois
         background = pygame.image.load("img/bench_press.png").convert()
         dumbbell = pygame.image.load("img/bench_press_dumbbell.png").convert_alpha()
         dumbbell_rect = dumbbell.get_rect(x=0, y=50)
         back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
-        looking: bool = True
+        working_out: bool = True
         counter: int = 0
         push_strength: int = 20
         weak: bool = True
+        exited: bool = False
+        start: int = pygame.time.get_ticks()
         
-        while looking and counter < 5:
+        while working_out and counter < 5:
             
+            # You have 1 min for this
+            if pygame.time.get_ticks() - start > 60 * 1000: working_out = False
+
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -62,17 +74,20 @@ class Quest:
             self.game.screen.blit(self.game.font.render("Times lifted: {} of 5".format(counter), True, WHITE), (10, 10))
             self.game.screen.blit(dumbbell, dumbbell_rect)
             self.game.screen.blit(back_button.image, back_button.rect)
-            if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False; weak = True
+            if back_button.is_pressed(mouse_pos, mouse_pressed): working_out = False; weak = True; exited = True
             self.game.clock.tick(FPS)
             pygame.display.update()
 
         # Made it
-        if counter in (1, 2, 3, 4, 5): 
+        if not exited: 
             weak = False
             if grade - counter == 0: grade = 1
             else: grade -= counter
             
             self.game.grades["TSV - gym"] = grade
+
+        # Music
+        if self.game.music_on: pygame.mixer.Sound.stop(self.game.tsv_theme); pygame.mixer.Sound.play(self.game.theme, -1)
 
         # Return
         return weak
@@ -101,11 +116,11 @@ class Quest:
             color = GRAY
 
             # To fill
-            fill_def = pygame.Rect(91, 90, 24, 13)
-            fill_self = pygame.Rect(291, 91, 29, 13)
-            fill_item = pygame.Rect(257, 233, 31, 12)
-            fill_even = pygame.Rect(509, 232, 46, 12)
-            fill_tuple = pygame.Rect(257, 257, 37, 13)
+            fill_def = pygame.Rect(84, 91, 26, 16)
+            fill_self = pygame.Rect(220, 93, 29, 14)
+            fill_item = pygame.Rect(248, 207, 30, 16)
+            fill_even = pygame.Rect(496, 206, 42, 19)
+            fill_tuple = pygame.Rect(248, 227, 35, 15)
             
             # text
             text_def = ""

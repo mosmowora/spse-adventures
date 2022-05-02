@@ -1,4 +1,5 @@
 # Import
+from re import M
 import pygame
 from quest import Quest
 from save_progress import SaveProgress
@@ -54,17 +55,28 @@ class Game:
 
         # Player name
         self.player_name: str = ""
-        
-        # Other helper variables
-        self.__kul_counter: int = 0
 
         # Npc list
         self.npc = []
 
         # Sounds
         self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
-        # self.theme = pygame.mixer.Sound("sounds/theme.mp3")
-        
+        self.wow_iphone.set_volume(0.5)
+        self.theme = pygame.mixer.Sound("sounds/theme.mp3")
+        self.theme.set_volume(0.008)
+        self.tsv_theme = pygame.mixer.Sound("sounds/bench.mp3")
+        self.tsv_theme.set_volume(0.05)
+        self.fall = pygame.mixer.Sound("sounds/fall.mp3")
+        self.fall.set_volume(0.25)
+        self.car = pygame.mixer.Sound("sounds/car.mp3")
+        self.car.set_volume(0.1)
+        self.lost = pygame.mixer.Sound("sounds/lost.mp3")
+        self.lost.set_volume(0.5)
+        self.lock = pygame.mixer.Sound("sounds/lock.mp3")
+        self.lock.set_volume(0.25)
+        self.door_open = pygame.mixer.Sound("sounds/door.mp3")
+        self.door_open.set_volume(0.25)
+
     def set_level_camera(self, level: List[str]):
         """
         Moves camera and player to stairs
@@ -121,6 +133,7 @@ class Game:
         # Variables for endings
         self.without_light: int = 0
         self.caught: int = 0
+        self.__kul_counter: int = 0
 
         # Variables for finding items/doing stuff
         self.key_in_trash: bool = True
@@ -266,6 +279,8 @@ class Game:
         """
         Game loop
         """
+
+        if not self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Main game loop
         while self.playing:
@@ -542,6 +557,8 @@ class Game:
         Game over screen
         """
 
+        if self.music_on: pygame.mixer.Sound.stop(self.theme)
+
         # Ending
         endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png"]
 
@@ -564,6 +581,11 @@ class Game:
             car_dead = pygame.image.load("img/car_dead.png")
             car_oops_move = -270
             car_dead_move = -700
+            if self.music_on: pygame.mixer.Sound.play(self.car, -1)
+
+        elif img == "img/lost.png": 
+            self.without_light = 0
+            if self.music_on: pygame.mixer.Sound.play(self.lost, -1)
 
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -581,12 +603,14 @@ class Game:
 
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
-                    self.endings.append(img)
+                    if img not in self.endings: self.endings.append(img)
                     self.reseting_game_values()
                     self.intro_screen().new("new").main()
                 else: self.new("old").main()
 
-            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append(img); self.save_game()
+            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): 
+                if img not in self.endings: self.endings.append(img)
+                self.save_game()
             
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
@@ -607,10 +631,16 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
+        if img == "img/window_fail.png": pygame.mixer.Sound.stop(self.car)
+        elif img == "img/lost.png": pygame.mixer.Sound.stop(self.lost)
+
     def intro_screen(self):
         """
         Intro screen
         """
+
+        # Start music
+        pygame.mixer.Sound.play(self.theme, -1)
 
         intro = True
 
@@ -761,6 +791,7 @@ class Game:
         Opens settings window
         """
         
+        music_playing = True
         opened = True
 
         # Slider
@@ -790,6 +821,10 @@ class Game:
         
         while opened:
             
+            # Music
+            if self.music_on and not music_playing: pygame.mixer.Sound.play(self.theme, -1); music_playing = True
+            elif not self.music_on and music_playing: pygame.mixer.Sound.stop(self.theme); music_playing = False
+
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -945,7 +980,7 @@ class Game:
                 self.talking("Wow, Iphone")
                 self.inv['phone'] = "img/Iphone_small.png"
                 self.phone_in_trash = False
-                pygame.mixer.music.stop()
+                pygame.mixer.Sound.stop(self.wow_iphone)
 
             # Empty
             else: self.talking("Just some rubbish.")
@@ -955,7 +990,7 @@ class Game:
         Player looks outside of window or falls
         """
 
-        if self.interacted[1] == 27 and self.interacted[2] in (65, 66): self.game_over("img/window_fail.png")
+        if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
         self.talking("What a pretty day.")
 
@@ -963,6 +998,10 @@ class Game:
         """
         Makes player stand right behind the door they walk through
         """
+
+        # Music
+        pygame.mixer.Sound.play(self.door_open)
+        pygame.time.delay(500)
 
         # Facing up
         if self.player.facing == "up":
@@ -1001,6 +1040,7 @@ class Game:
 
                 # Key in inventory
                 if "changing_room key" in self.inv:
+                    pygame.mixer.Sound.play(self.lock)
                     self.talking(f"{self.player_name} unlocked the door.")
                     self.locked_changing_room = False
 
@@ -1256,10 +1296,10 @@ class Game:
         elif self.player.facing == "up" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 201
-        elif self.player.facing == "up" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("201 - Goated place", "201"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("201 - Goated place", "201"); self.center_player_after_doors()
 
         # 201 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 42 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
     
         # Hall -> Toilets
         elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.talking("Toilets"); self.center_player_after_doors()
@@ -1434,7 +1474,9 @@ class Game:
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
     def talking_with_teachers(self):
-        
+        """
+        Player chatting with a teacher
+        """
         
         if self.interacted[0] == "Teacher":
             # LIA
@@ -1481,6 +1523,7 @@ class Game:
 
                 # Has key
                 if "locker key" in self.inv:
+                    pygame.mixer.Sound.play(self.lock)
                     self.talking(f"{self.player_name} unlocked the locker.")
                     self.locked_locker = False
 
@@ -1711,6 +1754,7 @@ class Game:
         """
         Grading player responses in PRO quiz
         """
+
         grade: int = 5 - len(tuple(i for i in zip(("def", "self", "item", "2 == 0", "tuple"), (text_def, text_self, text_item, text_even, text_tuple)) if i[0] == i[1]))
         return grade if grade != 0 else 1
 
@@ -2062,6 +2106,7 @@ class Game:
         """
         PeePeePooPoo time
         """
+
         self.talking(f"{self.player_name} has PeePeePooPoo time now.")
         
 
