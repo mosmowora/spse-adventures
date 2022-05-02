@@ -3,17 +3,21 @@
         "name": "Tomas",
         "inventory": {
             "light": "img/vtipnicek_small.png",
-            "changing_room key": "img/vtipnicek_small.png"
+            "changing_room key": "img/vtipnicek_small.png",
+            "phone": "img/Iphone_small.png"
         },
+        "endings": [],
         "quests": {
             "key_in_trash": true,
             "locked_locker": true,
             "locked_changing_room": false,
             "kokosky_in_locker": true,
             "vtipnicek": true,
-            "dumbbells": true,
+            "dumbbells": false,
             "program": true,
             "KUL_quest": false,
+            "phone": false,
+            "suplovanie": false,
             "locker_stuff": {
                 "crocs": true,
                 "boots": false,
@@ -23,11 +27,13 @@
             "caught": 0
         },
         "level": 3,
-        "room_number": "Gymnasium - chr",
-        "grades": {},
+        "room_number": "302",
+        "grades": {
+            "TSV - gym": 1
+        },
         "settings": {
             "music": true,
-            "talking_speed": 60
+            "talking_speed": 90
         }
     }
 ]

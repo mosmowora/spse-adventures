@@ -695,7 +695,7 @@ class Interact(pygame.sprite.Sprite):
                 for j, _ in enumerate(row):
 
                     # Trashcan
-                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
+                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]; print(j, i)
 
                     # Toilet
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]

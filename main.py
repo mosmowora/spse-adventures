@@ -45,6 +45,7 @@ class Game:
         self.saved_room_data: str = "017"
         self.quest = Quest(self)
         self.grades: dict[str, int] = {}
+        self.endings: List[str] = []
         
         # Settings
         self.music_on: bool = True
@@ -59,6 +60,10 @@ class Game:
 
         # Npc list
         self.npc = []
+
+        # Sounds
+        self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
+        # self.theme = pygame.mixer.Sound("sounds/theme.mp3")
         
     def set_level_camera(self, level: List[str]):
         """
@@ -111,7 +116,7 @@ class Game:
         self.interactive = {}
 
         # Inventory
-        self.inv: dict[str, str] = {"light": "img/vtipnicek_small.png", "changing_room key": "img/vtipnicek_small.png"}
+        self.inv: dict[str, str] = {}
 
         # Variables for endings
         self.without_light: int = 0
@@ -126,6 +131,8 @@ class Game:
         self.dumbbell_lifted: bool = True
         self.program_test: bool = True
         self.kul_quest: bool = True
+        self.phone_in_trash: bool = True
+        self.suplovanie: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -216,6 +223,7 @@ class Game:
             # Variables for endings
             self.without_light = data["quests"]["without_light"]
             self.caught = data["quests"]["caught"]
+            self.endings = data["endings"]
 
             # Variables for finding items/doing stuff
             self.key_in_trash = data["quests"]["key_in_trash"]
@@ -227,6 +235,8 @@ class Game:
             self.dumbbell_lifted = data["quests"]["dumbbells"]
             self.program_test = data["quests"]["program"]
             self.kul_quest = data["quests"]['KUL_quest']
+            self.suplovanie = data["quests"]['suplovanie']
+            self.phone_in_trash = data["quests"]["phone"]
             
             # Grades
             self.grades = data['grades']
@@ -393,8 +403,6 @@ class Game:
 
         while open_inventory:
 
-            
-
             # Background
             self.screen.blit(bg, (0, 0))
 
@@ -449,9 +457,10 @@ class Game:
         
         match img:
             
-            case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", BLACK) # Locker key
-            case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BLACK) # Changing room key
-            case "img/vtipnicek_small.png": self.info("I can read you.", BLACK); self.open_vtipnicek() # Changing room key
+            case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", WHITE, 90) # Locker key
+            case "img/changing_room key.png": self.info("This key is used for OUR changing room.", WHITE, 90) # Changing room key
+            case "img/vtipnicek_small.png": self.info("I can read you.", WHITE, 90); self.open_vtipnicek() # Changing room key
+            case "img/Iphone_small.png": self.info("Let's check substitution", WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Changing room key
         
     def open_vtipnicek(self):
         """
@@ -504,14 +513,17 @@ class Game:
                         "dumbbells": self.dumbbell_lifted,
                         "program": self.program_test,
                         "KUL_quest": self.kul_quest,
+                        "phone": self.phone_in_trash,
+                        "suplovanie": self.suplovanie, 
                         "locker_stuff": self.locker_stuff, 
-                        "without_light": self.without_light, 
+                        "without_light": self.without_light,
                         "caught": self.caught
                         }
         
         # Saving
         self.database = SaveProgress(self.player_name, 
                                     self.inv,
+                                    self.endings,
                                     self.quests,
                                     self.rooms.index(self.in_room),
                                     self.saved_room_data,
@@ -545,7 +557,7 @@ class Game:
 
         # Creates button
         restart_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Main menu", 32) if end else Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Try again", 32)
-        iamdone_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "I'm done", 32)
+        iamdone_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "Save & Quit", 32)
 
         if img == "img/window_fail.png": 
             car_oops = pygame.image.load("img/car_oops.png")
@@ -569,11 +581,12 @@ class Game:
 
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
+                    self.endings.append(img)
                     self.reseting_game_values()
                     self.intro_screen().new("new").main()
                 else: self.new("old").main()
 
-            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): self.save_game()
+            elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append(img); self.save_game()
             
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
@@ -891,7 +904,7 @@ class Game:
         self.update()
         self.draw()
 
-    def info(self, msg_content: str, color: tuple[int, int, int] = WHITE):
+    def info(self, msg_content: str, color: tuple[int, int, int] = WHITE, i: int = 10):
         """
         When character is talking but without the update and draw\n
         Good in some situations
@@ -899,7 +912,7 @@ class Game:
 
         for _ in range(self.talking_speed_number):
             text = self.font.render(msg_content, True, color)
-            text_rect = text.get_rect(x=10, y=10)
+            text_rect = text.get_rect(x=10, y=i)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
             pygame.display.update()
@@ -922,6 +935,20 @@ class Game:
 
             # Empty trashcan
             else: self.talking("There is nothing interesting.")
+
+        # 201 Trash can
+        elif self.interacted[1] == 24 and self.interacted[2] == 43: 
+
+            # Phone in trash
+            if self.phone_in_trash:
+                pygame.mixer.Sound.play(self.wow_iphone)
+                self.talking("Wow, Iphone")
+                self.inv['phone'] = "img/Iphone_small.png"
+                self.phone_in_trash = False
+                pygame.mixer.music.stop()
+
+            # Empty
+            else: self.talking("Just some rubbish.")
             
     def window(self):
         """
@@ -1417,7 +1444,7 @@ class Game:
                 
             elif self.interacted[2] == 57 and self.interacted[1] == 22:
                 self.__kul_counter += 1
-                if self.__kul_counter != 5:
+                if self.__kul_counter != 3:
                     self.talking("Mr. KUL, can I go home early?")
                     self.talking("You think I can manage that?", True)
                     self.talking("I was just thinking...")

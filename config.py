@@ -30,6 +30,7 @@ BLUE: tuple =           (  0,   0, 255)
 GRAY: tuple =           ( 64,  64,  64)
 DIM_GRAY: tuple =       (105, 105, 105)
 DARK_GRAY: tuple =      ( 32,  32,  32)
+NAVY: tuple =           ( 11,  19,  30)
 
 # Floors
 GROUND_FLOOR = 0
@@ -158,7 +159,7 @@ second_floor: List[str] = [
     "w..........W.............W..................WZZZZZZZŔzzzzzzzW..................W.................W................W..................W.........W................W.....W......WWWWWWWWWWWWWWWWWWWW",
     "WWWWWWWWDWWW.............W..................WZZZZZZZŔzzzzzzzW..................W.................W................W..................W.........W................WWWWWWW..............sssssssssssW",
     "W..........W..l..l..l....W.l..l..l..l..l....WZZZZZZZŔzzzzzzzW.l..l..l..l..l....W..l..l..l..l.....W................W..l..l..l..l......W.........W.l..l..l..l.....W.....W..............sssssssssssW",
-    "Wjjj.......W..l..l..l....W.l..l..l..l..l....WZZZZZZZŔzzzzzzzW.l..l..l..l..l...tW..l..l..l..l....tW...............tW..l..l..l..l.....tW.........W.l..l..l..l.....W.... W.............PsssssssssssW",
+    "Wjjj.......W..l..l..l....W.l..l..l..l..l...tWZZZZZZZŔzzzzzzzW.l..l..l..l..l...tW..l..l..l..l....tW...............tW..l..l..l..l.....tW.........W.l..l..l..l.....W.... W.............PsssssssssssW",
     "W..........WWWWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWŘŘŘŘŘŘŘŕzzzzzzzWWWWWWWWWWWWWWWWDWWWWWWWWWWWWWWWWDWWWWwwwwwwwwwwGGwwwwWWWWWWWWWWWWWWDWWWWWWWWWDWWWWWWWWWWWWWWWWWWDWWWWWWWWWt.............sssssssssssW",
     "W..........W.........................................................................................................................................................................RRRRRRRRRRRW",
     "wjj.....jj.W.........................................................................................................................................................................SSSSSSSSSSSw",

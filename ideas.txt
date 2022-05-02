@@ -13,7 +13,7 @@ storyline ideas:
     epilogue: you win watching eastern shows in the other building
     
 quests:
-    find suplovanie
+    find suplovanie ✔️
     don't get caught not wearing shoes ✔️
     bench press record (spamming) ✔️
     english practice with Mrs. GAJ (working with lists of words) 10 words
@@ -27,7 +27,7 @@ quests:
     player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess))
     special desks on each floor with desk ball
     special window -> sans: the flowers are blooming...
-    specialer (totally a word) window -> jump out (immediate secret ending)
+    specialer (totally a word) window -> jump out (immediate secret ending) ✔️
 
 gameplay ideas:
     women's toilets... the player won't know what it is

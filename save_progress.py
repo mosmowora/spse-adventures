@@ -8,6 +8,7 @@ class UserAlreadyExistsError(Exception): pass
 class SaveProgress(UserAlreadyExistsError):
     name: str
     inventory: dict[str]
+    endings: List[str] 
     quests: List[str]
     level: List[str]
     room_number: str
@@ -42,7 +43,7 @@ class SaveProgress(UserAlreadyExistsError):
         # Data from file
         loaded_data: List = json.load(open(SaveProgress.file_dest))
         # New data
-        write_data = {"name": self.name, "inventory": self.inventory, "quests": self.quests, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
+        write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
 
         has_profile = False
 

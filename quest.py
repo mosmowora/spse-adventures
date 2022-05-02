@@ -98,7 +98,7 @@ class Quest:
             active_tuple = False
 
             # Color
-            color = DIM_GRAY
+            color = GRAY
 
             # To fill
             fill_def = pygame.Rect(91, 90, 24, 13)
@@ -205,14 +205,79 @@ class Quest:
                 # Updates
                 self.game.clock.tick(FPS)
                 pygame.display.update()
-    
-    
-    # def function_to_bully_people(self):
-    #     """
-    #     This function needs your powers to fix it.
-    #     It's part of a class.
-    #     """
+                
+    def check_suplovanie(self):
+        """
+        Player checks for the substitution, very yes
+        """
 
-    #     add_even_to_list = [item for item in range(11) if item % 2 == 0]
-    #     tuple_of_previous = tuple(add_even_to_list)
-    #     return (item + 1 for item in tuple_of_previous)
+        checking = True
+
+        # Screen of the game
+        bg = pygame.image.load("img/screen.png")
+
+        # Phone
+        iphone = pygame.image.load("img/mobile.png")
+
+        # Screens
+        first_screen = pygame.image.load("img/screenshot_first.png")
+        first_rect = first_screen.get_rect(x=WIN_WIDTH // 2 - first_screen.get_width() // 2, y=WIN_HEIGHT // 2 - first_screen.get_height() // 2)
+        second_screen = pygame.image.load("img/screenshot_second.png")
+        second_rect = second_screen.get_rect(x=WIN_WIDTH // 2 - first_screen.get_width() // 2, y=WIN_HEIGHT // 2 - second_screen.get_height() // 2)
+
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+
+        # "Button"
+        empty_rect = pygame.Rect(192, 319, 129, 23)
+        back_rect = pygame.Rect(300, 420, 37, 29)
+
+        main_app = True
+        sub = False
+
+        while checking:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Keyboard
+                elif event.type == pygame.KEYDOWN:
+
+                    # Esc
+                    if event.key == pygame.K_ESCAPE: checking = False
+
+                # Mouse
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                    # Sub
+                    if empty_rect.collidepoint(event.pos): main_app = not main_app; sub = not sub
+
+                    # Back
+                    elif back_rect.collidepoint(event.pos): checking = False; return False
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+                                                            
+            self.game.screen.blit(iphone, (WIN_WIDTH // 2 - iphone.get_width() // 2, WIN_HEIGHT // 2 - iphone.get_height() // 2))
+            
+            if main_app: 
+                self.game.screen.blit(first_screen, first_rect)
+                pygame.draw.rect(self.game.screen, NAVY, empty_rect, 1)
+            elif sub: 
+                pygame.draw.rect(self.game.screen, BLACK, back_rect)
+                self.game.screen.blit(second_screen, second_rect)
+
+            # Back button
+            if back_button.is_pressed(mouse_pos, mouse_pressed): checking = False
+            self.game.screen.blit(back_button.image, back_button.rect)            
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
