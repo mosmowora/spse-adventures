@@ -145,7 +145,7 @@ class Game:
                 elif column == "!": Block(self, j, i, "!") # No entry ground
                 elif column == "P": self.player = Player(self, j, i) # Player
                 elif column == "W": Block(self, j, i, "W") # Basic wall
-                elif column == "w": Block(self, j, i, "w") # Window
+                elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
                 elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "Ľ": self.interactive[Block(self, j, i, "Ľ")] = "Ľ" + str(i) + str(j) # Locker
                 elif column == "ľ": self.interactive[Block(self, j, i, "ľ")] = "ľ" + str(i) + str(j) # Locker
@@ -306,6 +306,7 @@ class Game:
                     case "Desk": self.desk()
                     case "Computer": self.quest.programming()
                     case "Bench_press": self.dumbbell_lifted = self.quest.bench_press(self.dumbbell_lifted)
+                    case "Window": self.window()
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -530,7 +531,7 @@ class Game:
         """
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png"]
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
         end = True if img in endings else False
@@ -545,6 +546,12 @@ class Game:
         # Creates button
         restart_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Main menu", 32) if end else Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Try again", 32)
         iamdone_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "I'm done", 32)
+
+        if img == "img/window_fail.png": 
+            car_oops = pygame.image.load("img/car_oops.png")
+            car_dead = pygame.image.load("img/car_dead.png")
+            car_oops_move = -270
+            car_dead_move = -700
 
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -573,6 +580,17 @@ class Game:
             self.screen.blit(text, text_rect)
             self.screen.blit(restart_button.image, restart_button.rect)
             self.screen.blit(iamdone_button.image, iamdone_button.rect)
+
+            # Window ending
+            if img == "img/window_fail.png": 
+                self.screen.blit(car_oops, (car_oops_move, 81))
+                self.screen.blit(car_dead, (car_dead_move, 81))
+                car_oops_move += 5
+                car_dead_move += 5
+                if car_dead_move >= 1000:
+                    car_oops_move = -270
+                    car_dead_move = -700
+
             self.clock.tick(FPS)
             pygame.display.update()
 
@@ -905,6 +923,15 @@ class Game:
             # Empty trashcan
             else: self.talking("There is nothing interesting.")
             
+    def window(self):
+        """
+        Player looks outside of window or falls
+        """
+
+        if self.interacted[1] == 27 and self.interacted[2] in (65, 66): self.game_over("img/window_fail.png")
+
+        self.talking("What a pretty day.")
+
     def center_player_after_doors(self):
         """
         Makes player stand right behind the door they walk through

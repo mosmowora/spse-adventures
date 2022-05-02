@@ -206,7 +206,7 @@ third_floor: List[str] = [
     "W.....................................................WB...............BW..........W",
     "W.....................................................D.................D..........W",
     "W.....................................................W.................W..........W",
-    "WWWwwwWWwwwWWwwwWWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWWWWWwwWwwWWwwWwwWWWWWWWWWWWWWW"
+    "WWWwwwWWwwwWWwwwWWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWwwwWWWWWwwWwwWWWwwWwwWWWWWWWWWWWWWW"
 ]
 
 # Fourth floor

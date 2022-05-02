@@ -530,7 +530,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y", "g"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y", "g", "w"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -730,6 +730,9 @@ class Interact(pygame.sprite.Sprite):
 
                     # Computer
                     elif self.interactive[hits[0]] == "g" + str(i) + str(j): self.game.interacted = ["Computer", i, j]; print(j, i)
+
+                    # Special window
+                    elif self.interactive[hits[0]] == "w" + str(i) + str(j): self.game.interacted = ["Window", i, j]; print(j, i)
 
 class Button:
     """
