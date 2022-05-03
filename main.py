@@ -3,6 +3,7 @@ from re import M
 import pygame
 from quest import Quest
 from save_progress import SaveProgress
+from camera import Camera
 from sprites import *; from config import *
 
 class Game:
@@ -47,6 +48,7 @@ class Game:
         self.quest = Quest(self)
         self.grades: dict[str, int] = {}
         self.endings: List[str] = []
+        self.camera = Camera(self)
         
         # Settings
         self.music_on: bool = True
@@ -83,7 +85,7 @@ class Game:
         """
         
         # Ground floor
-        if level == ground_floor:
+        if level == ground_floor and self.saved_room_data == "Hall":
             for sprite in self.all_sprites:
                 sprite.rect.x -= 39 * TILE_SIZE
                 sprite.rect.y -= 7 * TILE_SIZE
@@ -91,7 +93,7 @@ class Game:
             self.player.rect.y += 8 * TILE_SIZE
         
         # First floor
-        elif level == first_floor:
+        elif level == first_floor and self.saved_room_data == "Hall":
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 17 * TILE_SIZE
@@ -99,7 +101,7 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Second floor
-        elif level == second_floor:
+        elif level == second_floor and self.saved_room_data == "Hall":
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 19 * TILE_SIZE
@@ -107,13 +109,13 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Third floor
-        elif level == third_floor:
+        elif level == third_floor and self.saved_room_data == "Hall":
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
                 
         # Fourth floor
-        elif level == fourth_floor: 
+        elif level == fourth_floor and self.saved_room_data == "Hall": 
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
@@ -204,6 +206,13 @@ class Game:
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
+    def set_camera(self, level: List[str]):
+            if level == ground_floor: self.camera.set_ground_camera()
+            elif level == first_floor: self.camera.set_first_camera()
+            elif level == second_floor: self.camera.set_second_camera()
+            elif level == third_floor: self.camera.set_third_camera()
+            elif level == fourth_floor: self.camera.set_fourth_camera()
+    
     def new(self, t: str):
         """
         A new game starts
@@ -229,6 +238,7 @@ class Game:
 
             # Level
             self.in_room = self.rooms[data["level"]]
+            self.saved_room_data = data['room_number']
 
             # Inventory
             self.inv = data["inventory"]
@@ -263,6 +273,7 @@ class Game:
 
             # Moving camera/player
             self.set_level_camera(self.in_room)
+            self.set_camera(self.in_room)
 
         # New player
         else: 
@@ -1058,7 +1069,7 @@ class Game:
             self.talking("Sadly it's closed now.")
 
         # Hall -> 020
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166:self.door_info("020 - not a classroom", "020")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166: self.door_info("020 - not a classroom", "020")
 
         # Hall -> 021
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 159: self.door_info("021 - not a classroom", "021")
@@ -1282,7 +1293,13 @@ class Game:
 
         # 203 -> Hall 
         elif self.player.facing == "right" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-
+        
+        # 203 -> Cabinet
+        elif self.player.facing == "up" and self.interacted[1] == 22 and self.interacted[2] == 9: self.door_info("Cabinet", "Cabinet HAR"); self.center_player_after_doors()
+        
+        # Cabinet -> 203
+        elif self.player.facing == "down" and self.interacted[1] == 22 and self.interacted[2] == 9: self.door_info("203 - III.A", "203"); self.center_player_after_doors()
+        
         # Hall -> 202
         elif self.player.facing == "up" and self.interacted[2] == 23 and self.interacted[1] == 25: self.door_info("202 - I.SC", "202"); self.center_player_after_doors()
 
@@ -1302,7 +1319,7 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
     
         # Hall -> Toilets
-        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.talking("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Toilets", "Toilets_1"); self.center_player_after_doors()
 
         # Toilets -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -1380,7 +1397,7 @@ class Game:
         elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 219
-        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("219 = I.SA", "219"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("219 - I.SA", "219"); self.center_player_after_doors()
 
         # 219 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -1439,10 +1456,10 @@ class Game:
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing rooms", "Gymnasium - chr"); self.center_player_after_doors()
 
         # Gymnasium changing room -> Showers
-        elif self.player.facing == "left" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Showers", "Showers"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Showers", "Showers"); self.center_player_after_doors()
 
         # Showers -> Gymnasium changing room
-        elif self.player.facing == "right" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing room", "Gymnasium - chr"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 72 and self.interacted[1] == 25: self.door_info("Gymnasium - Changing room", "Gymnasium - chr"); self.center_player_after_doors()
 
         # Hall -> Cabinet
         elif self.player.facing == "right" and self.interacted[2] == 70 and self.interacted[1] == 6: self.door_info("Cabinet", "Tsv - Cabinet"); self.center_player_after_doors()
