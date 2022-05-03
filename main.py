@@ -571,7 +571,7 @@ class Game:
 
         # Ending
         endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png"]
-
+        all_endings = (f"img/{ending}.png" for ending in self.endings)
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
         end = True if img in endings else False
 
@@ -613,13 +613,14 @@ class Game:
 
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
-                    if img not in self.endings: self.endings.append(img)
+                    # Appends the name of the ending intead of the actual image
+                    if img not in all_endings: self.endings.append(img[4:-4])
                     self.reseting_game_values()
                     self.intro_screen().new("new").main()
                 else: self.new("old").main()
 
             elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): 
-                if img not in self.endings: self.endings.append(img)
+                if img not in all_endings: self.endings.append(img[4:-4])
                 self.save_game()
             
             # Displaying background, text, button
@@ -1484,7 +1485,7 @@ class Game:
         elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # LROB (predsien) -> LROB
-        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB", "4"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB", "402"); self.center_player_after_doors()
 
         # LROB -> LROB (predsien)
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
