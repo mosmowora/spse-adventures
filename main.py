@@ -1,5 +1,4 @@
 # Import
-from re import M
 import pygame
 from quest import Quest
 from save_progress import SaveProgress
@@ -85,7 +84,7 @@ class Game:
         """
         
         # Ground floor
-        if level == ground_floor and self.saved_room_data == "Hall":
+        if level == ground_floor:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 39 * TILE_SIZE
                 sprite.rect.y -= 7 * TILE_SIZE
@@ -93,7 +92,7 @@ class Game:
             self.player.rect.y += 8 * TILE_SIZE
         
         # First floor
-        elif level == first_floor and self.saved_room_data == "Hall":
+        elif level == first_floor:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 17 * TILE_SIZE
@@ -101,7 +100,7 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Second floor
-        elif level == second_floor and self.saved_room_data == "Hall":
+        elif level == second_floor:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 19 * TILE_SIZE
@@ -109,13 +108,13 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Third floor
-        elif level == third_floor and self.saved_room_data == "Hall":
+        elif level == third_floor:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
                 
         # Fourth floor
-        elif level == fourth_floor and self.saved_room_data == "Hall": 
+        elif level == fourth_floor: 
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
@@ -272,9 +271,9 @@ class Game:
             self.create_tile_map()
 
             # Moving camera/player
-            self.set_level_camera(self.in_room)
-            self.set_camera(self.in_room)
-
+            if self.saved_room_data == "Hall": self.set_level_camera(self.in_room)
+            else: self.set_camera(self.in_room)
+            
         # New player
         else: 
             
@@ -485,8 +484,8 @@ class Game:
             
             case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", WHITE, 90) # Locker key
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", WHITE, 90) # Changing room key
-            case "img/vtipnicek_small.png": self.info("I can read you.", WHITE, 90); self.open_vtipnicek() # Changing room key
-            case "img/Iphone_small.png": self.info("Let's check substitution", WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Changing room key
+            case "img/vtipnicek_small.png": self.info("I can read you.", WHITE, 90); self.open_vtipnicek() # Vtipnicek
+            case "img/Iphone_small.png": self.info("Let's check substitution", WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
         
     def open_vtipnicek(self):
         """
@@ -1058,10 +1057,10 @@ class Game:
                 # No key
                 else: self.talking(f"{self.player_name} can't find key to unlock the door.")
             
-            elif not self.locked_changing_room: self.center_player_after_doors()
+            elif not self.locked_changing_room: self.door_info("Hall", "Hall"); self.center_player_after_doors()
                     
         # Hall -> Changing room
-        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.talking("Don't forget to change yo shoes"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.door_info("Changing room", "017"); self.center_player_after_doors()
 
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
