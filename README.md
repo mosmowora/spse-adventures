@@ -81,8 +81,9 @@ as you can throughout your playthrough while having a good time in your favourit
 
 <i class="t">**Bad endings**</i>
 
-- You get distracted waiting for your PE teacher and fall out of a widow on accident 😱
+- You get distracted waiting for your PE teacher and fall out of a window on accident 😱
 - You get cought not wearing proper footwear at school and the cleaning lady gets mad
+- You somehow got lost in school because you thought that you can go into the basement without light
 - *And more to come...*
 
 <div style="height: 50px"></div>

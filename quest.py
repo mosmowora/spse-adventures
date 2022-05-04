@@ -42,6 +42,10 @@ class Quest:
             # You have 1 min for this
             if pygame.time.get_ticks() - start > 60 * 1000: working_out = False
 
+            t = str(round((pygame.time.get_ticks() - start) // 1000)) if len(str(round((pygame.time.get_ticks() - start) // 1000))) > 1 else "0" + str(round((pygame.time.get_ticks() - start) // 1000))
+            time = self.game.font.render("0:" + t + " / 1:00", True, WHITE)
+            time_rect = time.get_rect(x=525, y=10)
+
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -72,6 +76,7 @@ class Quest:
             # Background, button, image
             self.game.screen.blit(background, (0, 0))
             self.game.screen.blit(self.game.font.render("Times lifted: {} of 5".format(counter), True, WHITE), (10, 10))
+            self.game.screen.blit(time, time_rect)
             self.game.screen.blit(dumbbell, dumbbell_rect)
             self.game.screen.blit(back_button.image, back_button.rect)
             if back_button.is_pressed(mouse_pos, mouse_pressed): working_out = False; weak = True; exited = True
