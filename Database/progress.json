@@ -27,9 +27,11 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
+        "level": 2,
         "room_number": "Hall",
-        "grades": {},
+        "grades": {
+            "DEJ": 1
+        },
         "settings": {
             "music": false,
             "talking_speed": 60

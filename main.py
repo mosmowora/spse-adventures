@@ -1339,6 +1339,12 @@ class Game:
         # Hall -> 209
         elif self.player.facing == "up" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("209 - I.B", "209"); self.center_player_after_doors()
 
+        # Hall -> 218
+        elif self.player.facing == "down" and self.interacted[2] == 158 and self.interacted[1] == 31: self.door_info("218 - I.SB", "218"); self.center_player_after_doors()
+        
+        # 218 -> Hall
+        elif self.player.facing == "up" and self.interacted[2] == 158 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        
         # 209 -> Hall
         elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
@@ -1389,9 +1395,6 @@ class Game:
 
         # 217 -> Hall
         elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-
-        # Hall -> 218
-        elif self.player.facing == "down" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("218 - I.SB", "218"); self.center_player_after_doors()
 
         # 218 -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -1516,7 +1519,22 @@ class Game:
                     self.talking("You've annoyed me this much...", True)
                     self.talking("I guess you can", True)
                     self.kul_quest = False
-                
+            
+            # Another teacher
+            if "DEJ" not in list(self.inv.keys()):
+                if self.interacted[2] == 155 and self.interacted[1] == 37:
+                    if "chalks" not in list(self.inv.keys()): 
+                        self.talking("Can you bring me chalks for the next lesson?", True)
+                        self.talking("Thanks in advance", True)
+                        self.talking("They should be in the first floor cabinet", True)
+                        self.talking("On the right that is...", True)
+                    else:
+                        self.talking("Thank you {}".format(self.player_name), True)
+                        self.talking("I can give you any grade", True)
+                        self.talking("Since I teach history...", True)
+                        self.info("You've recieved a grade for history")
+                        self.grades["DEJ"] = 1
+                        self.inv.pop("chalks")
     def shoes_on(self):
         """
         Checks if player has shoes on
@@ -1549,6 +1567,11 @@ class Game:
 
             # Unlocked
             else: self.in_locker()
+            
+        elif self.interacted[2] == 191 and self.interacted[1] == 17: 
+            self.inv["chalks"] = "img/chalks_small.png"
+            self.info("You should have chalks in your pocket")
+            print(self.inv.keys())
 
         # Locker with kokosky
         elif self.interacted[1] == 4 and self.interacted[2] == 165:

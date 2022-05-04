@@ -20,7 +20,7 @@ class Camera:
             case "023": 
                 for sprite in self.game.all_sprites:
                     sprite.rect.x -= 158 * TILE_SIZE
-                    sprite.rect.y -= 7 * TILE_SIZE
+                    sprite.rect.y -= 14 * TILE_SIZE
                     sprite.rect.x += 34 * TILE_SIZE
                 self.game.player.rect.y += 15 * TILE_SIZE
                 self.game.player.rect.x -= 35 * TILE_SIZE

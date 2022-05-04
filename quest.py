@@ -296,3 +296,16 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+            
+    def open_window(self):
+        """
+        DSY quest to open windows but with a twist
+        """
+        
+        if self.game.interacted[1] == 28 and self.game.interacted[2] in (28, 29):
+            pass
+            
+        
+        # Updates
+        self.game.clock.tick(FPS)
+        pygame.display.update()
