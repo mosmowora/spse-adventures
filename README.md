@@ -3,27 +3,32 @@
 .y {color: #FFFF99}
 .r {color: #FF6666}
 .g {color: lightgreen}
+.p {color: pink}
+.o {color: orange}
+.t {color: teal}
+.n {color: navy}
+.pr {color: #cc3399}
 </style>
 
-# **SPŠE ADVENTURES - REVENGEANCE**
+# <i class="g">**SPŠE ADVENTURES - REVENGEANCE**</i>
 
 <img src="img/title_screen.png" style="border-radius: 15px;"></img>
 <div style="height: 15px"></div>
 
-## **What's SPŠE ADVENTURES?**
+## <i class="g">**What's SPŠE ADVENTURES?**</i>
 <hr style="background-color: lightgreen; border-radius: 3px">
 
-- ~~**100%**~~ **99.7%** Replica of the real <a class="b">***SPŠE***</a> in Prešov
+- ~~**100%**~~ **99.7%** Replica of the real <i class="g">***SPŠE***</i> in Prešov
 
-- Exciting <a class="y">***storylines***</a> and quests
+- Exciting <i class="y">***storylines***</i> and quests
 
 - Lots of <u class="r"><b class="r">**easter eggs**</b></u> to discover 
 
-- All made in <a class="g">**pygame**</a>
+- All made in <i class="g">**pygame**</i>
 
-<div style="height: 50px"></div>
+<div style="height: 30px"></div>
 
-## **How to play our game?**
+## <i class="g">**How to play our game?**</i>
 
 <hr style="background-color: lightgreen; border-radius: 3px">
 
@@ -39,16 +44,47 @@
 <div style="height: 50px"></div>
 <hr style="background-color: lightgreen">
 
-## **About our game**
+## <i class="g">**About our game**</i>
 
 - Try not getting caught breaking school rules or don't break them at all - <u class="b"><i class="b">your choice</i></u>
 
 - If you're feeling tired, go relax in ***buffet Amper***
 
-- Discover multiple <a class="g">good</a> or <a class="r">bad</a> endings
+- Discover multiple <b class="g">**good**</b> or <b class="r">bad</b> endings
 
-- All of the characters in our game are only made up and do not resemble any of the real teachers 
+> *All of the characters in our game are only made up and do not resemble any of the real teachers*
+
+<div style="height: 50px"></div>
+<hr style="background-color: lightgreen">
+
+## <i class="g">**Gameplay**</i>
+You are a student on SPŠE and your goal is to <i class="pr">**discover**</i> as many:
+- Rooms
+- Endings
+- Easter eggs
+
+and <i class="g">**complete**</i> as many:
+- Quests 
+- Riddles
+
+as you can throughout your playthrough while having a good time in your favourite school! <br>
+> ***Careful, don't get lost!***
+<div style="height: 50px"></div>
+<hr style="background-color: lightgreen">
+
+## <i class="g">**Endings waiting to be discovered**</i>
+
+<i class="p">**Good endings**</i>
+
+- You escape to the other building and watch eastern shows in victory spirit
+- *And more to come...*
+
+<i class="t">**Bad endings**</i>
+
+- You get distracted waiting for your PE teacher and fall out of a widow on accident 😱
+- You get cought not wearing proper footwear at school and the cleaning lady gets mad
+- *And more to come...*
 
 <div style="height: 50px"></div>
 
-> A Pygame Project by Tomáš Nosaľ, Samuel Pasierb and Marko Olejník
+> **A Pygame Project by Tomáš Nosaľ, Samuel Pasierb and Marko Olejník**
