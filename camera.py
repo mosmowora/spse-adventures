@@ -164,9 +164,9 @@ class Camera:
             # OUC
             case "117": 
                 for sprite in self.game.all_sprites:
-                    sprite.rect.x -= 145 * TILE_SIZE
+                    sprite.rect.x -= 147 * TILE_SIZE
                     sprite.rect.y -= 16 * TILE_SIZE
-                self.game.player.rect.x -= 25 * TILE_SIZE     
+                self.game.player.rect.x -= 23 * TILE_SIZE     
 
             # OUB          
             case "115": 

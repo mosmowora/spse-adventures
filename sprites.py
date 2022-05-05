@@ -113,7 +113,8 @@ class Player(pygame.sprite.Sprite):
         if self.player_sitting:
             self.rect.x = self.x_change
             self.rect.y = self.y_change
-            self.image = self.game.character_spritesheet.get_sprite(102, 2, self.width, self.height) if self.facing != "right" else self.game.character_spritesheet.get_sprite(102, 34, self.width, self.height)
+            if self.facing in ("right", "left"): self.image = self.game.character_spritesheet.get_sprite(102, 34, self.width, self.height) if self.facing == "right" else self.game.character_spritesheet.get_sprite(102, 2, self.width, self.height)
+            else: self.image = self.game.character_spritesheet.get_sprite(102, 66, self.width, self.height) if self.facing == "up" else self.game.character_spritesheet.get_sprite(102, 98, self.width, self.height)
 
         # Not sitting
         else: 
@@ -530,7 +531,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y", "g", "w"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y", "g", "w"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -558,6 +559,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "D": self.image = self.game.terrain_spritesheet.get_sprite(104, 36, self.width, self.height)
         elif type == "G": self.image = self.game.terrain_spritesheet.get_sprite(172, 104, self.width, self.height)
         elif type == "B": self.image = self.game.terrain_spritesheet.get_sprite(2, 70, self.width, self.height)
+        elif type == "h": self.image = self.game.terrain_spritesheet.get_sprite(274, 70, self.width, self.height)
         elif type == "t": self.image = self.game.terrain_spritesheet.get_sprite(36, 70, self.width, self.height)
         elif type == "T": self.image = self.game.terrain_spritesheet.get_sprite(2, 104, self.width, self.height)
         elif type == "Ť": self.image = self.game.terrain_spritesheet.get_sprite(36, 104, self.width, self.height)
@@ -565,8 +567,11 @@ class Block(pygame.sprite.Sprite):
         elif type == "Ŕ": self.image = self.game.terrain_spritesheet.get_sprite(206, 36, self.width, self.height)
         elif type == "ŕ": self.image = self.game.terrain_spritesheet.get_sprite(206, 70, self.width, self.height)
         elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
-        elif type == "l": self.image = self.game.terrain_spritesheet.get_sprite(240, 104, self.width, self.height)
+        elif type == "l": self.image = self.game.terrain_spritesheet.get_sprite(241, 104, self.width, self.height)
+        elif type == "k": self.image = self.game.terrain_spritesheet.get_sprite(241, 138, self.width, self.height)
         elif type == "ĺ": self.image = self.game.terrain_spritesheet.get_sprite(240, 104, self.width, self.height)
+        elif type == "u": self.image = self.game.terrain_spritesheet.get_sprite(241, 172, self.width, self.height)
+        elif type == "e": self.image = self.game.terrain_spritesheet.get_sprite(274, 172, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
         elif type == "ř": self.image = self.game.terrain_spritesheet.get_sprite(70, 70, self.width, self.height)
         elif type == "b": self.image = self.game.terrain_spritesheet.get_sprite(138, 70, self.width, self.height)
@@ -575,13 +580,16 @@ class Block(pygame.sprite.Sprite):
         elif type == "J": self.image = self.game.terrain_spritesheet.get_sprite(2, 138, self.width, self.height)
         elif type == "U": self.image = self.game.terrain_spritesheet.get_sprite(36, 138, self.width, self.height)
         elif type == "j": self.image = self.game.terrain_spritesheet.get_sprite(206, 104, self.width, self.height)
+        elif type == "m": self.image = self.game.terrain_spritesheet.get_sprite(274, 104, self.width, self.height)
+        elif type == "i": self.image = self.game.terrain_spritesheet.get_sprite(274, 138, self.width, self.height)
+        elif type == "n": self.image = self.game.terrain_spritesheet.get_sprite(274, 36, self.width, self.height)
         elif type == "/": self.image = self.game.terrain_spritesheet.get_sprite(241, 70, self.width, self.height)
         elif type == "|": self.image = self.game.terrain_spritesheet.get_sprite(241, 36, self.width, self.height)
         elif type == "O": self.image = self.game.terrain_spritesheet.get_sprite(138, 138, self.width, self.height)
         elif type == "o": self.image = self.game.terrain_spritesheet.get_sprite(172, 138, self.width, self.height)
         elif type == "ó": self.image = self.game.terrain_spritesheet.get_sprite(70, 138, self.width, self.height)
         elif type == "Ó": self.image = self.game.terrain_spritesheet.get_sprite(104, 138, self.width, self.height)
-        elif type == "y": self.image = self.game.terrain_spritesheet.get_sprite(240, 2, self.width, self.height)
+        elif type == "y": self.image = self.game.terrain_spritesheet.get_sprite(241, 2, self.width, self.height)
         elif type == "Y": self.image = self.game.terrain_spritesheet.get_sprite(274, 2, self.width, self.height)
         elif type == "g": self.image = self.game.terrain_spritesheet.get_sprite(206, 138, self.width, self.height)
 
@@ -707,7 +715,8 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]; print(j, i)
 
                     # Bench
-                    elif self.interactive[hits[0]] == "B" + str(i) + str(j): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("B" + str(i) + str(j)): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("h" + str(i) + str(j)): self.game.interacted = ["BencH", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs
                     elif self.interactive[hits[0]] in ("S" + str(i) + str(j), "Z" + str(i) + str(j)): self.game.interacted = ["Stairs_up", i, j]; print(j, i)

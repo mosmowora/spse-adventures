@@ -133,8 +133,8 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 4,
-        "room_number": "403",
+        "level": 0,
+        "room_number": "Hall",
         "grades": {},
         "settings": {
             "music": false,

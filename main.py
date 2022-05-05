@@ -177,14 +177,21 @@ class Game:
                 elif column == "z": self.interactive[Block(self, j, i, "z")] = "z" + str(i) + str(j) # Stairs down
                 elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
                 elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
-                elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench
+                elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench (vertical)
+                elif column == "h": self.interactive[Block(self, j, i, "h")] = "h" + str(i) + str(j) # Bench (horizontal)
                 elif column == "y": self.interactive[Block(self, j, i, "y")] = "y" + str(i) + str(j) # Benchpress
                 elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
-                elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk
-                elif column == "ĺ": self.interactive[Block(self, j, i, "ĺ")] = "ĺ" + str(i) + str(j) # Desk
+                elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk + chair (vertical) left
+                elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
+                elif column == "ĺ": self.interactive[Block(self, j, i, "ĺ")] = "ĺ" + str(i) + str(j) # Desk special (vertical)
+                elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
+                elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
                 elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
                 elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
-                elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Horizontal Desk
+                elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Desk + chair (horizontal) up
+                elif column == "m": self.interactive[Block(self, j, i, "m")] = "m" + str(i) + str(j) # Desk no chair (horizontal) up
+                elif column == "i": self.interactive[Block(self, j, i, "i")] = "i" + str(i) + str(j) # Desk + chair (horizontal) down
+                elif column == "n": self.interactive[Block(self, j, i, "n")] = "n" + str(i) + str(j) # Desk no chair (horizontal) down
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
                 elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
                 elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
@@ -1233,10 +1240,10 @@ class Game:
         elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 117
-        elif self.player.facing == "up" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("117 - III.B", "117"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 157 and self.interacted[1] == 24: self.door_info("117 - III.B", "117"); self.center_player_after_doors()
         
         # 117 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 155 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 157 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # Hall -> 115
         elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 24: self.door_info("115 - IV.SB", "115"); self.center_player_after_doors()
@@ -1676,8 +1683,8 @@ class Game:
         """
         Sitting on the bench
         """
-        
-        if self.player.facing not in ("up", "down"):
+
+        if self.interacted[0] == "Bench" and self.player.facing in ("right", "left") or self.interacted[0] == "BencH" and self.player.facing in ("up", "down"):
             self.player.sit(True, self.interacted[1], self.interacted[2])
             self.update()
             self.draw()
