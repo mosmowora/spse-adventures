@@ -369,13 +369,13 @@ class Quest:
             self.game.screen.blit(bg, (0, 0))
             self.game.screen.blit(back_button.image, back_button.rect)
             self.game.screen.blit(paper, paper_rect)
-            text_surface_answer = self.game.big_font.render(answer_text, True, WHITE)
-            pygame.draw.rect(self.game.screen, BLACK, answer_rect)
+            text_surface_answer = self.game.big_font.render(answer_text, True, BLACK)
+            pygame.draw.rect(self.game.screen, BRITISH_WHITE, answer_rect)
             self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
             assing_text_surface = self.game.font.render(assign, True, BLACK)
             self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))
             answer_text_surface = self.game.font.render(str(word + 1) + "/10", True, BLACK)
-            self.game.screen.blit(answer_text_surface, (assign_rect.x+270, assign_rect.y-200))
+            self.game.screen.blit(answer_text_surface, (assign_rect.x+230, assign_rect.y-50))
             if back_button.is_pressed(mouse_pos, mouse_pressed): testing = not testing; return True
             # Updates
             self.game.clock.tick(FPS)

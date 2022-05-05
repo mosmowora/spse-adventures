@@ -31,6 +31,7 @@ GRAY: tuple =           ( 64,  64,  64)
 DIM_GRAY: tuple =       (105, 105, 105)
 DARK_GRAY: tuple =      ( 32,  32,  32)
 NAVY: tuple =           ( 11,  19,  30)
+BRITISH_WHITE: tuple =  (237, 225, 187)
 
 # Floors
 GROUND_FLOOR = 0
