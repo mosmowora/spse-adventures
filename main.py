@@ -37,7 +37,7 @@ class Game:
         self.settings_background = pygame.image.load("img/settings_bg.jpg")
         
         # Window icon and title (not final)
-        icon = pygame.image.load('img/spselogo.png')
+        icon = pygame.image.load('img/spselogo2.png')
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
@@ -147,6 +147,7 @@ class Game:
         self.kul_quest: bool = True
         self.phone_in_trash: bool = True
         self.suplovanie: bool = True
+        self.anj_test: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
     def create_tile_map(self):
@@ -259,6 +260,7 @@ class Game:
             self.kul_quest = data["quests"]['KUL_quest']
             self.suplovanie = data["quests"]['suplovanie']
             self.phone_in_trash = data["quests"]["phone"]
+            self.anj_test = data["quests"]["anj_test"]
             
             # Grades
             self.grades = data['grades']
@@ -539,7 +541,8 @@ class Game:
                         "program": self.program_test,
                         "KUL_quest": self.kul_quest,
                         "phone": self.phone_in_trash,
-                        "suplovanie": self.suplovanie, 
+                        "suplovanie": self.suplovanie,
+                        "anj_test": self.anj_test, 
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -1535,6 +1538,11 @@ class Game:
                         self.info("You've recieved a grade for history")
                         self.grades["DEJ"] = 1
                         self.inv.pop("chalks")
+                        
+            if self.interacted[2] == 94 and self.interacted[1] == 24 and "ANJ" not in list(self.grades.keys()):
+                anj_values = self.quest.anglictina()
+                if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
+                
     def shoes_on(self):
         """
         Checks if player has shoes on

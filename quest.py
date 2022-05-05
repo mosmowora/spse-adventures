@@ -1,6 +1,8 @@
 import pygame
 from config import *
 from sprites import Button
+from typing import List
+import math
 
 class Quest:
     
@@ -314,3 +316,67 @@ class Quest:
         # Updates
         self.game.clock.tick(FPS)
         pygame.display.update()
+    
+    def anglictina(self):
+        """
+        ANJ Skusanie quest
+        """
+        testing: bool = True
+        bg = pygame.image.load("img/anj_bg.png")
+        word: int = 0
+        
+        assignment: List[str] = ["mail".upper(), "aardvark".upper(), "genetic".upper(), "desk".upper(), "religion".upper(), "keyboard".upper(), "iteration".upper(), "carbonated".upper(), "switch".upper(), "printer".upper()]
+        assignment_answers: List[str] = ["posta", "mravciar", "geneticky", "lavica", "nabozentvo", "klavesnica", "iteracia", "perliva", "prepinac", "tlaciaren"]
+        answer: List[str] = []
+        answer_rect = pygame.Rect(155, 215, 302, 67)
+        active: bool = False
+        answer_text: str = ""
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        paper = pygame.image.load("img/paper.png")
+        paper_rect = paper.get_rect(x=20, y=0)
+        assign_rect = pygame.Rect(151, 141, 273, 50)
+        while testing:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            # Text of assignment
+            assign: str = assignment[word]
+            # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+            
+                # Logic
+                if pygame.KEYDOWN == event.type:
+                    if event.key == pygame.K_RETURN: word += 1; answer.append(answer_text); answer_text = ""
+                    # Check for backspace
+                    elif event.key == pygame.K_BACKSPACE: 
+                        if active: answer_text = answer_text[:-1]
+                    elif active: answer_text += event.unicode
+                    elif event.key == pygame.K_ESCAPE: testing = False
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if answer_rect.collidepoint(event.pos): active = not active
+            # Grading
+            if word == len(assignment_answers):
+                grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
+                self.game.anj_test = False
+                return grade if grade != 0 else 1, False
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(paper, paper_rect)
+            text_surface_answer = self.game.big_font.render(answer_text, True, WHITE)
+            pygame.draw.rect(self.game.screen, BLACK, answer_rect)
+            self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
+            assing_text_surface = self.game.font.render(assign, True, BLACK)
+            self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))
+            answer_text_surface = self.game.font.render(str(word + 1) + "/10", True, BLACK)
+            self.game.screen.blit(answer_text_surface, (assign_rect.x+270, assign_rect.y-200))
+            if back_button.is_pressed(mouse_pos, mouse_pressed): testing = not testing; return True
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()

@@ -24,6 +24,15 @@ class Camera:
                     sprite.rect.x += 34 * TILE_SIZE
                 self.game.player.rect.y += 15 * TILE_SIZE
                 self.game.player.rect.x -= 35 * TILE_SIZE
+            
+            # Lit 3
+            case "025": 
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x -= 158 * TILE_SIZE
+                    sprite.rect.y -= 15 * TILE_SIZE
+                    sprite.rect.x += 71 * TILE_SIZE
+                self.game.player.rect.y += 15 * TILE_SIZE
+                self.game.player.rect.x -= 72 * TILE_SIZE
 
             # II.SA
             case "016": 
