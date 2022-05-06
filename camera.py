@@ -104,7 +104,7 @@ class Camera:
                     sprite.rect.y -= 7 * TILE_SIZE
                     sprite.rect.x += 147 * TILE_SIZE
                 self.game.player.rect.y += 7 * TILE_SIZE
-                self.game.player.rect.x -= 147 * TILE_SIZE
+                self.game.player.rect.x -= 148 * TILE_SIZE
 
             # Lit 9
             case "006": 

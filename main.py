@@ -183,7 +183,7 @@ class Game:
                 elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
                 elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk + chair (vertical) left
                 elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
-                elif column == "ĺ": self.interactive[Block(self, j, i, "ĺ")] = "ĺ" + str(i) + str(j) # Desk special (vertical)
+                elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
                 elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
                 elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
                 elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk

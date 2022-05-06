@@ -531,7 +531,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "ĺ", "y", "Y", "g", "w"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -569,7 +569,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "r": self.image = self.game.terrain_spritesheet.get_sprite(172, 2, self.width, self.height)
         elif type == "l": self.image = self.game.terrain_spritesheet.get_sprite(241, 104, self.width, self.height)
         elif type == "k": self.image = self.game.terrain_spritesheet.get_sprite(241, 138, self.width, self.height)
-        elif type == "ĺ": self.image = self.game.terrain_spritesheet.get_sprite(240, 104, self.width, self.height)
+        elif type == "é": self.image = self.game.terrain_spritesheet.get_sprite(274, 172, self.width, self.height)
         elif type == "u": self.image = self.game.terrain_spritesheet.get_sprite(241, 172, self.width, self.height)
         elif type == "e": self.image = self.game.terrain_spritesheet.get_sprite(274, 172, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
@@ -726,7 +726,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("b" + str(i) + str(j), "d" + str(i) + str(j)): self.game.interacted = ["Basement", i, j]; print(j, i)
 
                     # Special desk
-                    elif self.interactive[hits[0]] == "ĺ" + str(i) + str(j): self.game.interacted = ["Desk", i ,j]; print(j, i)
+                    elif self.interactive[hits[0]] == "é" + str(i) + str(j): self.game.interacted = ["Desk", i ,j]; print(j, i)
                     
                     # Bench press
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
