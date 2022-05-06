@@ -210,6 +210,16 @@ class Game:
                 elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
                 elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
                 elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Computer LROB
+                elif column == "]": self.interactive[Block(self, j, i, "]")] = "]" + str(i) + str(j) # Whiteboard -> (that way)
+                elif column == "[": self.interactive[Block(self, j, i, "[")] = "[" + str(i) + str(j) # Whiteboard <- (that way)
+                elif column == "-": self.interactive[Block(self, j, i, "-")] = "-" + str(i) + str(j) # Whiteboard ^ (that way)
+                elif column == "=": self.interactive[Block(self, j, i, "=")] = "=" + str(i) + str(j) # Whiteboard V (that way)
+                elif column == "}": self.interactive[Block(self, j, i, "}")] = "}" + str(i) + str(j) # Blackboard -> (that way)
+                elif column == "{": self.interactive[Block(self, j, i, "{")] = "{" + str(i) + str(j) # Blackboard <- (that way)
+                elif column == "^": self.interactive[Block(self, j, i, "^")] = "^" + str(i) + str(j) # Blackboard ^ (that way)
+                elif column == "V": self.interactive[Block(self, j, i, "V")] = "V" + str(i) + str(j) # Blackboard V (that way)
+                elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
+                elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 

@@ -592,6 +592,16 @@ class Block(pygame.sprite.Sprite):
         elif type == "y": self.image = self.game.terrain_spritesheet.get_sprite(241, 2, self.width, self.height)
         elif type == "Y": self.image = self.game.terrain_spritesheet.get_sprite(274, 2, self.width, self.height)
         elif type == "g": self.image = self.game.terrain_spritesheet.get_sprite(206, 138, self.width, self.height)
+        elif type == "]": self.image = self.game.terrain_spritesheet.get_sprite(172, 172, self.width, self.height)
+        elif type == "[": self.image = self.game.terrain_spritesheet.get_sprite(104, 172, self.width, self.height)
+        elif type == "-": self.image = self.game.terrain_spritesheet.get_sprite(138, 172, self.width, self.height)
+        elif type == "=": self.image = self.game.terrain_spritesheet.get_sprite(206, 172, self.width, self.height)
+        elif type == "}": self.image = self.game.terrain_spritesheet.get_sprite(2, 172, self.width, self.height)
+        elif type == "{": self.image = self.game.terrain_spritesheet.get_sprite(70, 172, self.width, self.height)
+        elif type == "^": self.image = self.game.terrain_spritesheet.get_sprite(36, 172, self.width, self.height)
+        elif type == "V": self.image = self.game.terrain_spritesheet.get_sprite(2, 206, self.width, self.height)
+        elif type == "x": self.image = self.game.terrain_spritesheet.get_sprite(36, 206, self.width, self.height)
+        elif type == "X": self.image = self.game.terrain_spritesheet.get_sprite(70, 206, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
