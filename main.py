@@ -45,6 +45,7 @@ class Game:
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
         self.saved_room_data: str = "017"
         self.quest = Quest(self)
+        self.number_of_quests: int = 0
         self.grades: dict[str, int] = {}
         self.endings: List[str] = []
         self.camera = Camera(self)
@@ -285,6 +286,9 @@ class Game:
             # Saved settings
             self.music_on = data["settings"]["music"]
             self.talking_speed_number = data["settings"]["talking_speed"]
+            
+            # Quests done
+            self.number_of_quests = data['done_quests']
 
             # Tile map
             self.create_tile_map()
@@ -573,6 +577,7 @@ class Game:
                                     self.rooms.index(self.in_room),
                                     self.saved_room_data,
                                     self.grades,
+                                    self.number_of_quests,
                                     {
                                         "music": self.music_on,
                                         "talking_speed": self.talking_speed_number
@@ -1057,6 +1062,24 @@ class Game:
             self.player.rect.x = self.interacted[3] + TILE_SIZE
             self.player.rect.y = self.interacted[4]
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
+            
+    def end(self):
+        """
+        Canon ending for the game, crashes the program for now
+        """
+        main_menu_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Exit the game", 32)
+        ending_screen = pygame.image.load("img/unofficial_ending.png")
+        while True:
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            self.screen.blit(ending_screen, (0, 0))
+            self.screen.blit(main_menu_button.image, main_menu_button.rect)
+            if main_menu_button.is_pressed(mouse_pos, mouse_pressed): break
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+        
+        pygame.quit()
 
     def ground_floor_doors(self):
         """
@@ -1083,6 +1106,13 @@ class Game:
         # Hall -> Changing room
         elif self.player.facing == "up" and self.interacted[1] == 14 and self.interacted[2] == 167: self.door_info("Changing room", "017"); self.center_player_after_doors()
 
+        # Escape doors
+        elif self.player.facing == "down" and self.interacted[1] == 28 and self.interacted[2] in (54, 55):
+            if self.number_of_quests == ALL_QUESTS:
+                self.door_info("This is the end", "Exit")
+                self.end()
+            else: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
+        
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
             self.talking("Buffet Amper. I like to buy food here.")
@@ -1538,6 +1568,7 @@ class Game:
                     self.talking("I was just thinking...")
                     self.talking("You've annoyed me this much...", True)
                     self.talking("I guess you can", True)
+                    self.number_of_quests += 1
                     self.kul_quest = False
             
             # Another teacher
@@ -1554,6 +1585,7 @@ class Game:
                         self.talking("Since I teach history...", True)
                         self.info("You've recieved a grade for history")
                         self.grades["DEJ"] = 1
+                        self.number_of_quests += 1
                         self.inv.pop("chalks")
                         
             if self.interacted[2] == 94 and self.interacted[1] == 24 and "ANJ" not in list(self.grades.keys()):
@@ -1591,7 +1623,7 @@ class Game:
                 else: self.talking("Locked locker.")
 
             # Unlocked
-            else: self.in_locker()
+            else: self.in_locker(); self.number_of_quests += 1
             
         elif self.interacted[2] == 191 and self.interacted[1] == 17: 
             self.inv["chalks"] = "img/chalks_small.png"

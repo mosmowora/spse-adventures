@@ -92,6 +92,7 @@ class Quest:
             else: grade -= counter
             
             self.game.grades["TSV - gym"] = grade
+            self.game.number_of_quests += 1
 
         # Music
         if self.game.music_on: pygame.mixer.Sound.stop(self.game.tsv_theme); pygame.mixer.Sound.play(self.game.theme, -1)
@@ -190,7 +191,7 @@ class Quest:
                     grade: int = self.game.grade_program(text_def, text_self, text_item, text_even, text_tuple)
                     self.game.grades['PRO'] = grade
                     in_potitat = False
-                    if grade: self.game.talking("I did it!!")
+                    if grade: self.game.talking("I did it!!"); self.game.number_of_quests += 1
 
                 # Background
                 self.game.screen.blit(bg, (0, 0))
@@ -282,7 +283,7 @@ class Quest:
                     if empty_rect.collidepoint(event.pos): main_app = not main_app; sub = not sub
 
                     # Back
-                    elif back_rect.collidepoint(event.pos): checking = False; return False
+                    elif back_rect.collidepoint(event.pos): checking = False; self.game.info("What day even is today?"); self.game.number_of_quests += 1; return False
 
             # Background
             self.game.screen.blit(bg, (0, 0))
@@ -298,8 +299,7 @@ class Quest:
 
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): checking = False
-            self.game.screen.blit(back_button.image, back_button.rect)            
-
+            self.game.screen.blit(back_button.image, back_button.rect)       
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
@@ -364,6 +364,7 @@ class Quest:
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
                 self.game.anj_test = False
+                self.game.number_of_quests += 1;
                 return grade if grade != 0 else 1, False
             # Background
             self.game.screen.blit(bg, (0, 0))
