@@ -45,7 +45,6 @@ class Game:
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
         self.saved_room_data: str = "017"
         self.quest = Quest(self)
-        self.number_of_quests: int = 0
         self.grades: dict[str, int] = {}
         self.endings: List[str] = []
         self.camera = Camera(self)
@@ -78,6 +77,8 @@ class Game:
         self.lock.set_volume(0.25)
         self.door_open = pygame.mixer.Sound("sounds/door.mp3")
         self.door_open.set_volume(0.25)
+        self.speed = pygame.mixer.Sound("sounds/speed.mp3")
+        self.speed.set_volume(0.15)
 
     def set_level_camera(self, level: List[str]):
         """
@@ -125,6 +126,10 @@ class Game:
         When player wants to restart
         """
 
+        # Room and floor
+        self.saved_room_data = "017"
+        self.in_room = self.rooms[GROUND_FLOOR]
+
         # Objects you can interact with
         self.interacted: List[str, int] = ["", "", "", "", ""]
         self.interactive = {}
@@ -135,7 +140,10 @@ class Game:
         # Variables for endings
         self.without_light: int = 0
         self.caught: int = 0
-        self.__kul_counter: int = 0
+
+        # Quests variables
+        self.__gul_counter: int = 0
+        self.connected_router = True
 
         # Variables for finding items/doing stuff
         self.key_in_trash: bool = True
@@ -145,11 +153,16 @@ class Game:
         self.vtipnicek: bool = True
         self.dumbbell_lifted: bool = True
         self.program_test: bool = True
-        self.kul_quest: bool = True
         self.phone_in_trash: bool = True
         self.suplovanie: bool = True
         self.anj_test: bool = True
+        self.gul_quest: bool = True
+        self.nepusti: bool = True
+        self.five_min_sooner: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
+
+        # Grader
+        self.grades: dict[str, int] = {}
 
     def create_tile_map(self):
         """
@@ -221,6 +234,7 @@ class Game:
                 elif column == "V": self.interactive[Block(self, j, i, "V")] = "V" + str(i) + str(j) # Blackboard V (that way)
                 elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
                 elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
+                elif column == "E": self.interactive[Block(self, j, i, "E")] = "E" + str(i) + str(j) # Router
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
@@ -275,20 +289,21 @@ class Game:
             self.vtipnicek = data["quests"]["vtipnicek"]
             self.dumbbell_lifted = data["quests"]["dumbbells"]
             self.program_test = data["quests"]["program"]
-            self.kul_quest = data["quests"]['KUL_quest']
             self.suplovanie = data["quests"]['suplovanie']
             self.phone_in_trash = data["quests"]["phone"]
             self.anj_test = data["quests"]["anj_test"]
-            
+            self.gul_quest = data["quests"]['GUL_quest']
+            self.__gul_counter = data["quests"]["gul_counter"]
+            self.nepusti = data["quests"]["nepusti"]
+            self.connected_router = data["quests"]["router"]
+            self.five_min_sooner = data["quests"]["sooner"]
+
             # Grades
             self.grades = data['grades']
 
             # Saved settings
             self.music_on = data["settings"]["music"]
             self.talking_speed_number = data["settings"]["talking_speed"]
-            
-            # Quests done
-            self.number_of_quests = data['done_quests']
 
             # Tile map
             self.create_tile_map()
@@ -365,6 +380,9 @@ class Game:
                     case "Computer": self.quest.programming()
                     case "Bench_press": self.dumbbell_lifted = self.quest.bench_press(self.dumbbell_lifted)
                     case "Window": self.window()
+                    case "Router": 
+                        if type(self.connected_router) == list: router_outcome = self.quest.router(); self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+                        else: self.talking("I don't know what to do with this.")
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -416,8 +434,8 @@ class Game:
             # Return button was pressed
             if return_button.is_pressed(mouse_pos, mouse_pressed): break
 
-            # Save % Quit button was pressed
-            if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game()
+            # Save & Quit button was pressed
+            if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game(); quit()
 
             # BG
             self.screen.blit(bg, (0, 0))
@@ -560,10 +578,14 @@ class Game:
                         "vtipnicek": self.vtipnicek,
                         "dumbbells": self.dumbbell_lifted,
                         "program": self.program_test,
-                        "KUL_quest": self.kul_quest,
                         "phone": self.phone_in_trash,
                         "suplovanie": self.suplovanie,
-                        "anj_test": self.anj_test, 
+                        "anj_test": self.anj_test,
+                        "GUL_quest": self.gul_quest,
+                        "gul_counter": self.__gul_counter,
+                        "nepusti": self.nepusti,
+                        "router": self.connected_router,
+                        "sooner": self.five_min_sooner, 
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -577,7 +599,6 @@ class Game:
                                     self.rooms.index(self.in_room),
                                     self.saved_room_data,
                                     self.grades,
-                                    self.number_of_quests,
                                     {
                                         "music": self.music_on,
                                         "talking_speed": self.talking_speed_number
@@ -585,7 +606,6 @@ class Game:
                                     )
         self.database.save()
         print("SAVED")
-        quit()
 
     def game_over(self, img: str):
         """
@@ -595,8 +615,9 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png"]
         all_endings = (f"img/{ending}.png" for ending in self.endings)
+
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
         end = True if img in endings else False
 
@@ -611,6 +632,7 @@ class Game:
         restart_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Main menu", 32) if end else Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Try again", 32)
         iamdone_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "Save & Quit", 32)
 
+        # Window fail
         if img == "img/window_fail.png": 
             car_oops = pygame.image.load("img/car_oops.png")
             car_dead = pygame.image.load("img/car_dead.png")
@@ -618,9 +640,11 @@ class Game:
             car_dead_move = -700
             if self.music_on: pygame.mixer.Sound.play(self.car, -1)
 
-        elif img == "img/lost.png": 
-            self.without_light = 0
-            if self.music_on: pygame.mixer.Sound.play(self.lost, -1)
+        # Lost 
+        elif img == "img/lost.png" and self.music_on: pygame.mixer.Sound.play(self.lost, -1)
+
+        # Early
+        elif img == "img/early.png" and self.music_on: pygame.mixer.Sound.play(self.speed, -1)
 
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -636,17 +660,18 @@ class Game:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
 
+            # Restart button
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
-                    # Appends the name of the ending intead of the actual image
-                    if img not in all_endings: self.endings.append(img[4:-4])
-                    self.reseting_game_values()
-                    self.intro_screen().new("new").main()
+                    if img not in all_endings: self.endings.append(img[4:-4]) # Appends the name of the ending intead of the actual image
+                    self.reseting_game_values(); self.save_game(); self.intro_screen().new("new").main()
                 else: self.new("old").main()
 
+            # Save & Quit button
             elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): 
-                if img not in all_endings: self.endings.append(img[4:-4])
-                self.save_game()
+                if img not in all_endings: self.endings.append(img[4:-4]) # Appends the name of the ending intead of the actual image
+                if end: self.reseting_game_values()
+                self.save_game(); quit()
             
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
@@ -967,7 +992,7 @@ class Game:
         """
 
         for _ in range(self.talking_speed_number):
-            text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, BLUE)
+            text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, BRITISH_WHITE)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
@@ -1028,7 +1053,7 @@ class Game:
 
         if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
-        self.talking("What a pretty day.")
+        if self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.talking("What a pretty day.")
 
     def center_player_after_doors(self):
         """
@@ -1067,18 +1092,39 @@ class Game:
         """
         Canon ending for the game, crashes the program for now
         """
-        main_menu_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Exit the game", 32)
+
+        # Buttons
+        exit_button = Button(10, WIN_HEIGHT - 60, 200, 50, WHITE, DARK_GRAY, "Exit the game", 32)
+        main_menu_button = Button(10, WIN_HEIGHT - 120, 200, 50, WHITE, DARK_GRAY, "Main menu", 32)
+
+        # Background
         ending_screen = pygame.image.load("img/unofficial_ending.png")
+
+
         while True:
+
+            # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
             for event in pygame.event.get():
+
+                # Close button
                 if event.type == pygame.QUIT: quit()
                 
+
+            # Background
             self.screen.blit(ending_screen, (0, 0))
+
+            # Exit button
+            self.screen.blit(exit_button.image, exit_button.rect)
+            if exit_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append("canon_ending") if "canon_ending" not in self.endings else None; self.save_game(); quit()
+
+            # Main menu button
             self.screen.blit(main_menu_button.image, main_menu_button.rect)
-            if main_menu_button.is_pressed(mouse_pos, mouse_pressed):
-                self.endings.append("canon_ending"); self.save_game()
+            if main_menu_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append("canon_ending") if "canon_ending" not in self.endings else None; self.reseting_game_values(); self.save_game(); pygame.mixer.Sound.stop(self.theme); self.intro_screen().new("old").main()
+
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -1110,11 +1156,15 @@ class Game:
 
         # Escape doors
         elif self.player.facing == "down" and self.interacted[1] == 28 and self.interacted[2] in (54, 55):
-            if self.number_of_quests == ALL_QUESTS and "canon_ending" not in self.endings:
-                self.door_info("This is the end", "Exit")
-                self.end()
-            elif self.number_of_quests < ALL_QUESTS: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
-            else: self.talking("Let's try something else")
+
+            # Has everything
+            if len(self.grades) == ALL_GRADES: self.talking("This is the end"); self.end()
+
+            # Permission to go home sooner
+            elif self.five_min_sooner == self.nepusti == self.gul_quest == False: self.talking("Now I can go home sooner!"); self.game_over("img/early.png")
+
+            # Not yet
+            elif len(self.grades) < ALL_GRADES: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
         
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
@@ -1552,29 +1602,39 @@ class Game:
         """
         
         if self.interacted[0] == "Teacher":
-            # LIA
+
+            # Liascinska
             if self.interacted[2] == 100 and self.interacted[1] == 19: 
                 self.talking("LIA is just standing here")
                 self.talking("MENACINGLY")
                 
+            # Gulbaga
             elif self.interacted[2] == 57 and self.interacted[1] == 22:
-                self.__kul_counter += 1
-                if self.__kul_counter != 3:
-                    self.talking("Mr. KUL, can I go home early?")
-                    self.talking("You think I can manage that?", True)
-                    self.talking("I was just thinking...")
-                    self.talking("Maybe another time.", True)
                 
-                else:
-                    self.talking("Mr. KUL, can I go home early?")
-                    self.talking("You think I can manage that?", True)
-                    self.talking("I was just thinking...")
-                    self.talking("You've annoyed me this much...", True)
-                    self.talking("I guess you can", True)
-                    self.number_of_quests += 1
-                    self.kul_quest = False
+                # Sooner
+                if self.gul_quest:
+
+                    # Not annoyed enough
+                    if self.__gul_counter != 3:
+                        self.talking("Mr. GUL, can I go home early?")
+                        self.talking("You think I can manage that?", True)
+                        self.talking("I was just thinking...")
+                        self.talking("Maybe another time.", True)
+                        self.__gul_counter += 1
+                    
+                    # Annoyed
+                    else:
+                        self.talking("Mr. GUL, can I go home early?")
+                        self.talking("You think I can manage that?", True)
+                        self.talking("I was just thinking...")
+                        self.talking("You've annoyed me this much...", True)
+                        self.talking("I guess you can", True)
+                        self.gul_quest = False
+
+                # WoT
+                else: self.talking("You wanna play some WoT with me?", True)
             
-            # Another teacher
+            # Gonevalova
             if "DEJ" not in list(self.inv.keys()):
                 if self.interacted[2] == 155 and self.interacted[1] == 37:
                     if "chalks" not in list(self.inv.keys()): 
@@ -1588,12 +1648,67 @@ class Game:
                         self.talking("Since I teach history...", True)
                         self.info("You've recieved a grade for history")
                         self.grades["DEJ"] = 1
-                        self.number_of_quests += 1
                         self.inv.pop("chalks")
                         
+            # Guydosova
             if self.interacted[2] == 94 and self.interacted[1] == 24 and "ANJ" not in list(self.grades.keys()):
                 anj_values = self.quest.anglictina()
                 if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
+
+            # Koky
+            if self.interacted[2] == 111 and self.interacted[1] == 9:
+
+                if self.five_min_sooner:
+                    self.talking("Can you let us go 5 minutes sooner?")
+                    self.talking("No, I can't do that.", True)
+                    self.talking("But I will let you go 10 minutes sooner.", True)
+                    self.five_min_sooner = False
+                
+                elif not self.five_min_sooner: self.talking("What are you still doing here?", True)
+
+            # Michal (Ne)pusti
+            if self.interacted[2] == 188 and self.interacted[1] == 13:
+
+                # Already talked
+                if not self.nepusti: self.talking("Would you like to learn more about Sie?", True)
+
+                # Not yet done
+                elif self.nepusti: 
+                    
+                    # Not completed misson
+                    if type(self.connected_router) != list:
+                        self.talking("Hello, could you please let me go home earlier?")
+                        self.talking("I'm sorry but I don't think I can do that.", True)
+                        self.talking("Are you sure? Maybe I can help you somehow.")
+                        self.talking("Well there is something you can do.", True)
+                        self.talking("Connect all the routers please.", True)
+                        self.talking("If you do that I will let you go home earlier.", True)
+                        self.connected_router = []
+
+                    elif type(self.connected_router) == list:
+
+                        if len(self.connected_router) != 4: self.talking("Thank you for helping me.", True)
+
+                        # 023 missing
+                        if "023" not in self.connected_router: self.talking("One of them is in 023.", True)
+
+                        # 130 missing
+                        elif "130" not in self.connected_router: self.talking("You are doing great. Next one is in 130.", True)
+
+                        # Cabinet missing
+                        elif "217" not in self.connected_router: self.talking("Next one should be in the cabinet near this room.", True)
+                        
+                        # 402 missing
+                        elif "402" not in self.connected_router: self.talking("One of them should be somewhere on the fourth floor.", True)
+
+                        # Completed mission
+                        elif len(self.connected_router) == 4:
+                            self.talking("I'm back. I connected all of them.")
+                            self.talking("You really did it. Thank you for helping me.", True)
+                            self.talking("I guess you can go home earlier today", True)
+                            self.talking("Thank you very much.")
+                            self.connected_router = False
+                            self.nepusti = False
                 
     def shoes_on(self):
         """
@@ -1626,7 +1741,7 @@ class Game:
                 else: self.talking("Locked locker.")
 
             # Unlocked
-            else: self.in_locker(); self.number_of_quests += 1
+            else: self.in_locker()
             
         elif self.interacted[2] == 191 and self.interacted[1] == 17: 
             self.inv["chalks"] = "img/chalks_small.png"

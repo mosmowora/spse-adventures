@@ -1,84 +1,42 @@
 [
     {
-        "name": "Testik",
-        "inventory": {
-            "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png",
-            "phone": "img/Iphone_small.png"
-        },
-        "endings": [],
+        "name": "Samuel",
+        "inventory": {},
+        "endings": [
+            "canon_ending",
+            "lost",
+            "early"
+        ],
         "quests": {
-            "key_in_trash": false,
-            "locked_locker": false,
-            "locked_changing_room": false,
+            "key_in_trash": true,
+            "locked_locker": true,
+            "locked_changing_room": true,
             "kokosky_in_locker": true,
             "vtipnicek": true,
-            "dumbbells": false,
-            "program": false,
-            "KUL_quest": false,
-            "phone": false,
-            "suplovanie": false,
-            "anj_test": false,
+            "dumbbells": true,
+            "program": true,
+            "phone": true,
+            "suplovanie": true,
+            "anj_test": true,
+            "GUL_quest": true,
+            "gul_counter": 0,
+            "nepusti": true,
+            "router": true,
+            "sooner": true,
             "locker_stuff": {
-                "crocs": false,
-                "boots": true,
-                "key": false
+                "crocs": true,
+                "boots": false,
+                "key": true
             },
             "without_light": 0,
             "caught": 0
         },
         "level": 0,
-        "room_number": "Hall",
-        "grades": {
-            "ANJ": 1,
-            "DEJ": 1,
-            "TSV - gym": 1,
-            "PRO": 1
-        },
-        "done_quests": 7,
-        "settings": {
-            "music": false,
-            "talking_speed": 60
-        }
-    },
-    {
-        "name": "Tomas",
-        "inventory": {
-            "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
-        },
-        "endings": [
-            "you_never_learn",
-            "canon_ending",
-            "window_fail"
-        ],
-        "quests": {
-            "key_in_trash": false,
-            "locked_locker": false,
-            "locked_changing_room": false,
-            "kokosky_in_locker": true,
-            "vtipnicek": true,
-            "dumbbells": true,
-            "program": true,
-            "KUL_quest": true,
-            "phone": true,
-            "suplovanie": true,
-            "anj_test": true,
-            "locker_stuff": {
-                "crocs": true,
-                "boots": false,
-                "key": false
-            },
-            "without_light": 0,
-            "caught": 3
-        },
-        "level": 3,
-        "room_number": "Gymnasium - chr",
+        "room_number": "017",
         "grades": {},
-        "done_quests": 8,
         "settings": {
             "music": true,
-            "talking_speed": 90
+            "talking_speed": 60
         }
     }
 ]
