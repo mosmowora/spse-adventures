@@ -531,7 +531,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -603,6 +603,11 @@ class Block(pygame.sprite.Sprite):
         elif type == "x": self.image = self.game.terrain_spritesheet.get_sprite(36, 206, self.width, self.height)
         elif type == "X": self.image = self.game.terrain_spritesheet.get_sprite(70, 206, self.width, self.height)
         elif type == "E": self.image = self.game.terrain_spritesheet.get_sprite(104, 206, self.width, self.height)
+        elif type == "ž": self.image = self.game.terrain_spritesheet.get_sprite(138, 206, self.width, self.height)
+        elif type == "ý": self.image = self.game.terrain_spritesheet.get_sprite(172, 206, self.width, self.height)
+        elif type == "ň": self.image = self.game.terrain_spritesheet.get_sprite(206, 206, self.width, self.height)
+        elif type == "ú": self.image = self.game.terrain_spritesheet.get_sprite(241, 206, self.width, self.height)
+        elif type == "č": self.image = self.game.terrain_spritesheet.get_sprite(274, 205, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -756,6 +761,13 @@ class Interact(pygame.sprite.Sprite):
 
                     # Router
                     elif self.interactive[hits[0]] == "E" + str(i) + str(j): self.game.interacted = ["Router", i, j]
+                    
+                    # Taburetky
+                    elif self.interactive[hits[0]] == "ý" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "ž" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "ú" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "ň" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "č" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
 
 class Button:
     """

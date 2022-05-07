@@ -235,6 +235,11 @@ class Game:
                 elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
                 elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
                 elif column == "E": self.interactive[Block(self, j, i, "E")] = "E" + str(i) + str(j) # Router
+                elif column == "ý": self.interactive[Block(self, j, i, "ý")] = "ý" + str(i) + str(j) # ý as in Yellow Taburetka
+                elif column == "ž": self.interactive[Block(self, j, i, "ž")] = "ž" + str(i) + str(j) # ž as in Green (želena) Taburetka
+                elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
+                elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
+                elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # č as in Red (červena) Taburetka
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
@@ -380,6 +385,7 @@ class Game:
                     case "Computer": self.quest.programming()
                     case "Bench_press": self.dumbbell_lifted = self.quest.bench_press(self.dumbbell_lifted)
                     case "Window": self.window()
+                    case "Taburetka": self.taburetka()
                     case "Router": 
                         if type(self.connected_router) == list: router_outcome = self.quest.router(); self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
                         else: self.talking("I don't know what to do with this.")
@@ -1849,6 +1855,21 @@ class Game:
             self.update()
             self.draw()
             self.talking("You sit on a bench.")
+            self.talking("Sitting is really interesting.")
+            self.talking("You enjoyed this sitting session.")
+            self.talking("But now it's time to continue your journey.")
+            self.player.sit(False, self.interacted[1], self.interacted[2])
+            
+    def taburetka(self):
+        """
+        Sitting on a taburetka
+        """
+
+        if self.interacted[0] == "Taburetka" and self.player.facing in ("right", "left", "up", "down"):
+            self.player.sit(True, self.interacted[1], self.interacted[2])
+            self.update()
+            self.draw()
+            self.talking("You're sitting on a soft taburetka.")
             self.talking("Sitting is really interesting.")
             self.talking("You enjoyed this sitting session.")
             self.talking("But now it's time to continue your journey.")
