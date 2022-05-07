@@ -42,7 +42,7 @@ FOURTH_FLOOR = 4
 BASEMENT_FLOOR = -1
 
 # Number of quests to go home
-ALL_QUESTS: int = 7
+ALL_QUESTS: int = 8
 
 # Basement
 basement: List[str]  = [

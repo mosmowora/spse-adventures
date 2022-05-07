@@ -1072,15 +1072,17 @@ class Game:
         while True:
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: quit()
+                
             self.screen.blit(ending_screen, (0, 0))
             self.screen.blit(main_menu_button.image, main_menu_button.rect)
-            if main_menu_button.is_pressed(mouse_pos, mouse_pressed): break
+            if main_menu_button.is_pressed(mouse_pos, mouse_pressed):
+                self.endings.append("canon_ending"); self.save_game()
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
         
-        pygame.quit()
-
     def ground_floor_doors(self):
         """
         Doors on the ground floor
@@ -1108,10 +1110,11 @@ class Game:
 
         # Escape doors
         elif self.player.facing == "down" and self.interacted[1] == 28 and self.interacted[2] in (54, 55):
-            if self.number_of_quests == ALL_QUESTS:
+            if self.number_of_quests == ALL_QUESTS and "canon_ending" not in self.endings:
                 self.door_info("This is the end", "Exit")
                 self.end()
-            else: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
+            elif self.number_of_quests < ALL_QUESTS: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
+            else: self.talking("Let's try something else")
         
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
