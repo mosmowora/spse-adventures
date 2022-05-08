@@ -323,7 +323,6 @@ class Npc(pygame.sprite.Sprite):
         self.animation_loop = 1
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
-        self.kacurovanie = False
 
         colors = [0, 99, 198, 297, 396, 495, 594, 693, 792]
         if self.type == "C": self.color = colors[-1]
@@ -457,16 +456,16 @@ class Npc(pygame.sprite.Sprite):
             if hits: self.game.shoes_on()
         elif self.type == "K":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-<<<<<<< Updated upstream
             if hits and self.game.locker_stuff['boots']: 
-                pygame.mixer.Sound.play(self.game.kacurovanie)
-=======
-            if hits and self.game.locker_stuff['boots'] and not self.kacurovanie: 
-                pygame.mixer.Sound.play(self.game.kacurovanie, -1)
-                self.kacurovanie = True
-                print("greee", self.kacurovanie)
-                pygame.time.set_timer(pygame.USEREVENT, )
->>>>>>> Stashed changes
+                pygame.mixer.Sound.play(self.game.kacurovanie, 0, 6000, 1000)
+                if self.game.player.facing == "up": self.game.player.rect.y += 1 * TILE_SIZE
+                elif self.game.player.facing == "down": self.game.player.rect.y -= 1 * TILE_SIZE
+                elif self.game.player.facing == "right": self.game.player.rect.x -= 1 * TILE_SIZE
+                elif self.game.player.facing == "left": self.game.player.rect.x += 1 * TILE_SIZE
+                self.game.talking("WHY you not wearin' yo boots?", True)
+                self.game.talking("You'll get in a lot of trouble for this", True)
+                self.game.talking("Who's yo' classteacher?", True)
+            
 
         """else:
     
