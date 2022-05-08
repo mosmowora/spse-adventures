@@ -531,10 +531,10 @@ class Game:
         
         match img:
             
-            case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", WHITE, 90) # Locker key
-            case "img/changing_room key.png": self.info("This key is used for OUR changing room.", WHITE, 90) # Changing room key
-            case "img/vtipnicek_small.png": self.info("I can read you.", WHITE, 90); self.open_vtipnicek() # Vtipnicek
-            case "img/Iphone_small.png": self.info("Let's check substitution", WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
+            case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", BRITISH_WHITE, 90) # Locker key
+            case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BRITISH_WHITE, 90) # Changing room key
+            case "img/vtipnicek_small.png": self.info("I can read you.", BRITISH_WHITE, 90); self.open_vtipnicek() # Vtipnicek
+            case "img/Iphone_small.png": self.info("Let's check my phone", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
         
     def open_vtipnicek(self):
         """

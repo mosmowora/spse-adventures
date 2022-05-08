@@ -91,7 +91,7 @@ class Quest:
             if grade - counter == 0: grade = 1
             else: grade -= counter
             
-            self.game.grades["TSV - gym"] = grade
+            self.game.grades["TSV"] = grade
 
         # Music
         if self.game.music_on: pygame.mixer.Sound.stop(self.game.tsv_theme); pygame.mixer.Sound.play(self.game.theme, -1)
@@ -244,17 +244,44 @@ class Quest:
         first_screen = pygame.image.load("img/screenshot_first.png")
         first_rect = first_screen.get_rect(x=WIN_WIDTH // 2 - first_screen.get_width() // 2, y=WIN_HEIGHT // 2 - first_screen.get_height() // 2)
         second_screen = pygame.image.load("img/screenshot_second.png")
-        second_rect = second_screen.get_rect(x=WIN_WIDTH // 2 - first_screen.get_width() // 2, y=WIN_HEIGHT // 2 - second_screen.get_height() // 2)
+        second_rect = second_screen.get_rect(x=WIN_WIDTH // 2 - second_screen.get_width() // 2, y=WIN_HEIGHT // 2 - second_screen.get_height() // 2)
+        grades_one = pygame.image.load("img/grades_first.png")
+        grades_one_rect = grades_one.get_rect(x=WIN_WIDTH // 2 - grades_one.get_width() // 2, y=WIN_HEIGHT // 2 - grades_one.get_height() // 2)
+        grades_two = pygame.image.load("img/grades_second.png")
+        grades_two_rect = grades_two.get_rect(x=WIN_WIDTH // 2 - grades_two.get_width() // 2, y=WIN_HEIGHT // 2 - grades_two.get_height() // 2)
 
         # Button
         back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
 
         # "Button"
-        empty_rect = pygame.Rect(192, 319, 129, 23)
-        back_rect = pygame.Rect(300, 420, 37, 29)
+        empty_rect = pygame.Rect(193, 320, 127, 21)
+        back_rect = pygame.Rect(302, 422, 36, 22)
+        grade_rect = pygame.Rect(193, 245, 127, 24)
 
         main_app = True
         sub = False
+        grades_app = False
+        up = True
+
+        # Grades
+        grades_to_write = {
+            "SJL": 0,
+            "ANJ": 0,
+            "DEJ": 0,
+            "OBN": 0,
+            "MAT": 0,
+            "TSV": 0,
+            "PRO": 0,
+            "SIE": 0,
+            "ICD": 0,
+            "OSY": 0,
+            "AEN": 0,
+            "IOT": 0,
+            "DSY": 0
+        }
+
+        # From dictionary
+        for i in self.game.grades: grades_to_write[i] = self.game.grades[i]
 
         while checking:
             
@@ -274,6 +301,12 @@ class Quest:
                     # Esc
                     if event.key == pygame.K_ESCAPE: checking = False
 
+                    # Down
+                    elif event.key == pygame.K_DOWN and grades_app: up = False
+
+                    # Up
+                    elif event.key == pygame.K_UP and grades_app: up = True
+
                 # Mouse
                 elif event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -281,19 +314,35 @@ class Quest:
                     if empty_rect.collidepoint(event.pos): main_app = not main_app; sub = not sub
 
                     # Back
-                    elif back_rect.collidepoint(event.pos): checking = False; self.game.info("What day even is today?"); return False
+                    elif back_rect.collidepoint(event.pos): 
+                        if main_app: checking = False; self.game.info("What day even is today?", BRITISH_WHITE); return False
+                        elif sub: main_app = not main_app; sub = not sub
+                        elif grades_app: main_app = not main_app; grades_app = not grades_app
+
+                    # Grades
+                    elif grade_rect.collidepoint(event.pos): main_app = not main_app; grades_app = not grades_app
 
             # Background
             self.game.screen.blit(bg, (0, 0))
                                                             
             self.game.screen.blit(iphone, (WIN_WIDTH // 2 - iphone.get_width() // 2, WIN_HEIGHT // 2 - iphone.get_height() // 2))
             
+            pygame.draw.rect(self.game.screen, BLACK, back_rect)
+
+            # Main app
             if main_app: 
                 self.game.screen.blit(first_screen, first_rect)
                 pygame.draw.rect(self.game.screen, NAVY, empty_rect, 1)
-            elif sub: 
-                pygame.draw.rect(self.game.screen, BLACK, back_rect)
-                self.game.screen.blit(second_screen, second_rect)
+                pygame.draw.rect(self.game.screen, NAVY, grade_rect, 1)
+
+            # Substitution
+            elif sub: self.game.screen.blit(second_screen, second_rect)
+
+            # Grades
+            elif grades_app: 
+                if up: self.game.screen.blit(grades_one, grades_one_rect); self.render_grades(up, grades_to_write)
+                elif not up: self.game.screen.blit(grades_two, grades_two_rect); self.render_grades(up, grades_to_write)
+                
 
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): checking = False
@@ -303,6 +352,25 @@ class Quest:
             self.game.clock.tick(FPS)
             pygame.display.update()
             
+    def render_grades(self, up, grades):
+        """
+        Renders grades in EduPage
+        """
+
+        n = 0
+
+        # SJL, ANJ, DEJ, OBN, MAT, TSV, PRO
+        if up:
+            for i in grades: 
+                self.game.screen.blit(self.game.font.render(str(grades[i]), True, WHITE), (425, 97 + 44 * n)); n += 1
+                if n == 7: break
+
+        # PRO, SIE, ICDL, OSY, AEN, IOT, DSY
+        elif not up:
+            for i in grades:
+                if n > 5: self.game.screen.blit(self.game.font.render(str(grades[i]), True, WHITE), (425, 97 + 44 * (n - 6)))
+                n += 1
+
     def open_window(self):
         """
         DSY quest to open windows but with a twist

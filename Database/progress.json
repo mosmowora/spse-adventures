@@ -3,7 +3,8 @@
         "name": "Samuel",
         "inventory": {
             "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
+            "changing_room key": "img/changing_room key.png",
+            "phone": "img/Iphone_small.png"
         },
         "endings": [
             "canon_ending",
@@ -16,10 +17,10 @@
             "locked_changing_room": false,
             "kokosky_in_locker": true,
             "vtipnicek": true,
-            "dumbbells": true,
+            "dumbbells": false,
             "program": true,
-            "phone": true,
-            "suplovanie": true,
+            "phone": false,
+            "suplovanie": null,
             "anj_test": true,
             "GUL_quest": true,
             "gul_counter": 0,
@@ -34,9 +35,11 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
-        "room_number": "017",
-        "grades": {},
+        "level": 3,
+        "room_number": "302",
+        "grades": {
+            "TSV": 1
+        },
         "settings": {
             "music": true,
             "talking_speed": 60
