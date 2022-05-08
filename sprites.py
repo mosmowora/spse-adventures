@@ -454,6 +454,10 @@ class Npc(pygame.sprite.Sprite):
         if self.type == "C": 
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
             if hits: self.game.shoes_on()
+        elif self.type == "K":
+            hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+            if hits and self.game.locker_stuff['boots'] and not self.kacurovanie: 
+                pygame.mixer.Sound.play(self.game.kacurovanie)
 
         """else:
     
@@ -608,6 +612,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "ň": self.image = self.game.terrain_spritesheet.get_sprite(206, 206, self.width, self.height)
         elif type == "ú": self.image = self.game.terrain_spritesheet.get_sprite(241, 206, self.width, self.height)
         elif type == "č": self.image = self.game.terrain_spritesheet.get_sprite(274, 205, self.width, self.height)
+        elif type == "$": self.image = self.game.terrain_spritesheet.get_sprite(307, 172, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x

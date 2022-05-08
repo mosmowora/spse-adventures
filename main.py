@@ -64,6 +64,8 @@ class Game:
         self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
         self.wow_iphone.set_volume(0.5)
         self.theme = pygame.mixer.Sound("sounds/theme.mp3")
+        self.kacurovanie = pygame.mixer.Sound("sounds/kacurovanie.mp3")
+        self.kacurovanie.set_volume(0.05)
         self.theme.set_volume(0.008)
         self.tsv_theme = pygame.mixer.Sound("sounds/bench.mp3")
         self.tsv_theme.set_volume(0.05)
@@ -239,8 +241,10 @@ class Game:
                 elif column == "ž": self.interactive[Block(self, j, i, "ž")] = "ž" + str(i) + str(j) # ž as in Green (želena) Taburetka
                 elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
                 elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
+                elif column == "$": self.interactive[Block(self, j, i, "$")] = "$" + str(i) + str(j) # Corner desk
                 elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # č as in Red (červena) Taburetka
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
+                elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j)  # NPC
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
     def set_camera(self, level: List[str]):
