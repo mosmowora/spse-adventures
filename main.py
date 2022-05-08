@@ -387,7 +387,7 @@ class Game:
                     case "Window": self.window()
                     case "Taburetka": self.taburetka()
                     case "Router": 
-                        if type(self.connected_router) == list: router_outcome = self.quest.router(); self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+                        if type(self.connected_router) == list: router_outcome = self.quest.router(); self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK); self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
                         else: self.talking("I don't know what to do with this.")
 
                 # Reset
@@ -427,7 +427,9 @@ class Game:
             # Close button
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: quit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
+                    elif event.key == pygame.K_s: self.settings()
 
             if exit_pause: break
             # Position and click of the mouse
@@ -903,8 +905,25 @@ class Game:
                 if event.type == pygame.QUIT: quit()
                 
                 # Esc
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: opened = not opened
-            
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE: opened = not opened
+                    elif event.key == pygame.K_m:
+                        if self.music_on:
+                            for _ in range(12):
+                                slider.rect.x -= 4
+                                slider_inside.rect.x -= 4
+                                self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
+                            self.music_on = not self.music_on
+                            slider_inside.rect.x -= 2
+                            slider = Button(250, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
+                        else:
+                            for _ in range(12):
+                                slider.rect.x += 4
+                                slider_inside.rect.x += 4
+                                self._settings_animation(title, title_rect, sound_effects, sound_effects_rect, talking_speed, talking_speed_rect, slider_back, slider, slider_inside, back, slow, medium, fast)
+                            self.music_on = not self.music_on
+                            slider_inside.rect.x += 2
+                            slider = Button(300, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0)
             # Back button
             if back.is_pressed(mouse_pos, mouse_pressed): opened = not opened
         
@@ -1752,7 +1771,6 @@ class Game:
         elif self.interacted[2] == 191 and self.interacted[1] == 17: 
             self.inv["chalks"] = "img/chalks_small.png"
             self.info("You should have chalks in your pocket")
-            print(self.inv.keys())
 
         # Locker with kokosky
         elif self.interacted[1] == 4 and self.interacted[2] == 165:

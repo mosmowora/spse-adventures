@@ -1,4 +1,3 @@
-from turtle import color
 import pygame
 from config import *
 from sprites import Button

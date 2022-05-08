@@ -77,5 +77,43 @@
             "music": true,
             "talking_speed": 90
         }
+    },
+    {
+        "name": "Tomas",
+        "inventory": {},
+        "endings": [
+            "early"
+        ],
+        "quests": {
+            "key_in_trash": true,
+            "locked_locker": true,
+            "locked_changing_room": true,
+            "kokosky_in_locker": true,
+            "vtipnicek": true,
+            "dumbbells": true,
+            "program": true,
+            "phone": true,
+            "suplovanie": true,
+            "anj_test": true,
+            "GUL_quest": true,
+            "gul_counter": 0,
+            "nepusti": true,
+            "router": true,
+            "sooner": true,
+            "locker_stuff": {
+                "crocs": true,
+                "boots": false,
+                "key": true
+            },
+            "without_light": 0,
+            "caught": 0
+        },
+        "level": 0,
+        "room_number": "017",
+        "grades": {},
+        "settings": {
+            "music": true,
+            "talking_speed": 90
+        }
     }
 ]
