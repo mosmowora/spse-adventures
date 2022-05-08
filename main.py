@@ -393,7 +393,6 @@ class Game:
                     case "Router": 
                         if type(self.connected_router) == list: router_outcome = self.quest.router(); self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK); self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
                         else: self.talking("I don't know what to do with this.")
-
                 # Reset
                 self.interacted = ["", "", ""]
 
@@ -1481,10 +1480,10 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 299
-        elif self.player.facing == "up" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("299 - LRIS", "299"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] in (108, 109) and self.interacted[1] == 25: self.door_info("299 - LRIS", "299"); self.center_player_after_doors()
 
         # 299 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 109 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] in (108, 109) and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 210
         elif self.player.facing == "up" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("210 - III.SB", "210"); self.center_player_after_doors()
@@ -1681,6 +1680,7 @@ class Game:
                         
             # Guydosova
             if self.interacted[2] == 94 and self.interacted[1] == 24 and "ANJ" not in list(self.grades.keys()):
+                self.talking(f"{self.player_name} I've got the test you didn't attend", True)
                 anj_values = self.quest.anglictina()
                 if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
 
@@ -1738,6 +1738,8 @@ class Game:
                             self.talking("Thank you very much.")
                             self.connected_router = False
                             self.nepusti = False
+                            self.grades["SIE"] = 1
+                            self.info("You've recieved a grade for SIE")
                 
     def shoes_on(self):
         """

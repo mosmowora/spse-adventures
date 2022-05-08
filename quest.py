@@ -91,6 +91,7 @@ class Quest:
             if grade - counter == 0: grade = 1
             else: grade -= counter
             
+            self.info("You've recieved a grade for TSV")
             self.game.grades["TSV"] = grade
 
         # Music
@@ -189,6 +190,7 @@ class Quest:
                     self.game.program_test = False
                     grade: int = self.game.grade_program(text_def, text_self, text_item, text_even, text_tuple)
                     self.game.grades['PRO'] = grade
+                    self.info("You've recieved a grade for PRO")
                     in_potitat = False
 
                 # Background
@@ -397,7 +399,6 @@ class Quest:
         assignment_answers: List[str] = ["posta", "mravciar", "geneticky", "lavica", "nabozentvo", "klavesnica", "iteracia", "perliva", "prepinac", "tlaciaren"]
         answer: List[str] = []
         answer_rect = pygame.Rect(155, 215, 302, 67)
-        active: bool = False
         answer_text: str = ""
 
         # Button
@@ -428,24 +429,19 @@ class Quest:
                     if event.key == pygame.K_RETURN: word += 1; answer.append(answer_text); answer_text = ""
 
                     # Check for backspace
-                    elif event.key == pygame.K_BACKSPACE: 
-                        if active: answer_text = answer_text[:-1]
-
-                    # Unicode
-                    elif active: answer_text += event.unicode
+                    elif event.key == pygame.K_BACKSPACE: answer_text = answer_text[:-1]
 
                     # Escape
                     elif event.key == pygame.K_ESCAPE: testing = False
-                
-                elif event.type == pygame.MOUSEBUTTONDOWN:
 
-                    # Clicked
-                    if answer_rect.collidepoint(event.pos): active = not active
+                    # Unicode
+                    else: answer_text += event.unicode
 
             # Grading
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
                 self.game.anj_test = False
+                self.game.info("You've recieved a grade for ANJ", DIM_GRAY)
                 return grade if grade != 0 else 1, False
 
             # Background
@@ -459,7 +455,7 @@ class Quest:
 
             # Text
             text_surface_answer = self.game.big_font.render(answer_text, True, BLACK)
-            pygame.draw.rect(self.game.screen, BRITISH_WHITE, answer_rect)
+            pygame.draw.rect(self.game.screen, PAPER_WHITE, answer_rect)
             self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
             assing_text_surface = self.game.font.render(assign, True, BLACK)
             self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))

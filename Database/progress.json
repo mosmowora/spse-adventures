@@ -91,7 +91,8 @@
             "changing_room key": "img/changing_room key.png"
         },
         "endings": [
-            "early"
+            "early",
+            "lost"
         ],
         "quests": {
             "key_in_trash": false,
@@ -103,7 +104,7 @@
             "program": true,
             "phone": true,
             "suplovanie": true,
-            "anj_test": true,
+            "anj_test": false,
             "GUL_quest": true,
             "gul_counter": 0,
             "nepusti": true,
@@ -119,10 +120,12 @@
         },
         "level": 0,
         "room_number": "Hall",
-        "grades": {},
+        "grades": {
+            "ANJ": 1
+        },
         "settings": {
-            "music": true,
-            "talking_speed": 90
+            "music": false,
+            "talking_speed": 60
         }
     }
 ]
