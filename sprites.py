@@ -323,6 +323,7 @@ class Npc(pygame.sprite.Sprite):
         self.animation_loop = 1
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
+        self.kacurovanie = False
 
         colors = [0, 99, 198, 297, 396, 495, 594, 693, 792]
         if self.type == "C": self.color = colors[-1]
@@ -457,7 +458,10 @@ class Npc(pygame.sprite.Sprite):
         elif self.type == "K":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
             if hits and self.game.locker_stuff['boots'] and not self.kacurovanie: 
-                pygame.mixer.Sound.play(self.game.kacurovanie)
+                pygame.mixer.Sound.play(self.game.kacurovanie, -1)
+                self.kacurovanie = True
+                print("greee", self.kacurovanie)
+                pygame.time.set_timer(pygame.USEREVENT, )
 
         """else:
     
