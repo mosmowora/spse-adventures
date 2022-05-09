@@ -543,7 +543,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -624,6 +624,10 @@ class Block(pygame.sprite.Sprite):
         elif type == "Q": self.image = self.game.terrain_spritesheet.get_sprite(307, 104, self.width, self.height)
         elif type == "q": self.image = self.game.terrain_spritesheet.get_sprite(307, 138, self.width, self.height)
         elif type == "a": self.image = self.game.terrain_spritesheet.get_sprite(307, 70, self.width, self.height)
+        elif type == "@": self.image = self.game.terrain_spritesheet.get_sprite(342, 172, self.width, self.height)
+        elif type == "#": self.image = self.game.terrain_spritesheet.get_sprite(342, 206, self.width, self.height)
+        elif type == "*": self.image = self.game.terrain_spritesheet.get_sprite(307, 206, self.width, self.height)
+        elif type == "~": self.image = self.game.terrain_spritesheet.get_sprite(342, 138, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -784,7 +788,11 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "ú" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
                     elif self.interactive[hits[0]] == "ň" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
                     elif self.interactive[hits[0]] == "č" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
-
+                    
+                    # Green chairs
+                    elif self.interactive[hits[0]] == "@" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "#" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] == "*" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
 class Button:
     """
     Class for button
