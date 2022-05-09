@@ -1263,10 +1263,7 @@ class Game:
         if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
         # Windows between classrooms
-        if self.interacted[1] in (11, 14, 25) and self.interacted[2] in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): pass
-            
-        # Other
-        else: self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
+        if self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
 
     def sans(self):
         """
@@ -1905,7 +1902,7 @@ class Game:
                 elif self.nepusti: 
                     
                     # Not completed misson
-                    if type(self.connected_router) != list:
+                    if self.connected_router != list and SaveProgress.get_amount_of_quests(self.player_name) >= 6:
                         self.talking("Hello, could you please let me go home earlier?")
                         self.talking("I'm sorry but I don't think I can do that.", True)
                         self.talking("Are you sure? Maybe I can help you somehow.")
@@ -1941,6 +1938,12 @@ class Game:
                             self.grades["SIE"] = 1
                             self.info("You've recieved a grade for SIE")
                 
+                    else: 
+                        self.talking("Sorry, I don't see the results", True)
+                        self.talking("From other lessons", True)
+                        self.talking("Come back when you're a bit...", True)
+                        self.talking("Richer", True)
+                                    
     def shoes_on(self):
         """
         Checks if player has shoes on

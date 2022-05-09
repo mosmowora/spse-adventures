@@ -43,5 +43,92 @@
             "music": true,
             "talking_speed": 90
         }
+    },
+    {
+        "name": "Tomas",
+        "inventory": {
+            "locker key": "img/locker key.png",
+            "changing_room key": "img/changing_room key.png",
+            "Kokosky": "img/kokosky_small.png"
+        },
+        "endings": [],
+        "quests": {
+            "key_in_trash": false,
+            "locked_locker": false,
+            "locked_changing_room": false,
+            "number_kokosky": 4,
+            "kokosky_in_locker": false,
+            "kokosky_in_bookshelf": false,
+            "kokosky_under_bench": false,
+            "kokosky_in_trash": false,
+            "vtipnicek": true,
+            "dumbbells": true,
+            "program": true,
+            "phone": true,
+            "suplovanie": true,
+            "anj_test": true,
+            "GUL_quest": true,
+            "gul_counter": 0,
+            "nepusti": true,
+            "router": [],
+            "sooner": true,
+            "locker_stuff": {
+                "crocs": false,
+                "boots": true,
+                "key": false
+            },
+            "without_light": 0,
+            "caught": 0
+        },
+        "level": 2,
+        "room_number": "216",
+        "grades": {},
+        "settings": {
+            "music": false,
+            "talking_speed": 60
+        }
+    },
+    {
+        "name": "cool baca",
+        "inventory": {
+            "locker key": "img/locker key.png",
+            "changing_room key": "img/changing_room key.png"
+        },
+        "endings": [],
+        "quests": {
+            "key_in_trash": false,
+            "locked_locker": false,
+            "locked_changing_room": false,
+            "number_kokosky": 0,
+            "kokosky_in_locker": true,
+            "kokosky_in_bookshelf": true,
+            "kokosky_under_bench": true,
+            "kokosky_in_trash": true,
+            "vtipnicek": true,
+            "dumbbells": true,
+            "program": true,
+            "phone": true,
+            "suplovanie": true,
+            "anj_test": true,
+            "GUL_quest": true,
+            "gul_counter": 0,
+            "nepusti": true,
+            "router": true,
+            "sooner": true,
+            "locker_stuff": {
+                "crocs": false,
+                "boots": true,
+                "key": false
+            },
+            "without_light": 0,
+            "caught": 0
+        },
+        "level": 0,
+        "room_number": "017",
+        "grades": {},
+        "settings": {
+            "music": true,
+            "talking_speed": 60
+        }
     }
 ]

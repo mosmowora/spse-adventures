@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from typing import List
 import json
-
-class UserAlreadyExistsError(Exception): pass
+import unittest
+import unittest
 
 @dataclass
-class SaveProgress(UserAlreadyExistsError):
+class SaveProgress():
     name: str
     inventory: dict[str]
     endings: List[str] 
@@ -56,12 +56,23 @@ class SaveProgress(UserAlreadyExistsError):
                 has_profile = True
 
         # No profile for u big man
-        if not has_profile: 
-            loaded_data.append(write_data)
+        if not has_profile: loaded_data.append(write_data)
 
         # Writing to file 
         with open(self.file_dest, "w") as destination_file: json.dump(loaded_data, destination_file, indent=4)
     
     @staticmethod
     def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)
+    
+    @staticmethod
+    def get_amount_of_quests(player_name: str):
+        data = json.load(open(SaveProgress.file_dest))
+        for player in range(len(data)):
+            if data[player]['name'] == player_name: return len(tuple(quest for quest in data[player]['quests'].values() if quest == False and isinstance(quest, bool)))
             
+            
+class GetQuestsAmount(unittest.TestCase):
+    def test_four_quests(self):
+        self.assertEqual(SaveProgress.get_amount_of_quests("Tomas"), 7)
+
+if __name__ == '__main__': unittest.main()
