@@ -621,6 +621,9 @@ class Block(pygame.sprite.Sprite):
         elif type == "ú": self.image = self.game.terrain_spritesheet.get_sprite(241, 206, self.width, self.height)
         elif type == "č": self.image = self.game.terrain_spritesheet.get_sprite(274, 205, self.width, self.height)
         elif type == "$": self.image = self.game.terrain_spritesheet.get_sprite(307, 172, self.width, self.height)
+        elif type == "Q": self.image = self.game.terrain_spritesheet.get_sprite(307, 104, self.width, self.height)
+        elif type == "q": self.image = self.game.terrain_spritesheet.get_sprite(307, 138, self.width, self.height)
+        elif type == "a": self.image = self.game.terrain_spritesheet.get_sprite(307, 70, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -732,7 +735,7 @@ class Interact(pygame.sprite.Sprite):
                 for j, _ in enumerate(row):
 
                     # Trashcan
-                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
+                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]; print(i, j)
 
                     # Toilet
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
@@ -744,7 +747,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
 
                     # Bench
-                    elif self.interactive[hits[0]] in ("B" + str(i) + str(j)): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("B" + str(i) + str(j)): self.game.interacted = ["Bench", hits[0].rect.left, hits[0].rect.top, i, j]
                     elif self.interactive[hits[0]] in ("h" + str(i) + str(j)): self.game.interacted = ["BencH", hits[0].rect.left, hits[0].rect.top]
 
                     # Stairs

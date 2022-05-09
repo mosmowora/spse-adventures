@@ -1,5 +1,5 @@
 # Import
-import pygame
+import pygame, random as r
 from quest import Quest
 from save_progress import SaveProgress
 from camera import Camera
@@ -151,7 +151,11 @@ class Game:
         self.key_in_trash: bool = True
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
+        self.number_kokosky: int = 0
         self.kokosky_in_locker: bool = True
+        self.kokosky_in_bookshelf: bool = True
+        self.kokosky_under_bench: bool = True
+        self.kokosky_in_trash: bool = True
         self.vtipnicek: bool = True
         self.dumbbell_lifted: bool = True
         self.program_test: bool = True
@@ -202,12 +206,16 @@ class Game:
                 elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
                 elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
                 elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
+                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Desk + chair + PC (vertical) right
+                elif column == "a": self.interactive[Block(self, j, i, "a")] = "a" + str(i) + str(j) # Desk + chair + PC (vertical) left
                 elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
                 elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
                 elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Desk + chair (horizontal) up
                 elif column == "m": self.interactive[Block(self, j, i, "m")] = "m" + str(i) + str(j) # Desk no chair (horizontal) up
                 elif column == "i": self.interactive[Block(self, j, i, "i")] = "i" + str(i) + str(j) # Desk + chair (horizontal) down
                 elif column == "n": self.interactive[Block(self, j, i, "n")] = "n" + str(i) + str(j) # Desk no chair (horizontal) down
+                elif column == "q": self.interactive[Block(self, j, i, "q")] = "q" + str(i) + str(j) # Desk + chair + PC (horizontal) up
+                elif column == "Q": self.interactive[Block(self, j, i, "Q")] = "Q" + str(i) + str(j) # Desk + chair + PC (horizontal) down
                 elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
                 elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
                 elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
@@ -225,7 +233,6 @@ class Game:
                 elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
                 elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
                 elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
-                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Computer LROB
                 elif column == "]": self.interactive[Block(self, j, i, "]")] = "]" + str(i) + str(j) # Whiteboard -> (that way)
                 elif column == "[": self.interactive[Block(self, j, i, "[")] = "[" + str(i) + str(j) # Whiteboard <- (that way)
                 elif column == "-": self.interactive[Block(self, j, i, "-")] = "-" + str(i) + str(j) # Whiteboard ^ (that way)
@@ -293,7 +300,11 @@ class Game:
             self.key_in_trash = data["quests"]["key_in_trash"]
             self.locked_locker = data["quests"]["locked_locker"]
             self.locked_changing_room = data["quests"]["locked_changing_room"]
+            self.number_kokosky = data["quests"]["number_kokosky"]
             self.kokosky_in_locker = data["quests"]["kokosky_in_locker"]
+            self.kokosky_in_bookshelf = data["quests"]["kokosky_in_bookshelf"]
+            self.kokosky_under_bench = data["quests"]["kokosky_under_bench"]
+            self.kokosky_in_trash = data["quests"]["kokosky_in_trash"]
             self.locker_stuff = data["quests"]["locker_stuff"]
             self.vtipnicek = data["quests"]["vtipnicek"]
             self.dumbbell_lifted = data["quests"]["dumbbells"]
@@ -344,6 +355,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            self.craft()
 
         return self
     
@@ -538,7 +550,157 @@ class Game:
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BRITISH_WHITE, 90) # Changing room key
             case "img/vtipnicek_small.png": self.info("I can read you.", BRITISH_WHITE, 90); self.open_vtipnicek() # Vtipnicek
             case "img/Iphone_small.png": self.info("Let's check my phone", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
+            case "img/kokosky1_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky2_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky3_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky4_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky12_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky13_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky14_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky23_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky24_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky34_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky123_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky124_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+
+    def show_kokosky(self, img: str):
+        """
+        Opens big image of kokosky
+        """
+
+        kokoskoing = True
+
+        match img:
+            case "img/kokosky1_small.png": bg = pygame.image.load("img/kokosky1.png")
+            case "img/kokosky2_small.png": bg = pygame.image.load("img/kokosky2.png")
+            case "img/kokosky3_small.png": bg = pygame.image.load("img/kokosky3.png")
+            case "img/kokosky4_small.png": bg = pygame.image.load("img/kokosky4.png")
+            case "img/kokosky12_small.png": bg = pygame.image.load("img/kokosky12.png")
+            case "img/kokosky13_small.png": bg = pygame.image.load("img/kokosky13.png")
+            case "img/kokosky14_small.png": bg = pygame.image.load("img/kokosky14.png")
+            case "img/kokosky23_small.png": bg = pygame.image.load("img/kokosky23.png")
+            case "img/kokosky24_small.png": bg = pygame.image.load("img/kokosky24.png")
+            case "img/kokosky34_small.png": bg = pygame.image.load("img/kokosky34.png")
+            case "img/kokosky123_small.png": bg = pygame.image.load("img/kokosky123.png")
+            case "img/kokosky124_small.png": bg = pygame.image.load("img/kokosky124.png")
+            case "img/kokosky234_small.png": bg = pygame.image.load("img/kokosky234.png")
+            case "img/kokosky_small.png": bg = pygame.image.load("img/kokosky.png")
+
+        while kokoskoing:
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: kokoskoing = False
+
+            # Bg
+            self.screen.blit(bg, (0, 0))
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
+    def craft(self):
+        """
+        If player has items to craft something it will be crafted
+        """
+
+        inv = self.inv.keys()
         
+        if "Kokosky1" in inv and "Kokosky2" in inv:
+            self.inv.pop("Kokosky1"); self.inv.pop("Kokosky2")
+            self.inv["Kokosky12"] = "img/kokosky12_small.png"
+
+        if "Kokosky1" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky1"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky13"] = "img/kokosky13_small.png"
+
+        if "Kokosky1" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky1"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky14"] = "img/kokosky14_small.png"
+
+        if "Kokosky2" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky2"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky23"] = "img/kokosky23_small.png"
+
+        if "Kokosky2" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky2"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky24"] = "img/kokosky24_small.png"
+
+        if "Kokosky3" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky3"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky34"] = "img/kokosky34_small.png"
+
+        if "Kokosky12" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky12"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky123"] = "img/kokosky123_small.png"
+
+        if "Kokosky12" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky12"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky124"] = "img/kokosky124_small.png"
+
+        if "Kokosky13" in inv and "Kokosky2" in inv:
+            self.inv.pop("Kokosky13"); self.inv.pop("Kokosky2")
+            self.inv["Kokosky123"] = "img/kokosky123_small.png"
+
+        if "Kokosky13" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky13"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky134"] = "img/kokosky134_small.png"
+
+        if "Kokosky14" in inv and "Kokosky2" in inv:
+            self.inv.pop("Kokosky14"); self.inv.pop("Kokosky2")
+            self.inv["Kokosky124"] = "img/kokosky124_small.png"
+
+        if "Kokosky14" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky14"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky134"] = "img/kokosky134_small.png"
+
+        if "Kokosky23" in inv and "Kokosky1" in inv:
+            self.inv.pop("Kokosky23"); self.inv.pop("Kokosky1")
+            self.inv["Kokosky123"] = "img/kokosky123_small.png"
+
+        if "Kokosky23" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky23"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky234"] = "img/kokosky234_small.png"
+
+        if "Kokosky24" in inv and "Kokosky1" in inv:
+            self.inv.pop("Kokosky24"); self.inv.pop("Kokosky1")
+            self.inv["Kokosky124"] = "img/kokosky124_small.png"
+
+        if "Kokosky24" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky24"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky234"] = "img/kokosky234_small.png"
+
+        if "Kokosky34" in inv and "Kokosky1" in inv:
+            self.inv.pop("Kokosky34"); self.inv.pop("Kokosky1")
+            self.inv["Kokosky134"] = "img/kokosky134_small.png"
+
+        if "Kokosky34" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky34"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky234"] = "img/kokosky234_small.png"
+
+        if "Kokosky123" in inv and "Kokosky4" in inv:
+            self.inv.pop("Kokosky123"); self.inv.pop("Kokosky4")
+            self.inv["Kokosky"] = "img/kokosky_small.png"
+
+        if "Kokosky124" in inv and "Kokosky3" in inv:
+            self.inv.pop("Kokosky124"); self.inv.pop("Kokosky3")
+            self.inv["Kokosky"] = "img/kokosky_small.png"
+
+        if "Kokosky134" in inv and "Kokosky2" in inv:
+            self.inv.pop("Kokosky134"); self.inv.pop("Kokosky2")
+            self.inv["Kokosky"] = "img/kokosky_small.png"
+
+        if "Kokosky234" in inv and "Kokosky1" in inv:
+            self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
+            self.inv["Kokosky"] = "img/kokosky_small.png"
+
     def open_vtipnicek(self):
         """
         Player can read funny jokes from vtipnicek (not a quest)\n
@@ -585,7 +747,11 @@ class Game:
         self.quests = { "key_in_trash": self.key_in_trash,
                         "locked_locker": self.locked_locker, 
                         "locked_changing_room": self.locked_changing_room, 
+                        "number_kokosky": self.number_kokosky,
                         "kokosky_in_locker": self.kokosky_in_locker, 
+                        "kokosky_in_bookshelf": self.kokosky_in_bookshelf, 
+                        "kokosky_under_bench": self.kokosky_under_bench,
+                        "kokosky_in_trash": self.kokosky_in_trash,
                         "vtipnicek": self.vtipnicek,
                         "dumbbells": self.dumbbell_lifted,
                         "program": self.program_test,
@@ -1073,15 +1239,49 @@ class Game:
 
             # Empty
             else: self.talking("Just some rubbish.")
+
+        # 208 Trash can
+        elif self.interacted[1] == 24 and self.interacted[2] == 78:
+        
+            # Kokosky
+            if self.kokosky_in_trash:
+                self.talking("Why would someone throw away such yummy food.")
+                self.number_kokosky += 1
+                self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [{self.number_kokosky}/4]")
+                self.inv["Kokosky4"] = "img/kokosky4_small.png"
+                self.kokosky_in_trash = False
+
+            # Empty
+            else: self.talking("There's nothing interesting.")
             
     def window(self):
         """
         Player looks outside of window or falls
         """
 
+        # Window fail ending
         if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
-        if self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.talking("What a pretty day.")
+        # Windows between classrooms
+        if self.interacted[1] in (11, 14, 25) and self.interacted[2] in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): pass
+            
+        # Other
+        else: self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
+
+    def sans(self):
+        """
+        Special window
+        """
+
+        if self.music_on: pygame.mixer.Sound.stop(self.theme)
+        sans = pygame.mixer.Sound("sounds/sans.mp3")
+        pygame.mixer.Sound.play(sans).set_volume(0.1)
+        self.talking("It's a beautiful day outside.")
+        self.talking("Birds are singing, flowers are blooming...")
+        self.talking("On days like these, kids like you...")
+        self.talking("SHOULD BE BURNING IN HELL.")
+        pygame.mixer.Sound.stop(sans)
+        if self.music_on: pygame.mixer.Sound.play(self.theme)
 
     def center_player_after_doors(self):
         """
@@ -1785,9 +1985,10 @@ class Game:
             if self.kokosky_in_locker:
                 self.talking("Hmm? Why is it unlocked?")
                 self.talking("Wow, what is this?")
-                self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [1/4]")
+                self.number_kokosky += 1
+                self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [{self.number_kokosky}/4]")
                 self.kokosky_in_locker = False
-                self.inv.append("Kokosky1")
+                self.inv["Kokosky1"] = "img/kokosky1_small.png"
 
             # Locker empty
             else: self.talking("It's empty, but smells.")
@@ -1875,14 +2076,25 @@ class Game:
         """
 
         if self.interacted[0] == "Bench" and self.player.facing in ("right", "left") or self.interacted[0] == "BencH" and self.player.facing in ("up", "down"):
-            self.player.sit(True, self.interacted[1], self.interacted[2])
-            self.update()
-            self.draw()
-            self.talking("You sit on a bench.")
-            self.talking("Sitting is really interesting.")
-            self.talking("You enjoyed this sitting session.")
-            self.talking("But now it's time to continue your journey.")
-            self.player.sit(False, self.interacted[1], self.interacted[2])
+
+            # Kokosky
+            if self.interacted[3] == 4 and self.interacted[4] == 63 and self.kokosky_under_bench: 
+                self.talking("It seems someone forgot this here.")
+                self.number_kokosky += 1
+                self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [{self.number_kokosky}/4]")
+                self.inv["Kokosky3"] = "img/kokosky3_small.png"
+                self.kokosky_under_bench = False
+
+            # Sitting is fun
+            else:
+                self.player.sit(True, self.interacted[1], self.interacted[2])
+                self.update()
+                self.draw()
+                self.talking("You sit on a bench.")
+                self.talking("Sitting is really interesting.")
+                self.talking("You enjoyed this sitting session.")
+                self.talking("But now it's time to continue your journey.")
+                self.player.sit(False, self.interacted[1], self.interacted[2])
             
     def taburetka(self):
         """
@@ -1965,6 +2177,7 @@ class Game:
 
         self.talking("There is a lot of books.")
         if self.interacted[1] in (34, 35, 36) and self.interacted[2] == 85: self.otec_iot()
+        if self.interacted[1] == 32 and self.interacted[2] == 100 and self.kokosky_in_bookshelf: self.talking("Why is this between the books?"); self.number_kokosky += 1; self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [{self.number_kokosky}/4]"); self.inv["Kokosky2"] = "img/kokosky2_small.png"; self.kokosky_in_bookshelf = False
 
     def otec_iot(self):
         """
