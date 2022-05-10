@@ -37,7 +37,7 @@ class Game:
         self.intro_background = pygame.image.load("img/intro_background.png")
         self.settings_background = pygame.image.load("img/settings_bg.jpg")
         
-        # Window icon and title (not final)
+        # Window icon and title
         icon = pygame.image.load('img/spselogo2.png')
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')

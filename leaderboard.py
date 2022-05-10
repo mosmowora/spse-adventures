@@ -22,6 +22,9 @@ class Leaderboard:
         
         row = pygame.image.load("img/leaderboard_row.png")
         bg = pygame.image.load("img/leaderboard_bg.jpg")
+        first_medal = pygame.image.load("img/first_medal.png")
+        second_medal = pygame.image.load("img/second_medal.png")
+        third_medal = pygame.image.load("img/third_medal.png")
         players: int = len(json.load(open(self.player_info)))
         player_names: List = json.load(open(self.player_info))
         
@@ -50,13 +53,27 @@ class Leaderboard:
             if scroll:
                 self.game.screen.blit(bg, (0, 0))
                 # len(json.load(open(self.player_info, "r")))
-                for player in range(players):
+                if players <= 6:
+                    for player in range(players):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        if player == 0: self.game.screen.blit(first_medal, (WIN_WIDTH // 2 - 247, player * row.get_height() + 10))
+                        elif player == 1: self.game.screen.blit(second_medal, (WIN_WIDTH // 2 - 245, player * row.get_height() + 10))
+                        elif player == 2: self.game.screen.blit(third_medal, (WIN_WIDTH // 2 - 245, player * row.get_height() + 10))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        if player == 0: self.game.screen.blit(first_medal, (WIN_WIDTH // 2 - 234, player * row.get_height() + 10))
+                        elif player == 1: self.game.screen.blit(second_medal, (WIN_WIDTH // 2 - 234, player * row.get_height() + 10))
+                        elif player == 2: self.game.screen.blit(third_medal, (WIN_WIDTH // 2 - 234, player * row.get_height() + 10))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
                     
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * player * row.get_height() + 23))
                 
             elif not scroll:
                 self.game.screen.blit(bg, (0, 0))
