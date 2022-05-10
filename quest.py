@@ -778,9 +778,9 @@ class Quest:
             self.game.clock.tick(FPS)
             pygame.display.update()
         # Grading   
-        if gave_up: return 5
+        if gave_up: self.game.talking("At least try. Sorry, but that's a 5!", True, BLACK); return 5
         else: 
-            if answers == correct: return 1
-            else: return 3
+            if answers == correct: self.game.talking("You did well my student, that's a 1 for you.", True, BLACK); return 1
+            else: self.game.talking("Not the best, but I'll give you a 3.", True, BLACK); return 3
 
             

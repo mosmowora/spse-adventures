@@ -1186,13 +1186,13 @@ class Game:
         self.draw()
         self.saved_room_data = room_number
               
-    def talking(self, msg_content: str, teacher: bool = False):
+    def talking(self, msg_content: str, teacher: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE):
         """
         When character is talking
         """
 
         for _ in range(self.talking_speed_number):
-            text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, BRITISH_WHITE)
+            text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, additional_color)
             text_rect = text.get_rect(x=10, y=10)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
@@ -1895,10 +1895,7 @@ class Game:
                     self.talking("I Hope you studied resistors yesterday.", True)
                     self.grades["AEN"] = self.quest.resistor()
                     self.resistor = False
-                    if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True)
-                    elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True)
-                    else: self.talking("At least try. Sorry, but that's a 5!", True)
-                    
+                
                 # 5 Minutes sooner
                 elif not self.resistor and self.five_min_sooner:
                     self.talking("Can you let us go 5 minutes sooner?")
