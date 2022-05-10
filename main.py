@@ -1,5 +1,6 @@
 # Import
 import pygame, random as r
+from leaderboard import Leaderboard
 from quest import Quest
 from save_progress import SaveProgress
 from camera import Camera
@@ -48,6 +49,7 @@ class Game:
         self.grades: dict[str, int] = {}
         self.endings: List[str] = []
         self.camera = Camera(self)
+        self.leaderboarding = Leaderboard(self)
         
         # Settings
         self.music_on: bool = True
@@ -925,7 +927,7 @@ class Game:
             if settings_button.is_pressed(mouse_pos, mouse_pressed): self.settings()
             
             # Leadboard button was pressed
-            if leaderboard_button.is_pressed(mouse_pos, mouse_pressed): self.leaderboard()
+            if leaderboard_button.is_pressed(mouse_pos, mouse_pressed): self.leaderboarding.show_leaderboard()
 
             # Diplaying background, title, buttons
             self.screen.blit(self.intro_background, (0, 0))
@@ -934,6 +936,8 @@ class Game:
             self.screen.blit(play_button.image, play_button.rect)
             self.screen.blit(settings_button.image, settings_button.rect)
             self.screen.blit(leaderboard_button.image, leaderboard_button.rect)
+            
+            # Updates
             self.clock.tick(FPS)
             pygame.display.update()
 
@@ -1163,12 +1167,6 @@ class Game:
         self.screen.blit(back.image, back.rect)
         self.clock.tick(FPS)
         pygame.display.update()
-
-    def leaderboard(self):
-        """
-        Opens leaderboard window
-        """
-        print(SaveProgress.print_database())
 
     def door_info(self, msg_content: str, room_number: str):
         """

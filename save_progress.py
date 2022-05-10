@@ -70,9 +70,8 @@ class SaveProgress():
         for player in range(len(data)):
             if data[player]['name'] == player_name: return len(tuple(quest for quest in data[player]['quests'].values() if quest == False and isinstance(quest, bool)))
             
-            
 class GetQuestsAmount(unittest.TestCase):
     def test_four_quests(self):
-        self.assertEqual(SaveProgress.get_amount_of_quests("Tomas"), 7)
+        self.assertEqual(SaveProgress.get_amount_of_quests("cool baca"), 7)
 
 if __name__ == '__main__': unittest.main()
