@@ -21,7 +21,9 @@ class Leaderboard:
         scroll: bool = False
         
         row = pygame.image.load("img/leaderboard_row.png")
+        bg = pygame.image.load("img/leaderboard_bg.jpg")
         players: int = len(json.load(open(self.player_info, "r")))
+        player_names: List = json.load(open(self.player_info))
         
         while leaderboarding:
             
@@ -42,13 +44,18 @@ class Leaderboard:
                         
             
             if scroll:
+                self.game.screen.blit(bg, (0, 0))
                 # len(json.load(open(self.player_info, "r")))
-                for player in range(1):
-                    self.game.screen.blit(row, (0, player))
+                for player in range(players):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
+                    print(player_names[player]['name'])
+                    player_name = self.game.big_font.render(player_names[player]['name'], True, BLACK)
+                    self.game.screen.blit(player_name, (0, 0))
                 
             elif not scroll:
-                for player in range(1):
-                    self.game.screen.blit(row, (0, player))
+                self.game.screen.blit(bg, (0, 0))
+                for player in range(players):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
                     
             # Updates
             self.game.clock.tick(FPS)
