@@ -166,6 +166,7 @@ class Game:
         self.anj_test: bool = True
         self.gul_quest: bool = True
         self.nepusti: bool = True
+        self.resistor: bool = True
         self.five_min_sooner: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
@@ -321,6 +322,7 @@ class Game:
             self.gul_quest = data["quests"]['GUL_quest']
             self.__gul_counter = data["quests"]["gul_counter"]
             self.nepusti = data["quests"]["nepusti"]
+            self.resistor = data["quests"]["resistor"]
             self.connected_router = data["quests"]["router"]
             self.five_min_sooner = data["quests"]["sooner"]
 
@@ -769,6 +771,7 @@ class Game:
                         "gul_counter": self.__gul_counter,
                         "nepusti": self.nepusti,
                         "router": self.connected_router,
+                        "resistor": self.resistor,
                         "sooner": self.five_min_sooner, 
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
@@ -1886,8 +1889,18 @@ class Game:
 
             # Koky
             if self.interacted[2] == 111 and self.interacted[1] == 9:
-
-                if self.five_min_sooner:
+                # Resistor
+                if self.resistor:
+                    self.talking("It's time for your AEN test today.", True)
+                    self.talking("I Hope you studied resistors yesterday.", True)
+                    self.grades["AEN"] = self.quest.resistor()
+                    self.resistor = False
+                    if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True)
+                    elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True)
+                    else: self.talking("At least try. Sorry, but that's a 5!", True)
+                    
+                # 5 Minutes sooner
+                elif not self.resistor and self.five_min_sooner:
                     self.talking("Can you let us go 5 minutes sooner?")
                     self.talking("No, I can't do that.", True)
                     self.talking("But I will let you go 10 minutes sooner.", True)

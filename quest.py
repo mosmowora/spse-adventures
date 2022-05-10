@@ -664,3 +664,123 @@ class Quest:
             if answers == correct: return self.game.saved_room_data 
             elif self.game.saved_room_data in self.game.connected_router: return "I already connected this."
             else: return "There is something wrong."
+            
+    def resistor(self): 
+        """
+        Connecting resistor stuff
+        """
+
+        resisting = True
+        gave_up = False
+
+        # Background
+        bg = pygame.image.load("img/resistor.png")
+
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
+
+        # Clickable 
+        a1 = pygame.Rect(51, 315, 50, 22)
+        a2 = pygame.Rect(465, 318, 100, 22)
+
+        ans = 0
+        answers = [0, 0]
+
+        # Cables
+        start1 = (64, 177)
+        start2  = (116, 177)
+        end1 = (64, 177)
+        end2  = (116, 177)
+        ends = [end1, end2]
+        first_rect = pygame.Rect(54, 167, 20, 20)
+        second_rect = pygame.Rect(106, 167, 20, 20)
+
+        # Text
+        first_text = self.game.font.render("+", True, RED)
+        second_text = self.game.font.render("-", True, BLACK)
+
+        # Colors
+        colors = [RED, BLACK]
+
+         # Correct
+        correct = [1, 2]
+
+        while resisting:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Buttons pressed
+            if back_button.is_pressed(mouse_pos, mouse_pressed): resisting = False; gave_up = True
+            if done_button.is_pressed(mouse_pos, mouse_pressed): resisting = False
+
+            # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Keyboard
+                if pygame.KEYDOWN == event.type:
+
+                    # Escape
+                    if event.key == pygame.K_ESCAPE: resisting = False; gave_up = True
+
+                    # Enter
+                    if event.key == pygame.K_RETURN: resisting = False
+
+                # Mouse
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    
+                    # First rect
+                    if first_rect.collidepoint(event.pos): ans = 1
+
+                    # Second rect
+                    elif second_rect.collidepoint(event.pos): ans = 2
+
+
+                    # First rect
+                    elif a1.collidepoint(event.pos): 
+                        if ans != 0: answers[ans-1] = 1; ends[ans-1] = (58, 324)
+
+                    # Second rect
+                    elif a2.collidepoint(event.pos):
+                        if ans != 0: answers[ans-1] = 2; ends[ans-1] = (550, 318)
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(done_button.image, done_button.rect)
+
+            # Clickable poles
+            pygame.draw.rect(self.game.screen, (133, 133, 133), a1, 1)
+            pygame.draw.rect(self.game.screen, (133, 133, 133), a2, 1)
+
+            # Text
+            self.game.screen.blit(first_text, (55, 314))
+            self.game.screen.blit(second_text, (550, 318))
+
+
+            # Cables
+            pygame.draw.circle(self.game.screen, colors[correct[0]-1], (64, 177), 10)
+            pygame.draw.circle(self.game.screen, colors[correct[1]-1], (116, 177), 10)
+
+
+            # Cables
+            pygame.draw.line(self.game.screen, RED, start1, ends[0], 5)
+            pygame.draw.line(self.game.screen, BLACK, start2, ends[1], 5)
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+        # Grading   
+        if gave_up: return 5
+        else: 
+            if answers == correct: return 1
+            else: return 3
+
+            
