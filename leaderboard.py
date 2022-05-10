@@ -18,12 +18,16 @@ class Leaderboard:
         
         leaderboarding: bool = True
         is_up: bool = True
-        scroll: bool = False
+        scroll: bool = True
         
         row = pygame.image.load("img/leaderboard_row.png")
         bg = pygame.image.load("img/leaderboard_bg.jpg")
-        players: int = len(json.load(open(self.player_info, "r")))
+        players: int = len(json.load(open(self.player_info)))
         player_names: List = json.load(open(self.player_info))
+        
+        name_ending: list[tuple] = []
+        for player in range(players): name_ending.append((len(player_names[player]['endings']), player_names[player]['name']))
+        name_ending.sort(reverse=True)
         
         while leaderboarding:
             
@@ -47,10 +51,12 @@ class Leaderboard:
                 self.game.screen.blit(bg, (0, 0))
                 # len(json.load(open(self.player_info, "r")))
                 for player in range(players):
+                    
                     self.game.screen.blit(row, (0, player * row.get_height()))
-                    print(player_names[player]['name'])
-                    player_name = self.game.big_font.render(player_names[player]['name'], True, BLACK)
-                    self.game.screen.blit(player_name, (0, 0))
+                    player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * player * row.get_height() + 23))
                 
             elif not scroll:
                 self.game.screen.blit(bg, (0, 0))
