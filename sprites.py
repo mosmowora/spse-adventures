@@ -628,6 +628,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "#": self.image = self.game.terrain_spritesheet.get_sprite(342, 206, self.width, self.height)
         elif type == "*": self.image = self.game.terrain_spritesheet.get_sprite(307, 206, self.width, self.height)
         elif type == "~": self.image = self.game.terrain_spritesheet.get_sprite(342, 138, self.width, self.height)
+        elif type == "&": self.image = self.game.terrain_spritesheet.get_sprite(310, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
