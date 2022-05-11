@@ -703,7 +703,7 @@ class Quest:
         # Colors
         colors = [RED, BLACK]
 
-         # Correct
+        # Correct
         correct = [1, 2]
 
         while resisting:
@@ -740,7 +740,6 @@ class Quest:
                     # Second rect
                     elif second_rect.collidepoint(event.pos): ans = 2
 
-
                     # First rect
                     elif a1.collidepoint(event.pos): 
                         if ans != 0: answers[ans-1] = 1; ends[ans-1] = (58, 324)
@@ -764,11 +763,9 @@ class Quest:
             self.game.screen.blit(first_text, (55, 314))
             self.game.screen.blit(second_text, (550, 318))
 
-
             # Cables
             pygame.draw.circle(self.game.screen, colors[correct[0]-1], (64, 177), 10)
             pygame.draw.circle(self.game.screen, colors[correct[1]-1], (116, 177), 10)
-
 
             # Cables
             pygame.draw.line(self.game.screen, RED, start1, ends[0], 5)
@@ -777,10 +774,11 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+
         # Grading   
-        if gave_up: self.game.talking("At least try. Sorry, but that's a 5!", True, BLACK); return 5
+        if gave_up: return 5
         else: 
-            if answers == correct: self.game.talking("You did well my student, that's a 1 for you.", True, BLACK); return 1
-            else: self.game.talking("Not the best, but I'll give you a 3.", True, BLACK); return 3
+            if answers == correct: return 1
+            else: return 3
 
             

@@ -1895,11 +1895,17 @@ class Game:
 
             # Koky
             if self.interacted[2] == 111 and self.interacted[1] == 9:
+
                 # Resistor
                 if self.resistor:
-                    self.talking("It's time for your AEN test today.", True)
-                    self.talking("I Hope you studied resistors yesterday.", True)
+                    self.talking("It's time for your AEN test today.", True, BLUE)
+                    self.talking("I Hope you studied resistors yesterday.", True, BLUE)
                     self.grades["AEN"] = self.quest.resistor()
+                    self.draw()
+                    self.update()
+                    if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True, BLUE)
+                    elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True, BLUE)
+                    elif self.grades["AEN"] == 5: self.talking("At least try. Sorry, but that's a 5!", True, BLUE)
                     self.resistor = False
                 
                 # 5 Minutes sooner
@@ -1909,6 +1915,7 @@ class Game:
                     self.talking("But I will let you go 10 minutes sooner.", True)
                     self.five_min_sooner = False
                 
+                # Talking with Koky while nothing interesting
                 elif not self.five_min_sooner: self.talking("What are you still doing here?", True)
 
             # Michal (Ne)pusti
@@ -2176,23 +2183,29 @@ class Game:
         # Light in inventory
         if "light" in self.inv:
 
+            # Going in
+            self.talking("I got light with me.")
+            self.talking("I'll be able to see now.")
+            self.talking("Bravo six, going dark.")
+
             # From right
             if self.interacted[1] == 17 and self.interacted[2] in (193, 194):
-                self.talking("I got light with me.")
-                self.talking("I'll be able to see now.")
                 self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
                 for sprite in self.all_sprites: sprite.rect.x -= 79 * TILE_SIZE
 
             # From left
             elif self.interacted[1] in (26, 27) and self.interacted[2] == 117:
-                self.talking("I got light with me.")
-                self.talking("I'll be able to see now.")
                 self.in_room = self.rooms[BASEMENT_FLOOR] # Basement
                 self.create_tile_map()
                 for sprite in self.all_sprites: sprite.rect.x += 9 * TILE_SIZE; sprite.rect.y -= 3 * TILE_SIZE
                 self.player.rect.x -= 87 * TILE_SIZE
                 self.player.rect.y += 3 * TILE_SIZE
+
+            self.draw()
+            self.update()
+
+            if r.randint(1, 10) < 10: self.talking("Legend says this basement was"); self.talking("dug by David Baník in one day.")
 
         # No light
         else:
@@ -2204,7 +2217,7 @@ class Game:
                 self.without_light += 1
             else:
                 self.talking("Welp, you really want me to go down there?")
-                self.talking("Let's see.")
+                self.talking("Let's see. Bravo six, going dark.")
                 self.game_over("img/lost.png")
 
     def bookshelf(self):
@@ -2213,7 +2226,11 @@ class Game:
         """
 
         self.talking("There is a lot of books.")
+
+        # Otec IoT book
         if self.interacted[1] in (34, 35, 36) and self.interacted[2] == 85: self.otec_iot()
+
+        # Kokosky
         if self.interacted[1] == 32 and self.interacted[2] == 100 and self.kokosky_in_bookshelf: self.talking("Why is this between the books?"); self.number_kokosky += 1; self.talking(f"{self.player_name} found the forbidden Kokosky fragment. [{self.number_kokosky}/4]"); self.inv["Kokosky2"] = "img/kokosky2_small.png"; self.kokosky_in_bookshelf = False
 
     def otec_iot(self):
