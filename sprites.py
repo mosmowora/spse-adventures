@@ -1,7 +1,6 @@
 # Imports
 import pygame, math, random as r
 from config import *
-
 class Spritesheet:
     """
     Class for images
@@ -379,7 +378,7 @@ class Npc(pygame.sprite.Sprite):
         """
 
         # Moving
-        if self.type == "C": self.movement()
+        if self.type in ("C", "0"): self.movement()
         self.animate()
         
         # Collision
@@ -398,26 +397,27 @@ class Npc(pygame.sprite.Sprite):
         Movement for the npc
         """
 
-        if self.facing == "left":
-            self.x_change -= NPC_SPEED
-            self.movement_loop -= 1
-            if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+        if self.type != "0":
+            if self.facing == "left":
+                self.x_change -= NPC_SPEED
+                self.movement_loop -= 1
+                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-        elif self.facing == "right":
-            self.x_change += NPC_SPEED
-            self.movement_loop += 1
-            if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.facing == "right":
+                self.x_change += NPC_SPEED
+                self.movement_loop += 1
+                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-        elif self.facing == "up":
-            self.y_change -= NPC_SPEED
-            self.movement_loop -= 1
-            if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.facing == "up":
+                self.y_change -= NPC_SPEED
+                self.movement_loop -= 1
+                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-        elif self.facing == "down":
-            self.y_change += NPC_SPEED
-            self.movement_loop += 1
-            if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
-
+            elif self.facing == "down":
+                self.y_change += NPC_SPEED
+                self.movement_loop += 1
+                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+        elif self.type == "0": self.move_towards_player()
     def collide_blocks(self, direction: str):
         """
         Colliding with Blocks/objects
@@ -445,6 +445,13 @@ class Npc(pygame.sprite.Sprite):
                 # Moving up
                 if self.y_change < 0: self.rect.y = hits[0].rect.bottom
 
+    def move_towards_player(self):
+        dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
+                                      self.game.player.rect.y - self.rect.y)
+        dirvect.normalize()
+        dirvect.scale_to_length(NPC_SPEED)
+        self.rect.move_ip(dirvect)
+
     def collide_player(self, direction: str):
         """
         Colliding with Player
@@ -465,6 +472,9 @@ class Npc(pygame.sprite.Sprite):
                 self.game.talking("WHY you not wearin' yo boots?", True)
                 self.game.talking("You'll get in a lot of trouble for this", True)
                 self.game.talking("Who's yo' classteacher?", True)
+        elif self.type == "0":
+            hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+            if hits: self.game.game_over()
             
 
         """else:

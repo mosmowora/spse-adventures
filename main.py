@@ -260,6 +260,7 @@ class Game:
                 elif column == "&": self.interactive[Block(self, j, i, "&")] = "&" + str(i) + str(j) # Gym machine
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j)  # NPC
+                elif column == "0": self.interactive[Npc(self, j, i, "0")] = "0" + str(i) + str(j)  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
     def set_camera(self, level: List[str]):
