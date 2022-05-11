@@ -258,6 +258,10 @@ class Game:
                 elif column == "*": self.interactive[Block(self, j, i, "*")] = "*" + str(i) + str(j) # Left facing green chair
                 elif column == "~": self.interactive[Block(self, j, i, "~")] = "~" + str(i) + str(j) # Coffee machine
                 elif column == "&": self.interactive[Block(self, j, i, "&")] = "&" + str(i) + str(j) # Gym machine
+                elif column == "0": self.interactive[Block(self, j, i, "0")] = "0" + str(i) + str(j) # Basketball hoop (R)
+                elif column == "ô": self.interactive[Block(self, j, i, "ô")] = "ô" + str(i) + str(j) # Basketball hoop (L)
+                elif column == "ˇ": self.interactive[Block(self, j, i, "ˇ")] = "ˇ" + str(i) + str(j) # Dumbell rack
+                elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j)  # NPC
                 elif column == "0": self.interactive[Npc(self, j, i, "0")] = "0" + str(i) + str(j)  # NPC VUJ

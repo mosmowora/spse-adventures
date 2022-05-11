@@ -161,7 +161,7 @@
             "gul_counter": 0,
             "nepusti": true,
             "router": true,
-            "resistor": false,
+            "resistor": true,
             "sooner": false,
             "locker_stuff": {
                 "crocs": false,
@@ -171,11 +171,9 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
-        "room_number": "014",
-        "grades": {
-            "AEN": 3
-        },
+        "level": 3,
+        "room_number": "302",
+        "grades": {},
         "settings": {
             "music": true,
             "talking_speed": 90
@@ -253,7 +251,7 @@
             "gul_counter": 0,
             "nepusti": true,
             "router": true,
-            "resistor": false,
+            "resistor": true,
             "sooner": false,
             "locker_stuff": {
                 "crocs": false,
@@ -263,11 +261,9 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
-        "room_number": "014",
-        "grades": {
-            "AEN": 3
-        },
+        "level": 3,
+        "room_number": "302",
+        "grades": {},
         "settings": {
             "music": true,
             "talking_speed": 90

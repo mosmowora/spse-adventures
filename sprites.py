@@ -639,6 +639,11 @@ class Block(pygame.sprite.Sprite):
         elif type == "*": self.image = self.game.terrain_spritesheet.get_sprite(307, 206, self.width, self.height)
         elif type == "~": self.image = self.game.terrain_spritesheet.get_sprite(342, 138, self.width, self.height)
         elif type == "&": self.image = self.game.terrain_spritesheet.get_sprite(310, 2, self.width, self.height)
+        elif type == "0": self.image = self.game.terrain_spritesheet.get_sprite(307, 36, self.width, self.height)
+        elif type == "ô": self.image = self.game.terrain_spritesheet.get_sprite(342, 36, self.width, self.height)
+        elif type == "Ž": self.image = self.game.terrain_spritesheet.get_sprite(342, 70, self.width, self.height)
+        elif type == "ˇ": self.image = self.game.terrain_spritesheet.get_sprite(342, 104, self.width, self.height)
+        
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
