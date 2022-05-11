@@ -252,7 +252,7 @@ class Game:
                 elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
                 elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
                 elif column == "$": self.interactive[Block(self, j, i, "$")] = "$" + str(i) + str(j) # Corner desk
-                elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # č as in Red (červena) Taburetka
+                elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # dč as in Red (červena) Taburetka
                 elif column == "@": self.interactive[Block(self, j, i, "@")] = "@" + str(i) + str(j) # Up facing green chair
                 elif column == "#": self.interactive[Block(self, j, i, "#")] = "#" + str(i) + str(j) # Right facing green chair
                 elif column == "*": self.interactive[Block(self, j, i, "*")] = "*" + str(i) + str(j) # Left facing green chair
@@ -264,7 +264,7 @@ class Game:
                 elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j)  # NPC
-                elif column == "0": self.interactive[Npc(self, j, i, "0")] = "0" + str(i) + str(j)  # NPC VUJ
+                elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
 
     def set_camera(self, level: List[str]):

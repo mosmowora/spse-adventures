@@ -1,6 +1,7 @@
 # Imports
 import pygame, math, random as r
 from config import *
+from save_progress import SaveProgress
 class Spritesheet:
     """
     Class for images
@@ -378,7 +379,7 @@ class Npc(pygame.sprite.Sprite):
         """
 
         # Moving
-        if self.type in ("C", "0"): self.movement()
+        if self.type in ("C", "9"): self.movement()
         self.animate()
         
         # Collision
@@ -397,27 +398,30 @@ class Npc(pygame.sprite.Sprite):
         Movement for the npc
         """
 
-        if self.type != "0":
-            if self.facing == "left":
-                self.x_change -= NPC_SPEED
-                self.movement_loop -= 1
-                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+        if self.facing == "left":
+            self.x_change -= NPC_SPEED
+            self.movement_loop -= 1
+            if self.type == "9": self.move_towards_player()
+            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-            elif self.facing == "right":
-                self.x_change += NPC_SPEED
-                self.movement_loop += 1
-                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+        elif self.facing == "right":
+            self.x_change += NPC_SPEED
+            self.movement_loop += 1
+            if self.type == "9": self.move_towards_player()
+            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-            elif self.facing == "up":
-                self.y_change -= NPC_SPEED
-                self.movement_loop -= 1
-                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+        elif self.facing == "up":
+            self.y_change -= NPC_SPEED
+            self.movement_loop -= 1
+            if self.type == "9": self.move_towards_player()
+            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-            elif self.facing == "down":
-                self.y_change += NPC_SPEED
-                self.movement_loop += 1
-                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
-        elif self.type == "0": self.move_towards_player()
+        elif self.facing == "down":
+            self.y_change += NPC_SPEED
+            self.movement_loop += 1
+            if self.type == "9": self.move_towards_player()
+            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            
     def collide_blocks(self, direction: str):
         """
         Colliding with Blocks/objects
@@ -448,9 +452,19 @@ class Npc(pygame.sprite.Sprite):
     def move_towards_player(self):
         dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
                                       self.game.player.rect.y - self.rect.y)
-        dirvect.normalize()
-        dirvect.scale_to_length(NPC_SPEED)
-        self.rect.move_ip(dirvect)
+        # if player is in the hall and has more tham 6 quests done then VUJ is goona go after him
+        if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and SaveProgress.get_amount_of_quests(self.game.player_name) > 6:
+            dirvect.normalize(); dirvect.scale_to_length(VUJ_SPEED)
+            if round(dirvect[1]) < 0: self.facing = "up"
+            if round(dirvect[1]) > 0: self.facing = "down"
+            if round(dirvect[0]) > 0: self.facing = "right"
+            if round(dirvect[0]) < 0: self.facing = "left"
+            self.rect.move_ip(dirvect)
+            print(dirvect)
+        # Or he's just gonna behave like any other npc
+        else: 
+            if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
     def collide_player(self, direction: str):
         """
@@ -472,9 +486,9 @@ class Npc(pygame.sprite.Sprite):
                 self.game.talking("WHY you not wearin' yo boots?", True)
                 self.game.talking("You'll get in a lot of trouble for this", True)
                 self.game.talking("Who's yo' classteacher?", True)
-        elif self.type == "0":
+        elif self.type == "9":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits: self.game.game_over()
+            if hits and SaveProgress.get_amount_of_quests(self.game.player_name) > 6: self.game.game_over("img/game_over_background.png")
             
 
         """else:
