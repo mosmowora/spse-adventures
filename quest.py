@@ -91,7 +91,7 @@ class Quest:
             if grade - counter == 0: grade = 1
             else: grade -= counter
             
-            self.info("You've recieved a grade for TSV")
+            self.game.info("You've recieved a grade for TSV", WHITE, 90)
             self.game.grades["TSV"] = grade
 
         # Music
