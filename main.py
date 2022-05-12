@@ -2205,7 +2205,7 @@ class Game:
             self.draw()
             self.update()
 
-            if r.randint(1, 10) < 10: self.talking("Legend says this basement was"); self.talking("dug by David Baník in one day.")
+            if r.randint(1, 10) == 10: self.talking("Legend says this basement was"); self.talking("dug by David Baník in one day.")
 
         # No light
         else:

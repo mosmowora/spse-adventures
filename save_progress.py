@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import List
 import json
 import unittest
-import unittest
 
 @dataclass
 class SaveProgress():
@@ -42,6 +41,7 @@ class SaveProgress():
 
         # Data from file
         loaded_data: List = json.load(open(SaveProgress.file_dest))
+
         # New data
         write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
 
