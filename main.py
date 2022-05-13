@@ -419,10 +419,12 @@ class Game:
                     case "Green_chair": self.green_chair()
                     case "Router": 
                         if type(self.connected_router) == list:
+                            router_outcome = "I rather leave it be."
                             if self.saved_room_data in self.connected_router: self.info("I already connected this.")
                             else: router_outcome = self.quest.router()
-                            if router_outcome != "I rather leave it be.": self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
-                            self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+                            if router_outcome != "I rather leave it be.": 
+                                self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
+                                self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
                         else: self.talking("I don't know what to do with this.")
                 # Reset
                 self.interacted = ["", "", ""]
@@ -812,7 +814,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/game_over_background.png"]
         all_endings = (f"img/{ending}.png" for ending in self.endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
@@ -1930,16 +1932,15 @@ class Game:
 
                 # Not yet done
                 elif self.nepusti: 
-                    
                     # Not completed misson
-                    if type(self.connected_router) != list and SaveProgress.get_amount_of_quests(self.player_name) >= 3:
+                    if type(self.connected_router) != list and len(self.grades) > 4:
                         self.talking("Hello, could you please let me go home earlier?")
                         self.talking("I'm sorry but I don't think I can do that.", True)
                         self.talking("Are you sure? Maybe I can help you somehow.")
                         self.talking("Well there is something you can do.", True)
                         self.talking("Connect all the routers please.", True)
                         self.talking("If you do that I will let you go home earlier.", True)
-                        # self.connected_router = []
+                        self.connected_router = []
 
                     elif type(self.connected_router) == list:
 

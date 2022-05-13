@@ -19,7 +19,7 @@ GROUND_LAYER: int = 1
 # Speeds
 PLAYER_SPEED: int = 5
 NPC_SPEED: int = 3
-VUJ_SPEED: int = 2
+VUJ_SPEED: float = 1.5
 
 # Colors
 WHITE: tuple =          (255, 255, 255)

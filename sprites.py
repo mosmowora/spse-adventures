@@ -453,14 +453,14 @@ class Npc(pygame.sprite.Sprite):
         dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
                                       self.game.player.rect.y - self.rect.y)
         # if player is in the hall and has more tham 6 quests done then VUJ is goona go after him
-        if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and SaveProgress.get_amount_of_quests(self.game.player_name) > 9:
+        if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and len(self.game.grades) > 4:
             dirvect.normalize(); dirvect.scale_to_length(VUJ_SPEED)
             if round(dirvect[1]) < 0: self.facing = "up"
             elif round(dirvect[1]) > 0: self.facing = "down"
             elif round(dirvect[0]) > 0: self.facing = "right"
             elif round(dirvect[0]) < 0: self.facing = "left"
             self.rect.move_ip(dirvect)
-            print(dirvect)
+            print(self.game.saved_room_data)
         # Or he's just gonna behave like any other npc
         else: 
             if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
@@ -488,7 +488,7 @@ class Npc(pygame.sprite.Sprite):
                 self.game.talking("Who's yo' classteacher?", True)
         elif self.type == "9":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits and SaveProgress.get_amount_of_quests(self.game.player_name) > 9: self.game.game_over("img/game_over_background.png")
+            if hits and len(self.game.grades) > 4: self.game.game_over("img/game_over_background.png")
             
 
         """else:

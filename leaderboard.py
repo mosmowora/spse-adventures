@@ -1,4 +1,6 @@
 import json, pygame
+import math
+from typing import Any
 from config import *
 
 class Leaderboard:
@@ -18,22 +20,24 @@ class Leaderboard:
         
         leaderboarding: bool = True
         is_up: bool = True
-        scroll: bool = True
+        page_number: int = 1
         
         row = pygame.image.load("img/leaderboard_row.png")
         bg = pygame.image.load("img/leaderboard_bg.jpg")
         first_medal = pygame.image.load("img/first_medal.png")
         second_medal = pygame.image.load("img/second_medal.png")
         third_medal = pygame.image.load("img/third_medal.png")
+        
         players: int = len(json.load(open(self.player_info)))
-        player_names: List = json.load(open(self.player_info))
+        max_page_number = math.ceil(players / 6)
+        player_names: dict[str, Any] = json.load(open(self.player_info))
         
         name_ending: list[tuple] = []
         for player in range(players): name_ending.append((len(player_names[player]['endings']), player_names[player]['name']))
         name_ending.sort(reverse=True)
         
         while leaderboarding:
-            
+            print(page_number)
             # Events
             for event in pygame.event.get():
                 
@@ -44,15 +48,15 @@ class Leaderboard:
                 if event.type == pygame.KEYDOWN:
                     
                     # WHAT THE HELL
-                    if event.key == pygame.K_DOWN and is_up: scroll = not scroll
+                    if event.key == pygame.K_DOWN and is_up: page_number += 1
+                    elif event.key == pygame.K_UP and is_up: page_number -= 1 if page_number > 1 else 0
                     
                     # Escape
                     elif event.key == pygame.K_ESCAPE: leaderboarding = False
                         
-            
-            if scroll:
+            # First page 
+            if page_number <= max_page_number and page_number == 1:
                 self.game.screen.blit(bg, (0, 0))
-                # len(json.load(open(self.player_info, "r")))
                 if players <= 6:
                     for player in range(players):
                         self.game.screen.blit(row, (0, player * row.get_height()))
@@ -74,12 +78,53 @@ class Leaderboard:
                         self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
                         self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
                     
-                
-            elif not scroll:
+            # Second page   
+            elif page_number <= max_page_number and page_number == 2:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(players):
+                for player in range(6):
                     self.game.screen.blit(row, (0, player * row.get_height()))
-                    
+                    player_name = self.game.font.render(name_ending[player + 6][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player + 6][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+            # Third page   
+            elif page_number <= max_page_number and page_number == 3:
+                self.game.screen.blit(bg, (0, 0))
+                for player in range(6):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
+                    player_name = self.game.font.render(name_ending[player + 12][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player + 12][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+            # Fourth page 
+            elif page_number <= max_page_number and page_number == 4:
+                self.game.screen.blit(bg, (0, 0))
+                for player in range(6):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
+                    player_name = self.game.font.render(name_ending[player + 18][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player + 18][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+            # Fifth page    
+            elif page_number <= max_page_number and page_number == 5:
+                self.game.screen.blit(bg, (0, 0))
+                for player in range(6):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
+                    player_name = self.game.font.render(name_ending[player + 24][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player + 24][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+            # Sixth page     
+            elif page_number <= max_page_number and page_number == 6:
+                self.game.screen.blit(bg, (0, 0))
+                for player in range(6):
+                    self.game.screen.blit(row, (0, player * row.get_height()))
+                    player_name = self.game.font.render(name_ending[player + 30][1], True, BLACK)
+                    endings = self.game.font.render("Endings: " + str(name_ending[player + 30][0]), True, BLACK)
+                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                        
+            else: page_number = max_page_number
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()

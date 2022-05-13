@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 import json
-import unittest
 
 @dataclass
 class SaveProgress():
@@ -63,17 +62,3 @@ class SaveProgress():
     
     @staticmethod
     def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)
-    
-    @staticmethod
-    def get_amount_of_quests(player_name: str):
-        data = json.load(open(SaveProgress.file_dest))
-        for player in range(len(data)):
-            if data[player]['name'] == player_name: return len(tuple(quest for quest in data[player]['quests'].values() if quest == False and isinstance(quest, bool)))
-        
-        return 0
-            
-class GetQuestsAmount(unittest.TestCase):
-    def test_four_quests(self):
-        self.assertEqual(SaveProgress.get_amount_of_quests("cool baca"), 7)
-
-if __name__ == '__main__': unittest.main()
