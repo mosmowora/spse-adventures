@@ -69,6 +69,8 @@ class SaveProgress():
         data = json.load(open(SaveProgress.file_dest))
         for player in range(len(data)):
             if data[player]['name'] == player_name: return len(tuple(quest for quest in data[player]['quests'].values() if quest == False and isinstance(quest, bool)))
+        
+        return 0
             
 class GetQuestsAmount(unittest.TestCase):
     def test_four_quests(self):

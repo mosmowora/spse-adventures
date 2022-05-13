@@ -190,7 +190,7 @@ class Quest:
                     self.game.program_test = False
                     grade: int = self.game.grade_program(text_def, text_self, text_item, text_even, text_tuple)
                     self.game.grades['PRO'] = grade
-                    self.info("You've recieved a grade for PRO")
+                    self.game.info("You've recieved a grade for PRO")
                     in_potitat = False
 
                 # Background
@@ -662,7 +662,7 @@ class Quest:
         if exited: return "I rather leave it be."
         else: 
             if answers == correct: return self.game.saved_room_data 
-            elif self.game.saved_room_data in self.game.connected_router: return "I already connected this."
+            # elif self.game.saved_room_data in self.game.connected_router: return "I already connected this."
             else: return "There is something wrong."
             
     def resistor(self): 
