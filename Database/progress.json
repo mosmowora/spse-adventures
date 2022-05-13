@@ -1,14 +1,18 @@
 [
     {
         "name": "Samuel",
-        "inventory": {},
+        "inventory": {
+            "locker key": "img/locker key.png",
+            "changing_room key": "img/changing_room key.png",
+            "light": "img/locker key.png"
+        },
         "endings": [
             "window_fail"
         ],
         "quests": {
-            "key_in_trash": true,
-            "locked_locker": true,
-            "locked_changing_room": true,
+            "key_in_trash": false,
+            "locked_locker": false,
+            "locked_changing_room": false,
             "number_kokosky": 0,
             "kokosky_in_locker": true,
             "kokosky_in_bookshelf": true,
@@ -23,22 +27,25 @@
             "GUL_quest": true,
             "gul_counter": 0,
             "nepusti": true,
-            "router": true,
+            "router": [
+                "217"
+            ],
             "sooner": true,
+            "resistor": true,
             "locker_stuff": {
-                "crocs": true,
-                "boots": false,
-                "key": true
+                "crocs": false,
+                "boots": true,
+                "key": false
             },
-            "without_light": 0,
+            "without_light": 1,
             "caught": 0
         },
-        "level": 0,
-        "room_number": "017",
+        "level": 5,
+        "room_number": "Hall",
         "grades": {},
         "settings": {
             "music": true,
-            "talking_speed": 90
+            "talking_speed": 60
         }
     },
     {

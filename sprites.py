@@ -2,6 +2,7 @@
 import pygame, math, random as r
 from config import *
 from save_progress import SaveProgress
+
 class Spritesheet:
     """
     Class for images

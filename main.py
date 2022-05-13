@@ -90,7 +90,7 @@ class Game:
         """
         
         # Ground floor
-        if level == ground_floor:
+        if level == self.rooms[GROUND_FLOOR]:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 39 * TILE_SIZE
                 sprite.rect.y -= 7 * TILE_SIZE
@@ -98,7 +98,7 @@ class Game:
             self.player.rect.y += 8 * TILE_SIZE
         
         # First floor
-        elif level == first_floor:
+        elif level == self.rooms[FIRST_FLOOR]:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 17 * TILE_SIZE
@@ -106,7 +106,7 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Second floor
-        elif level == second_floor:
+        elif level == self.rooms[SECOND_FLOOR]:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 47 * TILE_SIZE
                 sprite.rect.y -= 19 * TILE_SIZE
@@ -114,16 +114,21 @@ class Game:
             self.player.rect.y += 2 * TILE_SIZE
         
         # Third floor
-        elif level == third_floor:
+        elif level == self.rooms[THIRD_FLOOR]:
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
                 
         # Fourth floor
-        elif level == fourth_floor: 
+        elif level == self.rooms[FOURTH_FLOOR]: 
             for sprite in self.all_sprites:
                 sprite.rect.x -= 62 * TILE_SIZE
                 sprite.rect.y -= 4 * TILE_SIZE
+
+        # Basement
+        elif level == self.rooms[BASEMENT_FLOOR]:
+            for sprite in self.all_sprites: sprite.rect.x -= 34 * TILE_SIZE
+            self.player.rect.x -= 45 * TILE_SIZE
 
     def reseting_game_values(self):
         """
@@ -166,8 +171,8 @@ class Game:
         self.anj_test: bool = True
         self.gul_quest: bool = True
         self.nepusti: bool = True
-        self.resistor: bool = True
         self.five_min_sooner: bool = True
+        self.resistor: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
         # Grader
@@ -328,9 +333,9 @@ class Game:
             self.gul_quest = data["quests"]['GUL_quest']
             self.__gul_counter = data["quests"]["gul_counter"]
             self.nepusti = data["quests"]["nepusti"]
-            self.resistor = data["quests"]["resistor"]
             self.connected_router = data["quests"]["router"]
             self.five_min_sooner = data["quests"]["sooner"]
+            self.resistor = data["quests"]["resistor"]
 
             # Grades
             self.grades = data['grades']
@@ -418,13 +423,21 @@ class Game:
                     case "Taburetka": self.taburetka()
                     case "Green_chair": self.green_chair()
                     case "Router": 
+
+                        # Doing the (Ne)Pusti mission
                         if type(self.connected_router) == list:
                             router_outcome = "I rather leave it be."
+
+                            # Already connected
                             if self.saved_room_data in self.connected_router: self.info("I already connected this.")
                             else: router_outcome = self.quest.router()
+
+                            # After connecting
                             if router_outcome != "I rather leave it be.": 
                                 self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
                                 self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+                        
+                        # Didn't talk to (Ne)Pusti yet
                         else: self.talking("I don't know what to do with this.")
                 # Reset
                 self.interacted = ["", "", ""]
@@ -783,8 +796,8 @@ class Game:
                         "gul_counter": self.__gul_counter,
                         "nepusti": self.nepusti,
                         "router": self.connected_router,
-                        "resistor": self.resistor,
                         "sooner": self.five_min_sooner, 
+                        "resistor": self.resistor,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -1931,7 +1944,8 @@ class Game:
                 if not self.nepusti: self.talking("Would you like to learn more about Sie?", True)
 
                 # Not yet done
-                elif self.nepusti: 
+                elif self.nepusti:
+
                     # Not completed misson
                     if type(self.connected_router) != list and len(self.grades) > 4:
                         self.talking("Hello, could you please let me go home earlier?")
@@ -2589,7 +2603,7 @@ class Game:
             self.in_room = self.rooms[THIRD_FLOOR]
             self.create_tile_map()
             
-            if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
+            if self.interacted[1] in (27, 28, 29, 30) and self.interacted[2] == 181: 
                 for sprite in self.all_sprites:
                     sprite.rect.x -= 62 * TILE_SIZE
                     sprite.rect.y -= 4 * TILE_SIZE

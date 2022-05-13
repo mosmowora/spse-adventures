@@ -568,7 +568,7 @@ class Quest:
             # Correct
             correct = [4, 2, 3, 1]
 
-        while connecting and self.game.saved_room_data not in self.game.connected_router:
+        while connecting:
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -662,7 +662,6 @@ class Quest:
         if exited: return "I rather leave it be."
         else: 
             if answers == correct: return self.game.saved_room_data 
-            # elif self.game.saved_room_data in self.game.connected_router: return "I already connected this."
             else: return "There is something wrong."
             
     def resistor(self): 
