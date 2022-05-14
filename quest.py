@@ -946,5 +946,202 @@ class Quest:
         else: 
             if answers == correct: return 1
             else: return 3
+            
+    def bash(self):
+        """
+        (č) OSYYYYY
+        """
 
+
+        bashing = True
+
+        # Background
+        bg = pygame.image.load("img/OSY.png")
+        
+        # active
+        active_bash = True
+
+        # To fill
+        fill_bash = pygame.Rect(103, 147, 96, 13)
+        
+        # text
+        text_bash = ""
+        
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        grade_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Grade", fontsize=32)
+        
+        # Info 
+        info_text = self.game.font.render("Initiate a bash program", True, BLACK)
+
+        while bashing:
+            
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Click
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                    if fill_bash.collidepoint(event.pos): active_bash = True
+                    else: active_bash = False
+                    
+                # Keyboard
+                if event.type == pygame.KEYDOWN:
+    
+                    # Esc
+                    if event.key == pygame.K_ESCAPE: bashing = False
+
+                    # Check for backspace
+                    elif event.key == pygame.K_BACKSPACE: 
+                        if active_bash: text_bash = text_bash[:-1]
+
+                    elif active_bash: text_bash += event.unicode
+
+
+            # Back button
+            if back_button.is_pressed(mouse_pos, mouse_pressed): bashing = False; return 5
+
+            # Grade button
+            elif grade_button.is_pressed(mouse_pos, mouse_pressed): 
+                bashing = False
+                if text_bash == "!#/bin/bash": return 1
+                else: return 3
+
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+            
+            # Very useful info text
+            self.game.screen.blit(info_text, (10, 10))
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(grade_button.image, grade_button.rect)
+
+            # Bash
+            pygame.draw.rect(self.game.screen, BLACK, fill_bash) if active_bash else None
+            text_surface_def = self.game.lrob_font.render(text_bash, True, (4.20, 169, 4.20))
+            self.game.screen.blit(text_surface_def, (fill_bash.x+1, fill_bash.y-1))
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+            
+    def iotest(self): 
+        """
+        Iot edupage test
+        """
+
+        ioting = True
+
+        # Background
+        bg = pygame.image.load("img/iot.png")
+
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
+
+        a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+        b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+        c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+        d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+        # Counters for pressed buttons
+        a = 0
+        b = 0
+        c = 0
+        d = 0
+
+        while ioting:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Buttons pressed
+            if back_button.is_pressed(mouse_pos, mouse_pressed): ioting = False; return 5
+            if done_button.is_pressed(mouse_pos, mouse_pressed): ioting = False; return grade
+            # CSS for active buttons (extremely scuffed)
+            if a_button.is_pressed(mouse_pos, mouse_pressed): 
+                a += 1
+                if a % 2 == 0:
+                    a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                else:
+                    a_button = Button(101, 145, 25, 27, fg=WHITE, bg=GREEN, content="a)", fontsize=20)
+                    b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                    c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                    grade = 1
+            if b_button.is_pressed(mouse_pos, mouse_pressed): 
+                b += 1
+                if b % 2 == 0:
+                    b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                else:
+                    a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                    b_button = Button(101, 192, 25, 27, fg=WHITE, bg=GREEN, content="b)", fontsize=20)  
+                    c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)                 
+                    grade = 3
+            if c_button.is_pressed(mouse_pos, mouse_pressed): 
+                c += 1
+                if c % 2 == 0:
+                    c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                else:
+                    a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                    b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                    c_button = Button(101, 238, 25, 27, fg=WHITE, bg=GREEN, content="c)", fontsize=20)
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20) 
+                    grade = 3
+            if d_button.is_pressed(mouse_pos, mouse_pressed): 
+                d += 1
+                if d % 2 == 0:
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                else:
+                    a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                    b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                    c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                    d_button = Button(101, 286, 25, 27, fg=WHITE, bg=GREEN, content="d)", fontsize=20)
+                    
+                    grade = 3
+            
+
+            # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Keyboard
+                if pygame.KEYDOWN == event.type:
+
+                    # Escape
+                    if event.key == pygame.K_ESCAPE: ioting = False; return 5
+
+                    # Enter
+                    if event.key == pygame.K_RETURN: ioting = False
+
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(done_button.image, done_button.rect)
+            self.game.screen.blit(a_button.image, a_button.rect)
+            self.game.screen.blit(b_button.image, b_button.rect)
+            self.game.screen.blit(c_button.image, c_button.rect)
+            self.game.screen.blit(d_button.image, d_button.rect)
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+
+        
             

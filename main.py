@@ -27,7 +27,7 @@ class Game:
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
         self.font = pygame.font.Font("Roboto.ttf", 22)
         self.settings_font = pygame.font.Font("Caveat.ttf", 45)
-        self.lrob_font = pygame.font.Font("Roboto.ttf", 13)
+        self.lrob_font = pygame.font.Font("Roboto.ttf", 13) # also OSY font
 
         # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -176,6 +176,8 @@ class Game:
         self.nepusti: bool = True
         self.five_min_sooner: bool = True
         self.resistor: bool = True
+        self.osy: bool = True
+        self.iot: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
         # Grader
@@ -340,6 +342,8 @@ class Game:
             self.connected_router = data["quests"]["router"]
             self.five_min_sooner = data["quests"]["sooner"]
             self.resistor = data["quests"]["resistor"]
+            self.osy = data["quests"]["osy"]
+            self.iot = data["quests"]["iot"]
 
             # Grades
             self.grades = data['grades']
@@ -803,6 +807,8 @@ class Game:
                         "router": self.connected_router,
                         "sooner": self.five_min_sooner, 
                         "resistor": self.resistor,
+                        "osy": self.osy,
+                        "iot": self.iot,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -2078,7 +2084,43 @@ class Game:
                 self.talking("Just fill in the blanks", True, RED)
                 sjl_test = self.quest.slovak_bs()
                 if isinstance(sjl_test, tuple): self.grades["SJL"], self.sjl_test = sjl_test[0], sjl_test[1]
-                                    
+                
+            # Martin šeky
+            elif self.interacted[2] == 180 and self.interacted[1] == 5:
+                # Quest here
+                if self.osy: 
+                    self.talking("Oh, hey there", True, YELLOW)
+                    self.talking("I wasn't planning to give you a test today", True, YELLOW)
+                    self.talking("But while you're here", True, YELLOW)
+                    self.talking("I think I should.", True, YELLOW)
+                    self.grades["OSY"] = self.quest.bash()
+                    self.draw()
+                    self.update()
+                    self.osy = not self.osy 
+                    # After grade talk 
+                    if self.grades["OSY"] == 1: self.talking("Good linux knowledge, that's a 1 for you.", True, YELLOW)
+                    elif self.grades["OSY"] == 3: self.talking("You have a lot to learn, but I'll give you a 3.", True, YELLOW)
+                    elif self.grades["OSY"] == 5: self.talking("No second chances here.", True, YELLOW)
+                # When quest completed
+                else: self.talking("Hi, leave me alone i need to", True, YELLOW); self.talking("install Linux on this machine", True, YELLOW)
+                
+            # Kôňtura
+            elif self.interacted[2] == 21 and self.interacted[1] == 3: 
+                if self.iot:
+                    self.talking(f"Hello {self.player_name},", True, BLUE)
+                    self.talking("you missed the last lesson", True, BLUE)
+                    self.talking("I have a test for you", True, BLUE)
+                    self.talking("you have to take it or else you'll recieve an a.", True, BLUE)
+                    self.grades["IOT"] = self.quest.iotest()
+                    self.draw()
+                    self.update()
+                    self.iot = not self.iot
+                    # After grade talk with Kôňtura
+                    if self.grades["IOT"] == 1: self.talking("Good work my student, that's a 1 for you.", True, BLUE)
+                    elif self.grades["IOT"] == 3: self.talking("You need to learn more about IoT", True, BLUE); self.talking("but I'll give you a 3", True, BLUE); self.talking("since you missed the last lesson.", True, BLUE)
+                    elif self.grades["IOT"] == 5: self.talking("Why would you give up, my student.", True, BLUE); self.talking("Oh, he seems very sad.")
+                else: self.talking("Dang, those bad students broke my 3D printer.", True, BLUE)
+                
     def shoes_on(self):
         """
         Checks if player has shoes on

@@ -2,9 +2,9 @@ you get confused reading kokocke otazky and get lost in school
 
 PRO TIP: (do things that we can actually code)
 štebot - npc with useful advice
-kokošky collectibles (4 piece puzzle)
+kokošky collectibles (4 piece puzzle) ✔️
 bananky collectibles
-vujcik jumpscare
+vujcik jumpscare ✔️ (kinda)
 
 
 storyline ideas:
@@ -23,7 +23,7 @@ quests:
     vyvetraj na DSY
     buy a secret item from Amper (2.5% chance to get it)
     get chalks for a certain teacher ✔️
-    player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess))
+    player has to acquire flashlight and battery to craft working flashlight to be able to go into the basement (crafting will be automatic if player has both (I guess)) ✔️
     special desks on each floor with desk ball
     special window -> sans: the flowers are blooming...
     specialer (totally a word) window -> jump out (immediate secret ending) ✔️
@@ -33,6 +33,6 @@ gameplay ideas:
 
 easter eggs:
     Kontura's vtipníček ✔️
-    kacurovanie
+    kacurovanie ✔️
     Hedvigova's rovnitko
 
