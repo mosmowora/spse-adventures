@@ -972,7 +972,7 @@ class Quest:
         grade_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Grade", fontsize=32)
         
         # Info 
-        info_text = self.game.font.render("Initiate a bash program", True, BLACK)
+        info_text = self.game.font.render("Tell linux to use bash", True, BLACK)
 
         while bashing:
             
@@ -1007,7 +1007,7 @@ class Quest:
 
 
             # Back button
-            if back_button.is_pressed(mouse_pos, mouse_pressed): bashing = False; return 5
+            if back_button.is_pressed(mouse_pos, mouse_pressed): bashing = False
 
             # Grade button
             elif grade_button.is_pressed(mouse_pos, mouse_pressed): 
@@ -1071,8 +1071,7 @@ class Quest:
             # CSS for active buttons (extremely scuffed)
             if a_button.is_pressed(mouse_pos, mouse_pressed): 
                 a += 1
-                if a % 2 == 0:
-                    a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                if a % 10 == 0: a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=WHITE, bg=GREEN, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
@@ -1081,8 +1080,7 @@ class Quest:
                     grade = 1
             if b_button.is_pressed(mouse_pos, mouse_pressed): 
                 b += 1
-                if b % 2 == 0:
-                    b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                if b % 10 == 0: b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=WHITE, bg=GREEN, content="b)", fontsize=20)  
@@ -1091,8 +1089,7 @@ class Quest:
                     grade = 3
             if c_button.is_pressed(mouse_pos, mouse_pressed): 
                 c += 1
-                if c % 2 == 0:
-                    c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                if c % 10 == 0: c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
@@ -1101,8 +1098,7 @@ class Quest:
                     grade = 3
             if d_button.is_pressed(mouse_pos, mouse_pressed): 
                 d += 1
-                if d % 2 == 0:
-                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                if d % 10 == 0: d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
