@@ -308,7 +308,7 @@ class Npc(pygame.sprite.Sprite):
         self.type = type
         self.game = game
         self._layer = NPC_LAYER
-        if self.type == "C": self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible, self.game.cleaner
+        if self.type in ("C", "K", "9"): self.groups = self.game.all_sprites, self.game.npcs, self.game.cleaner
         else: self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
         pygame.sprite.Sprite.__init__(self, self.groups)
 
@@ -477,7 +477,7 @@ class Npc(pygame.sprite.Sprite):
             if hits: self.game.shoes_on()
         elif self.type == "K":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits and self.game.locker_stuff['boots']: 
+            if hits and self.game.locker_stuff['crocs']: 
                 pygame.mixer.Sound.play(self.game.kacurovanie, 0, 6000, 1000)
                 if self.game.player.facing == "up": self.game.player.rect.y += 1 * TILE_SIZE
                 elif self.game.player.facing == "down": self.game.player.rect.y -= 1 * TILE_SIZE
