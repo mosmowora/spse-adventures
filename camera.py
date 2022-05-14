@@ -414,3 +414,12 @@ class Camera:
                     sprite.rect.y += 1 * TILE_SIZE
                 self.game.player.rect.x -= 18 * TILE_SIZE
                 self.game.player.rect.y -= 5 * TILE_SIZE
+                
+                
+    def set_ending_camera(self):
+        """
+        Set camera for ending sequence
+        """
+        for sprite in self.game.all_sprites:
+            sprite.rect.x += 3 * TILE_SIZE
+            sprite.rect.y -= 165 * TILE_SIZE

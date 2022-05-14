@@ -468,6 +468,173 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+    
+    def slovak_bs(self):
+        """
+        SJL quest
+        """
+
+        testing: bool = True
+        bg = pygame.image.load("img/sjl_bg.png")
+        word: int = 0
+        
+        assignment: List[str] = ["Ako __ sa má babička?".upper(), "Čo __ __ večer?".upper(), "__ máš namierené?".upper(), "V diaľke som videl lietať v_ra".upper(), "Kr_štálový".upper(), "prer_vaný".upper(), "__ Botto".upper(), "materinský".upper(), "ˇ%053!4P3%!".upper(), "1#!@%^d6n".upper()]
+        assignment_answers: List[str] = ["sa", "budeš robiť", "kam", "ý", "y", "ý", "Ján", "jazyk", "/(§)\\", "LK:{DA"]
+        answer: List[str] = []
+        answer_rect = pygame.Rect(155, 215, 302, 67)
+        answer_text: str = ""
+
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        paper = pygame.image.load("img/paper.png")
+        paper_rect = paper.get_rect(x=20, y=0)
+        assign_rect = pygame.Rect(61, 141, 273, 50)
+
+        while testing:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Text of assignment
+            assign: str = assignment[word]
+
+            # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+            
+                # Logic
+                if pygame.KEYDOWN == event.type:
+
+                    # Enter
+                    if event.key == pygame.K_RETURN: word += 1; answer.append(answer_text); answer_text = ""
+
+                    # Check for backspace
+                    elif event.key == pygame.K_BACKSPACE: answer_text = answer_text[:-1]
+
+                    # Escape
+                    elif event.key == pygame.K_ESCAPE: testing = False
+
+                    # Unicode
+                    else: answer_text += event.unicode
+
+            # Grading
+            if word == len(assignment_answers):
+                grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
+                self.game.anj_test = False
+                self.game.info("You've recieved a grade for SJL", DIM_GRAY)
+                return grade if grade != 0 else 1, False
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+
+            # Paper
+            self.game.screen.blit(paper, paper_rect)
+
+            # Text
+            text_surface_answer = self.game.big_font.render(answer_text, True, BLACK)
+            pygame.draw.rect(self.game.screen, PAPER_WHITE, answer_rect)
+            self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
+            assing_text_surface = self.game.font.render(assign, True, BLACK)
+            self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))
+            answer_text_surface = self.game.font.render(str(word + 1) + "/10", True, BLACK)
+            self.game.screen.blit(answer_text_surface, (assign_rect.x+230, assign_rect.y-50))
+
+            # Button pressed
+            if back_button.is_pressed(mouse_pos, mouse_pressed): testing = not testing; return True
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+    
+    def maths(self):
+        """
+        SJL quest
+        """
+
+        testing: bool = True
+        bg = pygame.image.load("img/maths_bg.png")
+        word: int = 0
+        
+        assignment: List[str] = ["10x - 1 = 15 - 6x".upper(), "9x - 8 = 11x - 10".upper(), "7 + x/3 = 8 + x/4".upper(), "x/2 + x/3 = 5".upper(), "x - 2/3 = 5x/7 + 1/2".upper(), "2x - x/2 + 4 = x + x/3".upper(), "5x - 9 - 4/15 = (2x - 1)/3".upper(), "-1 - (3x - x)/4 = (2x - 5)/6".upper(), "(-17/19)x + 51 = 0".upper(), "|x - 7| = 0".upper()]
+        assignment_answers: List[str] = ["1", "1", "12", "6", "49/12", "-24", "3/5", "-1/5", "57", "7"]
+        # print(assignment_answers) # for maths quest debugging
+        answer: List[str] = []
+        answer_rect = pygame.Rect(155, 215, 302, 67)
+        answer_text: str = ""
+
+        # Button
+        back_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        paper = pygame.image.load("img/paper.png")
+        paper_rect = paper.get_rect(x=20, y=0)
+        assign_rect = pygame.Rect(81, 141, 273, 50)
+
+        while testing:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Text of assignment
+            assign: str = assignment[word]
+
+            # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+            
+                # Logic
+                if pygame.KEYDOWN == event.type:
+
+                    # Enter
+                    if event.key == pygame.K_RETURN: word += 1; answer.append(answer_text); answer_text = ""
+
+                    # Check for backspace
+                    elif event.key == pygame.K_BACKSPACE: answer_text = answer_text[:-1]
+
+                    # Escape
+                    elif event.key == pygame.K_ESCAPE: testing = False
+
+                    # Unicode
+                    else: answer_text += event.unicode
+
+            # Grading
+            if word == len(assignment_answers):
+                grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
+                self.game.anj_test = False
+                self.game.info("You've recieved a grade for MAT", DIM_GRAY)
+                return grade if grade != 0 else 1, False
+
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+
+            # Paper
+            self.game.screen.blit(paper, paper_rect)
+
+            # Text
+            text_surface_answer = self.game.big_font.render(answer_text, True, BLACK)
+            pygame.draw.rect(self.game.screen, PAPER_WHITE, answer_rect)
+            self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
+            assing_text_surface = self.game.font.render(assign, True, BLACK)
+            self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))
+            answer_text_surface = self.game.font.render(str(word + 1) + "/10", True, BLACK)
+            self.game.screen.blit(answer_text_surface, (assign_rect.x+230, assign_rect.y-50))
+
+            # Button pressed
+            if back_button.is_pressed(mouse_pos, mouse_pressed): testing = not testing; return True
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
 
     def router(self): 
         """

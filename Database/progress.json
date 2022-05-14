@@ -120,12 +120,14 @@
             "phone": true,
             "suplovanie": null,
             "anj_test": false,
+            "sjl_test": false,
+            "mat_test": false,
             "GUL_quest": false,
             "gul_counter": 3,
             "nepusti": false,
             "router": false,
-            "resistor": false,
             "sooner": true,
+            "resistor": false,
             "locker_stuff": {
                 "crocs": false,
                 "boots": true,
@@ -134,7 +136,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "level": 0,
+        "level": 2,
         "room_number": "Hall",
         "grades": {
             "ANJ": 2,
@@ -142,7 +144,8 @@
             "DEJ": 1,
             "TSV": 1,
             "PRO": 1,
-            "SIE": 1
+            "SIE": 1,
+            "SJL": 2
         },
         "settings": {
             "music": false,

@@ -453,7 +453,7 @@ class Npc(pygame.sprite.Sprite):
     def move_towards_player(self):
         dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
                                       self.game.player.rect.y - self.rect.y)
-        # if player is in the hall and has more tham 6 quests done then VUJ is goona go after him
+        # if player is in the hall and has more than 6 quests done then VUJ is goona go after him
         if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and len(self.game.grades) > 4:
             dirvect.normalize(); dirvect.scale_to_length(VUJ_SPEED)
             if round(dirvect[1]) < 0: self.facing = "up"
@@ -461,7 +461,6 @@ class Npc(pygame.sprite.Sprite):
             elif round(dirvect[0]) > 0: self.facing = "right"
             elif round(dirvect[0]) < 0: self.facing = "left"
             self.rect.move_ip(dirvect)
-            print(self.game.saved_room_data)
         # Or he's just gonna behave like any other npc
         else: 
             if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
@@ -776,7 +775,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
 
                     # Locker
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
@@ -799,7 +798,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
-                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(j, i)
 
                     # Bookshelf
                     elif self.interactive[hits[0]] in ("O" + str(i) + str(j), "o" + str(i) + str(j), "ó" + str(i) + str(j), "Ó" + str(i) + str(j)): self.game.interacted = ["Bookshelf", i, j]

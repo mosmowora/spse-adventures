@@ -1,4 +1,5 @@
 # Import
+import getpass
 import pygame, random as r
 from leaderboard import Leaderboard
 from quest import Quest
@@ -42,7 +43,7 @@ class Game:
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
-        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, basement] # Rooms where player can go
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement] # Rooms where player can go
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
         self.saved_room_data: str = "017"
         self.quest = Quest(self)
@@ -169,6 +170,8 @@ class Game:
         self.phone_in_trash: bool = True
         self.suplovanie: bool = True
         self.anj_test: bool = True
+        self.mat_test: bool = True
+        self.sjl_test: bool = True
         self.gul_quest: bool = True
         self.nepusti: bool = True
         self.five_min_sooner: bool = True
@@ -330,6 +333,7 @@ class Game:
             self.suplovanie = data["quests"]['suplovanie']
             self.phone_in_trash = data["quests"]["phone"]
             self.anj_test = data["quests"]["anj_test"]
+            self.sjl_test = data["quests"]["sjl_test"]
             self.gul_quest = data["quests"]['GUL_quest']
             self.__gul_counter = data["quests"]["gul_counter"]
             self.nepusti = data["quests"]["nepusti"]
@@ -792,6 +796,7 @@ class Game:
                         "phone": self.phone_in_trash,
                         "suplovanie": self.suplovanie,
                         "anj_test": self.anj_test,
+                        "sjl_test": self.sjl_test,
                         "GUL_quest": self.gul_quest,
                         "gul_counter": self.__gul_counter,
                         "nepusti": self.nepusti,
@@ -827,7 +832,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/game_over_background.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png"]
         all_endings = (f"img/{ending}.png" for ending in self.endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
@@ -1344,9 +1349,18 @@ class Game:
             self.player.rect.y = self.interacted[4]
             for sprite in self.all_sprites: sprite.rect.x -= 2 * TILE_SIZE
             
-    def end(self):
+    def ending_hallway(self):
         """
-        Canon ending for the game, crashes the program for now
+        Canon ending for the game
+        """
+        
+        self.in_room = self.rooms[ENDING_HALLWAY]
+        self.create_tile_map()
+        self.camera.set_ending_camera()
+            
+    def end(self, tried: bool = False):
+        """
+        Main ending for the game
         """
 
         # Buttons
@@ -1371,7 +1385,7 @@ class Game:
                 
 
             # Background
-            self.screen.blit(ending_screen, (0, 0))
+            self.screen.blit(ending_screen, (0, 0)) if not tried else self.screen.blit(pygame.image.load("img/you_tried.png"), (0, 0))
 
             # Exit button
             self.screen.blit(exit_button.image, exit_button.rect)
@@ -1414,7 +1428,9 @@ class Game:
         elif self.player.facing == "down" and self.interacted[1] == 28 and self.interacted[2] in (54, 55):
 
             # Has everything
-            if len(self.grades) == ALL_GRADES: self.talking("This is the end"); self.end()
+            if len(self.grades) == ALL_GRADES:
+                if sum(self.grades.values()) // len(self.grades) <= 1.5: self.talking("This is the end"); self.ending_hallway() # self.end()
+                elif 1.5 < sum(self.grades.values()) // len(self.grades) <= 3.5: self.talking("Well, I got everything"); self.end(tried=True)
 
             # Permission to go home sooner
             elif self.five_min_sooner == self.nepusti == self.gul_quest == False: self.talking("Now I can go home sooner!"); self.game_over("img/early.png")
@@ -1852,6 +1868,66 @@ class Game:
         # LROB -> LROB (predsien)
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
+
+    def ending_hallway_doors(self):
+        if self.player.facing == "up" and self.interacted[2] in (5, 6, 7) and self.interacted[1] == 9: 
+            self.center_player_after_doors()
+            temp_speed = self.talking_speed_number
+            self.talking_speed_number = 120
+            self.talking("So this is the end?")
+            self.talking("There's nothing, just an empty room.")
+            self.talking("Maybe it was supposed to be a room with a TV.")
+            self.talking("Or maybe just me in this room.")
+            self.talking("Did I do a good job?")
+            self.talking("Was I a good student?")
+            self.talking("Person?")
+            self.talking("What do you think?")
+            
+            deciding = True
+            # Buttons
+            yes_button = Button(140, 190, 120, 50, fg=WHITE, bg=BLACK, content="Yes", fontsize=32)
+            no_button = Button(360, 190, 120, 50, fg=WHITE, bg=BLACK, content="No", fontsize=32)
+            
+            while deciding:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                
+                # Events
+                for event in pygame.event.get():
+
+                    # Close button
+                    if event.type == pygame.QUIT: print("You ruined the whole thing"); quit()
+
+                    # Keyboard
+                    elif event.type == pygame.KEYDOWN:
+
+                        # Esc
+                        if event.key == pygame.K_ESCAPE: print("You ruined the whole thing"); deciding = False
+                
+                if yes_button.is_pressed(mouse_pos, mouse_pressed):
+                    self.talking("I did a good job.")
+                    self.talking("Thank you for navigating me through this journey.")
+                    # Gets the name of the current machine user (account) 4th WALL BREAK
+                    self.talking("Thank you {}".format(getpass.getuser()))
+                    self.talking_speed_number = temp_speed
+                    quit()
+                
+                elif no_button.is_pressed(mouse_pos, mouse_pressed):
+                    self.talking("At least I got the thing I wanted.")
+                    self.talking("And that is all there can be to it.")
+                    self.talking("We both can rest now.")
+                    self.talking_speed_number = temp_speed
+                    quit()
+                
+                self.screen.blit(yes_button.image, yes_button.rect)
+                self.screen.blit(no_button.image, no_button.rect)
+                
+                # Updates
+                self.clock.tick(FPS)
+                pygame.display.update()
+
+
+
     def talking_with_teachers(self):
         """
         Player chatting with a teacher
@@ -1860,9 +1936,14 @@ class Game:
         if self.interacted[0] == "Teacher":
 
             # Liascinska
-            if self.interacted[2] == 100 and self.interacted[1] == 19: 
+            if self.interacted[2] == 100 and self.interacted[1] == 19 and self.mat_test: 
                 self.talking("LIA is just standing here")
                 self.talking("MENACINGLY")
+                self.talking("Oh, hey {}, fancy seeing you here".format(self.player_name), True, BLUE)
+                self.talking("School work can't be postponed", True, BLUE)
+                self.talking("I found something you can understand", True, BLUE)
+                math_values = self.quest.maths()
+                if isinstance(math_values, tuple): self.grades["MAT"], self.mat_test = math_values[0], math_values[1]
                 
             # Gulbaga
             elif self.interacted[2] == 57 and self.interacted[1] == 22:
@@ -1988,6 +2069,15 @@ class Game:
                         self.talking("From other lessons", True)
                         self.talking("Come back when you're a bit...", True)
                         self.talking("Richer", True)
+            
+            elif self.interacted[2] == 77 and self.interacted[1] == 16 and self.sjl_test:
+                self.talking("Oh, you're finally here", True, RED)
+                self.talking("Where have you been?", True, RED)
+                self.talking("I've been standing here waiting", True, RED)
+                self.talking("Nevermind. Finish this so I can move on", True, RED)
+                self.talking("Just fill in the blanks", True, RED)
+                sjl_test = self.quest.slovak_bs()
+                if isinstance(sjl_test, tuple): self.grades["SJL"], self.sjl_test = sjl_test[0], sjl_test[1]
                                     
     def shoes_on(self):
         """
@@ -2191,8 +2281,10 @@ class Game:
         # Third floor
         elif self.in_room == third_floor: self.third_floor_doors()
         
-        # Third floor
+        # Fourth floor
         elif self.in_room == fourth_floor: self.fourth_floor_doors()
+        
+        elif self.in_room == self.rooms[ENDING_HALLWAY]: self.ending_hallway_doors()
                
     def basement(self):
         """

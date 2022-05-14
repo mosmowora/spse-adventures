@@ -37,7 +37,7 @@ class Leaderboard:
         name_ending.sort(reverse=True)
         
         while leaderboarding:
-            print(page_number)
+            # print(page_number)
             # Events
             for event in pygame.event.get():
                 
@@ -81,48 +81,89 @@ class Leaderboard:
             # Second page   
             elif page_number <= max_page_number and page_number == 2:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(6):
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player + 6][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player + 6][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                if players - 6 <= 6:
+                    for player in range(6, players):
+                        self.game.screen.blit(row, (0, (player - 6) * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 6) * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 6) * row.get_height() + 23))
+                        print((0, player * row.get_height()))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player + 6][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player + 6][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
             # Third page   
             elif page_number <= max_page_number and page_number == 3:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(6):
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player + 12][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player + 12][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                if players - 12 <= 6:
+                    for player in range(12, players):
+                        self.game.screen.blit(row, (0, (player - 12) * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 12) * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 12) * row.get_height() + 23))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player + 12][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player + 12][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
             # Fourth page 
             elif page_number <= max_page_number and page_number == 4:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(6):
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player + 18][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player + 18][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                if players - 18 <= 6:
+                    for player in range(18, players):
+                        self.game.screen.blit(row, (0, (player - 18) * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 18) * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 18) * row.get_height() + 23))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player + 18][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player + 18][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
             # Fifth page    
             elif page_number <= max_page_number and page_number == 5:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(6):
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player + 24][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player + 24][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                if players - 24 <= 6:
+                    for player in range(24, players):
+                        self.game.screen.blit(row, (0, (player - 24) * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 24) * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 24) * row.get_height() + 23))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player + 24][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player + 24][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
             # Sixth page     
             elif page_number <= max_page_number and page_number == 6:
                 self.game.screen.blit(bg, (0, 0))
-                for player in range(6):
-                    self.game.screen.blit(row, (0, player * row.get_height()))
-                    player_name = self.game.font.render(name_ending[player + 30][1], True, BLACK)
-                    endings = self.game.font.render("Endings: " + str(name_ending[player + 30][0]), True, BLACK)
-                    self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
-                    self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
+                if players - 30 <= 6:
+                    for player in range(30, players):
+                        self.game.screen.blit(row, (0, (player - 30) * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 30) * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 30) * row.get_height() + 23))
+                else:
+                    for player in range(6):
+                        self.game.screen.blit(row, (0, player * row.get_height()))
+                        player_name = self.game.font.render(name_ending[player + 30][1], True, BLACK)
+                        endings = self.game.font.render("Endings: " + str(name_ending[player + 30][0]), True, BLACK)
+                        self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, player * row.get_height() + 23))
+                        self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
                         
             else: page_number = max_page_number
             # Updates
