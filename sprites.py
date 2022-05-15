@@ -463,8 +463,25 @@ class Npc(pygame.sprite.Sprite):
             self.rect.move_ip(dirvect)
         # Or he's just gonna behave like any other npc
         else: 
-            if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
-            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            if self.facing == "left":
+                self.x_change -= VUJ_SPEED / 2
+                self.movement_loop -= 1
+                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+
+            elif self.facing == "right":
+                self.x_change += VUJ_SPEED / 2
+                self.movement_loop += 1
+                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+
+            elif self.facing == "up":
+                self.y_change -= VUJ_SPEED / 2
+                self.movement_loop -= 1
+                if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+
+            elif self.facing == "down":
+                self.y_change += VUJ_SPEED / 2
+                self.movement_loop += 1
+                if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
     def collide_player(self, direction: str):
         """
