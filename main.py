@@ -1,6 +1,5 @@
 # Import
-import getpass
-import pygame, random as r
+import pygame, random as r, getpass
 from leaderboard import Leaderboard
 from quest import Quest
 from save_progress import SaveProgress
@@ -44,8 +43,8 @@ class Game:
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement] # Rooms where player can go
-        self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Room where player is rn (starting point) that's ground floor for those who don't know
-        self.saved_room_data: str = "017"
+        self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Floor where player is rn (starting point) that's ground floor for those who don't know
+        self.saved_room_data: str = "017" # Room where player is rn (starting point) that's Satna for those who don't know
         self.quest = Quest(self)
         self.grades: dict[str, int] = {}
         self.endings: List[str] = []
@@ -67,9 +66,9 @@ class Game:
         self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
         self.wow_iphone.set_volume(0.5)
         self.theme = pygame.mixer.Sound("sounds/theme.mp3")
+        self.theme.set_volume(0.008)
         self.kacurovanie = pygame.mixer.Sound("sounds/kacurovanie.mp3")
         self.kacurovanie.set_volume(0.05)
-        self.theme.set_volume(0.008)
         self.tsv_theme = pygame.mixer.Sound("sounds/bench.mp3")
         self.tsv_theme.set_volume(0.05)
         self.fall = pygame.mixer.Sound("sounds/fall.mp3")
@@ -84,6 +83,8 @@ class Game:
         self.door_open.set_volume(0.25)
         self.speed = pygame.mixer.Sound("sounds/speed.mp3")
         self.speed.set_volume(0.15)
+        self.wrong_house = pygame.mixer.Sound("sounds/wrong_house.mp3")
+        self.wrong_house.set_volume(0.5)
 
     def set_level_camera(self, level: List[str]):
         """
@@ -159,6 +160,8 @@ class Game:
         self.key_in_trash: bool = True
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
+        self.amper_locked: bool = True
+        self.amper_key_in_trash: bool = True
         self.number_kokosky: int = 0
         self.kokosky_in_locker: bool = True
         self.kokosky_in_bookshelf: bool = True
@@ -178,7 +181,476 @@ class Game:
         self.resistor: bool = True
         self.osy: bool = True
         self.iot: bool = True
+        self.haram_test: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
+
+        # Bananok
+        self.number_bananok: int = 0
+        self.bananky_in_trash: dict[str, dict[str, int]] = {
+            "ground floor": {
+                "2113": 2,
+                "2313": 3, 
+                "3413": 4, 
+                "8313": 1, 
+                "8513": 5, 
+                "10513": 3,
+                "14113": 2,
+                "16313": 1,
+                "2021": 4,
+                "3021": 2,
+                "9321": 3,
+                "12921": 2
+            },
+            "first floor": {
+                "1747": 1,
+                "7823": 1,
+                "8023": 2,
+                "11323": 3,
+                "11523": 2,
+                "16724": 4,
+                "10231": 2,
+                "138": 2,
+                "7038": 5,
+                "15638": 2
+            },
+            "second floor": {
+                "16712": 3,
+                "13415": 2,
+                "9624": 2,
+                "11324": 4,
+                "13224": 2,
+                "16725": 1,
+                "139": 1
+            },
+            "fourth floor":{
+                "557": 2,
+                "5516": 2
+            }
+        }
+        self.bananky_on_ground: dict[str, dict[str, bool]] = {
+            "ground floor": {
+                "11": True,
+                "151": True, 
+                "161": True, 
+                "181": True, 
+                "191": True, 
+                "211": True, 
+                "641": True, 
+                "831": True, 
+                "851": True, 
+                "1031": True,
+                "1201": True,
+                "1411": True,
+                "1431": True,
+                "1631": True,
+                "12": True,
+                "152": True,
+                "162": True,
+                "182": True,
+                "192": True,
+                "212": True,
+                "642": True,
+                "832": True,
+                "852": True,
+                "1032": True,
+                "1202": True,
+                "1412": True,
+                "1432": True,
+                "1632": True,
+                "13": True,
+                "14": True,
+                "15": True,
+                "16": True,
+                "17": True,
+                "18": True,
+                "1059": True,
+                "1189": True,
+                "10510": True,
+                "11810": True,
+                "2311": True,
+                "11811": True,
+                "2312": True,
+                "4312": True,
+                "4313": True,
+                "10421": True,
+                "14721": True,
+                "14821": True,
+                "14722": True,
+                "14822": True,
+                "127": True,
+                "227": True,
+                "327": True,
+                "427": True,
+                "527": True,
+                "627": True,
+                "727": True,
+                "827": True,
+                "927": True,
+                "1027": True,
+                "10427": True
+            },
+            "first floor": {
+                "1671": True,
+                "1681": True,
+                "1691": True,
+                "1701": True,
+                "1891": True,
+                "1901": True,
+                "1911": True,
+                "1672": True,
+                "1682": True,
+                "1692": True,
+                "1673": True,
+                "1683": True,
+                "1674": True,
+                "1897": True,
+                "1907": True,
+                "1917": True,
+                "1899": True,
+                "1909": True,
+                "1919": True,
+                "7611": True,
+                "7711": True,
+                "7811": True,
+                "9311": True,
+                "9411": True,
+                "9511": True,
+                "9611": True,
+                "12811": True,
+                "12911": True,
+                "13011": True,
+                "13111": True,
+                "13211": True,
+                "15711": True,
+                "15811": True,
+                "15911": True,
+                "7612": True,
+                "7712": True,
+                "7812": True,
+                "9312": True,
+                "9412": True,
+                "9512": True,
+                "9612": True,
+                "12812": True,
+                "12912": True,
+                "13012": True,
+                "13112": True,
+                "13212": True,
+                "15712": True,
+                "15812": True,
+                "15912": True,
+                "18915": True,
+                "19015": True,
+                "19115": True,
+                "18831": True,
+                "18931": True,
+                "19031": True,
+                "19131": True,
+                "18832": True,
+                "18932": True,
+                "19032": True,
+                "19132": True,
+                "18833": True,
+                "18933": True,
+                "19033": True,
+                "19133": True,
+                "10238": True,
+                "10338": True,
+                "10438": True,
+                "10538": True
+            },
+            "second floor": {
+                "1671": True,
+                "1681": True,
+                "1691": True,
+                "1701": True,
+                "1711": True,
+                "1721": True,
+                "1731": True,
+                "1741": True,
+                "1751": True,
+                "1761": True,
+                "1771": True,
+                "1781": True,
+                "1791": True,
+                "1801": True,
+                "1811": True,
+                "1821": True,
+                "1831": True,
+                "1841": True,
+                "1851": True,
+                "1861": True,
+                "1871": True,
+                "1881": True,
+                "1891": True,
+                "1901": True,
+                "1911": True,
+                "1893": True,
+                "1903": True,
+                "1913": True,
+                "115": True,
+                "215": True,
+                "315": True,
+                "415": True,
+                "515": True,
+                "615": True,
+                "715": True,
+                "815": True,
+                "915": True,
+                "1015": True,
+                "1215": True,
+                "2615": True,
+                "6115": True,
+                "8015": True,
+                "8115": True,
+                "11515": True,
+                "11615": True,
+                "14415": True,
+                "1216": True,
+                "2616": True,
+                "6116": True,
+                "8016": True,
+                "8116": True,
+                "11516": True,
+                "11616": True,
+                "14416": True,
+                "1217": True,
+                "1218": True,
+                "1219": True,
+                "2619": True,
+                "6119": True,
+                "8019": True,
+                "8119": True,
+                "11519": True,
+                "11619": True,
+                "14419": True,
+                "1220": True,
+                "2620": True,
+                "6120": True,
+                "8020": True,
+                "8120": True,
+                "11520": True,
+                "11620": True,
+                "14420": True,
+                "1221": True,
+                "1222": True,
+                "1223": True,
+                "2623": True,
+                "6123": True,
+                "8023": True,
+                "8123": True,
+                "11523": True,
+                "11623": True,
+                "14423": True,
+                "1224": True,
+                "2624": True,
+                "6124": True,
+                "8024": True,
+                "8124": True,
+                "11524": True,
+                "11624": True,
+                "14424": True,
+                "125": True,
+                "126": True,
+                "128": True,
+                "129": True,
+                "131": True,
+                "132": True,
+                "12132": True,
+                "12232": True,
+                "12432": True,
+                "12532": True,
+                "12732": True,
+                "12832": True,
+                "13032": True,
+                "13132": True,
+                "13232": True,
+                "14132": True,
+                "14232": True,
+                "14432": True,
+                "14532": True,
+                "14732": True,
+                "14832": True,
+                "15032": True,
+                "15132": True,
+                "15232": True,
+                "14133": True,
+                "14233": True,
+                "14433": True,
+                "14533": True,
+                "14733": True,
+                "14833": True,
+                "15033": True,
+                "15133": True,
+                "15233": True,
+                "134": True,
+                "135": True,
+                "4735": True,
+                "4835": True,
+                "5135": True,
+                "5235": True,
+                "5935": True,
+                "6035": True,
+                "6235": True,
+                "6335": True,
+                "4736": True,
+                "4836": True,
+                "5136": True,
+                "5236": True,
+                "5936": True,
+                "6036": True,
+                "6236": True,
+                "6336": True,
+                "4737": True,
+                "4837": True,
+                "4937": True,
+                "5037": True,
+                "5137": True,
+                "5237": True,
+                "5937": True,
+                "6037": True,
+                "6137": True,
+                "6237": True,
+                "6337": True,
+                "1238": True,
+                "1338": True,
+                "13938": True,
+                "14038": True,
+                "14238": True,
+                "14338": True,
+                "14538": True,
+                "14638": True,
+                "14838": True,
+                "14938": True,
+                "15138": True,
+                "15238": True,
+                "1239": True,
+                "1339": True,
+                "12139": True,
+                "12239": True,
+                "12439": True,
+                "12539": True,
+                "12739": True,
+                "12839": True,
+                "13039": True,
+                "13139": True,
+                "13239": True,
+                "13939": True,
+                "14039": True,
+                "14239": True,
+                "14339": True,
+                "14539": True,
+                "14639": True,
+                "14839": True,
+                "14939": True,
+                "15139": True,
+                "15239": True,
+                "18239": True,
+                "18339": True,
+                "18439": True,
+                "18539": True,
+                "18639": True
+            },
+            "third floor": {
+                "11": True,
+                "21": True, 
+                "31": True, 
+                "41": True, 
+                "51": True, 
+                "61": True, 
+                "71": True, 
+                "81": True, 
+                "91": True, 
+                "101": True,
+                "12": True, 
+                "22": True, 
+                "32": True,
+                "42": True,
+                "52": True,
+                "62": True,
+                "72": True,
+                "82": True,
+                "92": True,
+                "102": True,
+                "13": True,
+                "23": True,
+                "33": True,
+                "43": True,
+                "53": True,
+                "63": True,
+                "73": True,
+                "83": True,
+                "93": True,
+                "103": True,
+                "14": True,
+                "24": True,
+                "34": True,
+                "44": True,
+                "54": True,
+                "64": True,
+                "74": True,
+                "84": True,
+                "94": True,
+                "104": True,
+                "15": True,
+                "25": True,
+                "35": True,
+                "45": True,
+                "55": True,
+                "65": True,
+                "75": True,
+                "85": True,
+                "95": True,
+                "105": True,
+                "16": True,
+                "26": True,
+                "36": True,
+                "46": True,
+                "56": True,
+                "66": True,
+                "76": True,
+                "86": True,
+                "96": True,
+                "106": True,
+                "7318": True,
+                "7418": True,
+                "7518": True,
+                "7618": True,
+                "7718": True,
+                "7818": True,
+                "7918": True,
+                "8018": True,
+                "8118": True,
+                "8218": True
+            },
+            "fourth floor": {
+                "5515": True,
+                "6418": True,
+                "6518": True,
+                "6718": True,
+                "6818": True,
+                "7018": True,
+                "7118": True,
+                "7318": True,
+                "7418": True,
+                "7618": True,
+                "7718": True,
+                "5526": True,
+                "5626": True,
+                "5726": True,
+                "5826": True,
+                "6426": True,
+                "6526": True,
+                "6726": True,
+                "6826": True,
+                "7026": True,
+                "7126": True,
+                "7326": True,
+                "7426": True,
+                "7626": True,
+                "7726": True
+            }
+        }
 
         # Grader
         self.grades: dict[str, int] = {}
@@ -189,9 +661,12 @@ class Game:
         """
 
         self.interactive = {}
+        floors = ["ground floor", "first floor", "second floor", "third floor", "fourth floor", "ending hallway", "basement"]
 
+        # Destroying previous sprites
         for sprite in self.all_sprites: sprite.kill()
 
+        # Creating sprites
         for i, row in enumerate(self.in_room):
             for j, column in enumerate(row):
                 Ground(self, j, i)
@@ -272,10 +747,12 @@ class Game:
                 elif column == "ô": self.interactive[Block(self, j, i, "ô")] = "ô" + str(i) + str(j) # Basketball hoop (L)
                 elif column == "ˇ": self.interactive[Block(self, j, i, "ˇ")] = "ˇ" + str(i) + str(j) # Dumbell rack
                 elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
+                elif column == "A": self.interactive[Block(self, j, i, "A")] = "A" + str(i) + str(j) # Pult in Amper
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j)  # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j)  # NPC
                 elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
+                elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
 
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
@@ -300,6 +777,7 @@ class Game:
         self.interacts = pygame.sprite.LayeredUpdates()
         self.interactible = pygame.sprite.LayeredUpdates()
         self.cleaner = pygame.sprite.LayeredUpdates()
+        self.bananky = pygame.sprite.LayeredUpdates()
 
         # Loads data
         data = SaveProgress.load_data(self.player_name)
@@ -323,6 +801,8 @@ class Game:
             self.key_in_trash = data["quests"]["key_in_trash"]
             self.locked_locker = data["quests"]["locked_locker"]
             self.locked_changing_room = data["quests"]["locked_changing_room"]
+            self.amper_locked = data["quests"]["amper_locked"]
+            self.amper_key_in_trash = data["quests"]["amper_key_in_trash"]
             self.number_kokosky = data["quests"]["number_kokosky"]
             self.kokosky_in_locker = data["quests"]["kokosky_in_locker"]
             self.kokosky_in_bookshelf = data["quests"]["kokosky_in_bookshelf"]
@@ -344,6 +824,12 @@ class Game:
             self.resistor = data["quests"]["resistor"]
             self.osy = data["quests"]["osy"]
             self.iot = data["quests"]["iot"]
+            self.haram_test = data["quests"]["haram_test"]
+
+            # Bananok
+            self.number_bananok = data["number_bananok"]
+            self.bananky_in_trash = data["bananky_in_trash"]
+            self.bananky_on_ground = data["bananky_on_ground"]
 
             # Grades
             self.grades = data['grades']
@@ -447,6 +933,9 @@ class Game:
                         
                         # Didn't talk to (Ne)Pusti yet
                         else: self.talking("I don't know what to do with this.")
+
+                    case "Pult": self.quest.amper()
+
                 # Reset
                 self.interacted = ["", "", ""]
 
@@ -592,6 +1081,7 @@ class Game:
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BRITISH_WHITE, 90) # Changing room key
             case "img/vtipnicek_small.png": self.info("I can read you.", BRITISH_WHITE, 90); self.open_vtipnicek() # Vtipnicek
             case "img/Iphone_small.png": self.info("Let's check my phone", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
+            case "img/amper key.png": self.info("A suspicious key from buffet Amper", BRITISH_WHITE, 90) # Amper key
             case "img/kokosky1_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky2_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky3_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
@@ -606,6 +1096,8 @@ class Game:
             case "img/kokosky124_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
+            case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.teleporter_map() # Teleport-Map
 
     def show_kokosky(self, img: str):
         """
@@ -743,6 +1235,36 @@ class Game:
             self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
             self.inv["Kokosky"] = "img/kokosky_small.png"
 
+    def teleporter_map(self):
+        """
+        Map that teleports you to selected room on your current floor\n
+        TODO: complete this
+        """
+        
+        mapping = True 
+
+        maps = ["img/gound_floor_map.png", "img/first_floor_map.png", "img/second_floor_map.png", "img/third_floor_map.png", "img/fourth_floor_map.png"]
+
+        bg = maps[self.rooms.index(self.in_room)]
+
+        while mapping:
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: mapping = False
+
+            # Bg
+            self.screen.blit(bg, (0, 0))
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
     def open_vtipnicek(self):
         """
         Player can read funny jokes from vtipnicek (not a quest)\n
@@ -789,6 +1311,8 @@ class Game:
         self.quests = { "key_in_trash": self.key_in_trash,
                         "locked_locker": self.locked_locker, 
                         "locked_changing_room": self.locked_changing_room, 
+                        "amper_locked": self.amper_locked,
+                        "amper_key_in_trash": self.amper_key_in_trash,
                         "number_kokosky": self.number_kokosky,
                         "kokosky_in_locker": self.kokosky_in_locker, 
                         "kokosky_in_bookshelf": self.kokosky_in_bookshelf, 
@@ -809,6 +1333,7 @@ class Game:
                         "resistor": self.resistor,
                         "osy": self.osy,
                         "iot": self.iot,
+                        "haram_test": self.haram_test,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -819,6 +1344,9 @@ class Game:
                                     self.inv,
                                     self.endings,
                                     self.quests,
+                                    self.number_bananok,
+                                    self.bananky_in_trash,
+                                    self.bananky_on_ground,
                                     self.rooms.index(self.in_room),
                                     self.saved_room_data,
                                     self.grades,
@@ -1255,7 +1783,7 @@ class Game:
         """
 
         # In changing room
-        if self.interacted[1] == 13 and self.interacted[2] == 165:
+        if self.interacted[1] == 13 and self.interacted[2] == 165 and self.in_room == self.rooms[GROUND_FLOOR]:
             self.talking("There's paper on the side of the trashcan.")
             self.talking("It says 2.SA. You agree with this statement.")
 
@@ -1269,7 +1797,7 @@ class Game:
             else: self.talking("There is nothing interesting.")
 
         # 201 Trash can
-        elif self.interacted[1] == 24 and self.interacted[2] == 43: 
+        elif self.interacted[1] == 24 and self.interacted[2] == 43 and self.in_room == self.rooms[SECOND_FLOOR]: 
 
             # Phone in trash
             if self.phone_in_trash:
@@ -1283,7 +1811,7 @@ class Game:
             else: self.talking("Just some rubbish.")
 
         # 208 Trash can
-        elif self.interacted[1] == 24 and self.interacted[2] == 78:
+        elif self.interacted[1] == 24 and self.interacted[2] == 78 and self.in_room == self.rooms[SECOND_FLOOR]:
         
             # Kokosky
             if self.kokosky_in_trash:
@@ -1295,6 +1823,33 @@ class Game:
 
             # Empty
             else: self.talking("There's nothing interesting.")
+
+        # Near green chairs
+        elif self.interacted[1] == 39 and self.interacted[2] == 65 and self.in_room == self.rooms[SECOND_FLOOR]:
+
+            # Key
+            if self.amper_key_in_trash:
+                self.talking("Why is there this key?")
+                self.amper_key_in_trash = False
+                self.inv["amper key"] = "img/amper key.png"
+
+            # Empty
+            else: self.talking("Wow, you found nothing.")
+
+        # Bananky
+        else:
+
+            floors = ["ground floor", "first floor", "second floor", "third floor", "fourth floor", "ending hallway", "basement"]
+
+            # Bananky in
+            if self.bananky_in_trash[floors[self.rooms.index(self.in_room)]][str(self.interacted[2]) + str(self.interacted[1])] > 0:
+                if "bananok" in self.inv.keys(): self.number_bananok += self.bananky_in_trash[floors[self.rooms.index(self.in_room)]][str(self.interacted[2]) + str(self.interacted[1])]
+                else: self.inv["bananok"] = "img/bananok.png"; self.number_bananok += self.bananky_in_trash[floors[self.rooms.index(self.in_room)]][str(self.interacted[2]) + str(self.interacted[1])]
+                self.talking(f"{self.player_name} found {self.bananky_in_trash[floors[self.rooms.index(self.in_room)]][str(self.interacted[2]) + str(self.interacted[1])]} of bananoks.")
+                self.bananky_in_trash[floors[self.rooms.index(self.in_room)]][str(self.interacted[2]) + str(self.interacted[1])] = 0
+            
+            # Empty
+            else: self.talking(r.choice(["Wow, you found nothing.", "There's nothing interesting.", "Just some rubbish."]))
             
     def window(self):
         """
@@ -1446,8 +2001,23 @@ class Game:
         
         # Hall -> Buffet Amper
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 176:
-            self.talking("Buffet Amper. I like to buy food here.")
-            self.talking("Sadly it's closed now.")
+
+            # Locked & No key
+            if self.amper_locked and "amper key" not in self.inv.keys():
+                self.talking("Buffet Amper. I like to buy food here.")
+                self.talking("Sadly it's closed now.")
+            
+            # Locked & Key
+            elif self.amper_locked and "amper key" in self.inv.keys():
+                pygame.mixer.Sound.play(self.lock)
+                self.talking(f"{self.player_name} unlocked the door.")
+                self.amper_locked = False
+
+            # Unlocked
+            elif not self.amper_locked: self.door_info("Buffet Amper", "Amper"); self.center_player_after_doors()
+
+        # Buffet Amper -> Hall
+        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 176: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 020
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 166: self.door_info("020 - not a classroom", "020")
@@ -1670,11 +2240,13 @@ class Game:
         """
 
         # Hall -> 203
-        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("203 - III.A", "203"); self.center_player_after_doors()
+        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28: 
+            self.door_info("203 - III.A", "203"); self.center_player_after_doors()
+            if self.haram_test: self.haram_test = self.quest.haram()
 
         # 203 -> Hall 
         elif self.player.facing == "right" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-        
+            
         # 203 -> Cabinet
         elif self.player.facing == "up" and self.interacted[1] == 22 and self.interacted[2] == 9: self.door_info("Cabinet", "Cabinet HAR"); self.center_player_after_doors()
         
@@ -1874,8 +2446,11 @@ class Game:
         # LROB -> LROB (predsien)
         elif self.player.facing == "right" and self.interacted[2] == 54 and self.interacted[1] == 5: self.door_info("402 - LROB hallway", "402 - hallway"); self.center_player_after_doors()
 
-
     def ending_hallway_doors(self):
+        """
+        Doors in the ending hallway
+        """
+
         if self.player.facing == "up" and self.interacted[2] in (5, 6, 7) and self.interacted[1] == 9: 
             self.center_player_after_doors()
             temp_speed = self.talking_speed_number
@@ -1890,11 +2465,14 @@ class Game:
             self.talking("What do you think?")
             
             deciding = True
+
             # Buttons
             yes_button = Button(140, 190, 120, 50, fg=WHITE, bg=BLACK, content="Yes", fontsize=32)
             no_button = Button(360, 190, 120, 50, fg=WHITE, bg=BLACK, content="No", fontsize=32)
             
             while deciding:
+
+                # Position and click of the mouse
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pressed = pygame.mouse.get_pressed()
                 
@@ -1909,7 +2487,8 @@ class Game:
 
                         # Esc
                         if event.key == pygame.K_ESCAPE: print("You ruined the whole thing"); deciding = False
-                
+
+                # Yes
                 if yes_button.is_pressed(mouse_pos, mouse_pressed):
                     self.talking("I did a good job.")
                     self.talking("Thank you for navigating me through this journey.")
@@ -1918,6 +2497,7 @@ class Game:
                     self.talking_speed_number = temp_speed
                     quit()
                 
+                # No
                 elif no_button.is_pressed(mouse_pos, mouse_pressed):
                     self.talking("At least I got the thing I wanted.")
                     self.talking("And that is all there can be to it.")
@@ -1925,14 +2505,13 @@ class Game:
                     self.talking_speed_number = temp_speed
                     quit()
                 
+                # Buttons
                 self.screen.blit(yes_button.image, yes_button.rect)
                 self.screen.blit(no_button.image, no_button.rect)
                 
                 # Updates
                 self.clock.tick(FPS)
                 pygame.display.update()
-
-
 
     def talking_with_teachers(self):
         """
@@ -1980,24 +2559,44 @@ class Game:
             # Gonevalova
             if "DEJ" not in list(self.inv.keys()):
                 if self.interacted[2] == 155 and self.interacted[1] == 37:
-                    if "chalks" not in list(self.inv.keys()): 
+
+                    # No chalks
+                    if "chalks" not in list(self.inv.keys()) and "DEJ" not in list(self.grades.keys()): 
                         self.talking("Can you bring me chalks for the next lesson?", True)
                         self.talking("Thanks in advance", True)
                         self.talking("They should be in the first floor cabinet", True)
                         self.talking("On the right that is...", True)
-                    else:
+
+                    # Yes chalks
+                    elif "chalks" in list(self.inv.keys()):
                         self.talking("Thank you {}".format(self.player_name), True)
                         self.talking("I can give you any grade", True)
                         self.talking("Since I teach history...", True)
                         self.info("You've recieved a grade for history")
                         self.grades["DEJ"] = 1
                         self.inv.pop("chalks")
+
+                    # Chatting
+                    else: self.talking("Do you want to learn more about history?", True)
                         
             # Guydosova
-            if self.interacted[2] == 94 and self.interacted[1] == 24 and "ANJ" not in list(self.grades.keys()):
-                self.talking(f"{self.player_name} I've got the test you didn't attend", True)
-                anj_values = self.quest.anglictina()
-                if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
+            if self.interacted[2] == 94 and self.interacted[1] == 24:
+                
+                # Before test
+                if "ANJ" not in list(self.grades.keys()):
+                    self.talking(f"{self.player_name} I've got the test you didn't attend", True)
+                    anj_values = self.quest.anglictina()
+                    if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
+                    self.draw(); self.update()
+
+                    # Grade talk
+                    if self.grades["ANJ"] in (1, 2): self.talking("You got " + str(self.grades["ANJ"]) + ". I am proud of you.", True)
+                    elif self.grades["ANJ"] == 3: self.talking("You got " + str(self.grades["ANJ"]) + ". Not great, not terrible.", True)
+                    elif self.grades["ANJ"] in (4, 5): self.talking("You got " + str(self.grades["ANJ"]) + ". You need to practice more.", True)
+
+                # Already took the test
+                else: self.talking("Will you come to my kruzok?", True) # pls someone translate this  
+
 
             # Koky
             if self.interacted[2] == 111 and self.interacted[1] == 9:
@@ -2007,8 +2606,9 @@ class Game:
                     self.talking("It's time for your AEN test today.", True, BLUE)
                     self.talking("I Hope you studied resistors yesterday.", True, BLUE)
                     self.grades["AEN"] = self.quest.resistor()
-                    self.draw()
-                    self.update()
+                    self.draw(); self.update()
+
+                    # Grade talk
                     if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True, BLUE)
                     elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True, BLUE)
                     elif self.grades["AEN"] == 5: self.talking("At least try. Sorry, but that's a 5!", True, BLUE)
@@ -2034,7 +2634,7 @@ class Game:
                 elif self.nepusti:
 
                     # Not completed misson
-                    if type(self.connected_router) != list and len(self.grades) > 4:
+                    if type(self.connected_router) != list and len(self.grades) > 3:
                         self.talking("Hello, could you please let me go home earlier?")
                         self.talking("I'm sorry but I don't think I can do that.", True)
                         self.talking("Are you sure? Maybe I can help you somehow.")
@@ -2070,23 +2670,40 @@ class Game:
                             self.grades["SIE"] = 1
                             self.info("You've recieved a grade for SIE")
                 
+                    # Didn't do much
                     else: 
                         self.talking("Sorry, I don't see the results", True)
                         self.talking("From other lessons", True)
                         self.talking("Come back when you're a bit...", True)
                         self.talking("Richer", True)
             
-            elif self.interacted[2] == 77 and self.interacted[1] == 16 and self.sjl_test:
-                self.talking("Oh, you're finally here", True, RED)
-                self.talking("Where have you been?", True, RED)
-                self.talking("I've been standing here waiting", True, RED)
-                self.talking("Nevermind. Finish this so I can move on", True, RED)
-                self.talking("Just fill in the blanks", True, RED)
-                sjl_test = self.quest.slovak_bs()
-                if isinstance(sjl_test, tuple): self.grades["SJL"], self.sjl_test = sjl_test[0], sjl_test[1]
+            # Whygusova
+            elif self.interacted[2] == 77 and self.interacted[1] == 16:
+
+                # Taking test
+                if self.sjl_test:
+                    self.talking("Oh, you're finally here", True, RED)
+                    self.talking("Where have you been?", True, RED)
+                    self.talking("I've been standing here waiting", True, RED)
+                    self.talking("Nevermind. Finish this so I can move on", True, RED)
+                    self.talking("Just fill in the blanks", True, RED)
+                    sjl_test = self.quest.slovak_bs()
+                    if isinstance(sjl_test, tuple): self.grades["SJL"], self.sjl_test = sjl_test[0], sjl_test[1]
+                    self.draw(); self.update()
+
+                    # Grade talk
+                    if self.grades["SJL"] == 1: self.talking("You got 1. That's great.", True, RED)
+                    elif self.grades["SJL"] == 2: self.talking("Nearly perfect. 2 is your grade.", True, RED)
+                    elif self.grades["SJL"] in (3, 4, 5): 
+                        self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
+                        self.talking("None of you ever do." + str(self.grades["SJL"]), True, RED)
+
+                # After test
+                else: self.talking("What do you want? Get lost", True, RED)
                 
             # Martin šeky
             elif self.interacted[2] == 180 and self.interacted[1] == 5:
+
                 # Quest here
                 if self.osy: 
                     self.talking("Oh, hey there", True, YELLOW)
@@ -2094,32 +2711,45 @@ class Game:
                     self.talking("But while you're here", True, YELLOW)
                     self.talking("I think I should.", True, YELLOW)
                     self.grades["OSY"] = self.quest.bash()
-                    self.draw()
-                    self.update()
+                    self.draw(); self.update()
                     self.osy = not self.osy 
+
                     # After grade talk 
                     if self.grades["OSY"] == 1: self.talking("Good linux knowledge, that's a 1 for you.", True, YELLOW)
                     elif self.grades["OSY"] == 3: self.talking("You have a lot to learn, but I'll give you a 3.", True, YELLOW)
                     elif self.grades["OSY"] == 5: self.talking("No second chances here.", True, YELLOW)
+
                 # When quest completed
                 else: self.talking("Hi, leave me alone i need to", True, YELLOW); self.talking("install Linux on this machine", True, YELLOW)
                 
             # Kôňtura
             elif self.interacted[2] == 21 and self.interacted[1] == 3: 
+
+                # Test
                 if self.iot:
-                    self.talking(f"Hello {self.player_name},", True, BLUE)
+                    self.talking(f"Hello student {self.player_name},", True, BLUE)
                     self.talking("you missed the last lesson", True, BLUE)
                     self.talking("I have a test for you", True, BLUE)
                     self.talking("you have to take it or else you'll recieve an a.", True, BLUE)
                     self.grades["IOT"] = self.quest.iotest()
-                    self.draw()
-                    self.update()
+                    self.draw(); self.update()
                     self.iot = not self.iot
+
                     # After grade talk with Kôňtura
                     if self.grades["IOT"] == 1: self.talking("Good work my student, that's a 1 for you.", True, BLUE)
-                    elif self.grades["IOT"] == 3: self.talking("You need to learn more about IoT", True, BLUE); self.talking("but I'll give you a 3", True, BLUE); self.talking("since you missed the last lesson.", True, BLUE)
+                    elif self.grades["IOT"] == 3: self.talking("You need to learn more about IoT my student.", True, BLUE); self.talking("But I'll give you a 3", True, BLUE); self.talking("since you missed the last lesson and are my student.", True, BLUE)
                     elif self.grades["IOT"] == 5: self.talking("Why would you give up, my student.", True, BLUE); self.talking("Oh, he seems very sad.")
+
+                # Vtipnicek gone
+                elif not self.vtipnicek: self.talking("Someone took my vtipnicek. Now I am not funny.", True, BLUE)
+
+                # After test, vtipnicek in safe
                 else: self.talking("Dang, those bad students broke my 3D printer.", True, BLUE)
+
+            # Haramgozo
+            elif self.interacted[2] == 8 and self.interacted[1] == 28: 
+                self.talking("Ohm's law is used to calculate....", True, RED)
+                self.talking("I rather leave him be.")
                 
     def shoes_on(self):
         """

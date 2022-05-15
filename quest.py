@@ -2,7 +2,7 @@ import pygame
 from config import *
 from sprites import Button
 from typing import List
-import math
+import math, random as r
 
 class Quest:
     
@@ -395,6 +395,7 @@ class Quest:
         bg = pygame.image.load("img/anj_bg.png")
         word: int = 0
         
+        # Answers/Questions
         assignment: List[str] = ["mail".upper(), "aardvark".upper(), "genetic".upper(), "desk".upper(), "religion".upper(), "keyboard".upper(), "iteration".upper(), "carbonated".upper(), "switch".upper(), "printer".upper()]
         assignment_answers: List[str] = ["posta", "mravciar", "geneticky", "lavica", "nabozentvo", "klavesnica", "iteracia", "perliva", "prepinac", "tlaciaren"]
         answer: List[str] = []
@@ -478,6 +479,7 @@ class Quest:
         bg = pygame.image.load("img/sjl_bg.png")
         word: int = 0
         
+        # Answers/Questions
         assignment: List[str] = ["Ako __ sa má babička?".upper(), "Čo __ __ večer?".upper(), "__ máš namierené?".upper(), "V diaľke som videl lietať v_ra".upper(), "Kr_štálový".upper(), "prer_vaný".upper(), "__ Botto".upper(), "materinský".upper(), "ˇ%053!4P3%!".upper(), "1#!@%^d6n".upper()]
         assignment_answers: List[str] = ["sa", "budeš robiť", "kam", "ý", "y", "ý", "Ján", "jazyk", "/(§)\\", "LK:{DA"]
         answer: List[str] = []
@@ -554,13 +556,14 @@ class Quest:
     
     def maths(self):
         """
-        SJL quest
+        MAT quest
         """
 
         testing: bool = True
         bg = pygame.image.load("img/maths_bg.png")
         word: int = 0
         
+        # Answers/Questions
         assignment: List[str] = ["10x - 1 = 15 - 6x".upper(), "9x - 8 = 11x - 10".upper(), "7 + x/3 = 8 + x/4".upper(), "x/2 + x/3 = 5".upper(), "x - 2/3 = 5x/7 + 1/2".upper(), "2x - x/2 + 4 = x + x/3".upper(), "5x - 9 - 4/15 = (2x - 1)/3".upper(), "-1 - (3x - x)/4 = (2x - 5)/6".upper(), "(-17/19)x + 51 = 0".upper(), "|x - 7| = 0".upper()]
         assignment_answers: List[str] = ["1", "1", "12", "6", "49/12", "-24", "3/5", "-1/5", "57", "7"]
         # print(assignment_answers) # for maths quest debugging
@@ -1049,15 +1052,17 @@ class Quest:
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
         done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
 
+        # Anwer button
         a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
         b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
         c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
         d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+
         # Counters for pressed buttons
-        a = 0
-        b = 0
-        c = 0
-        d = 0
+        a = False
+        b = False
+        c = False
+        d = False
 
         while ioting:
 
@@ -1068,44 +1073,64 @@ class Quest:
             # Buttons pressed
             if back_button.is_pressed(mouse_pos, mouse_pressed): ioting = False; return 5
             if done_button.is_pressed(mouse_pos, mouse_pressed): ioting = False; return grade
+
             # CSS for active buttons (extremely scuffed)
+
+            # Anwer A
             if a_button.is_pressed(mouse_pos, mouse_pressed): 
-                a += 1
-                if a % 10 == 0: a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
+                if a: a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20); a = False; pygame.time.delay(200)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=WHITE, bg=GREEN, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
                     c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
                     d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                    a = True
+
+                    # Grade
                     grade = 1
+                    pygame.time.delay(200)
+
+            # Answer B
             if b_button.is_pressed(mouse_pos, mouse_pressed): 
-                b += 1
-                if b % 10 == 0: b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
+                if b: b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20); b = False; pygame.time.delay(200)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=WHITE, bg=GREEN, content="b)", fontsize=20)  
                     c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
-                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)                 
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)    
+                    b = True
+
+                    # Grade             
                     grade = 3
+                    pygame.time.delay(200)
+
+            # Answer C
             if c_button.is_pressed(mouse_pos, mouse_pressed): 
-                c += 1
-                if c % 10 == 0: c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
+                if c: c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20); c = False; pygame.time.delay(200)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
                     c_button = Button(101, 238, 25, 27, fg=WHITE, bg=GREEN, content="c)", fontsize=20)
-                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20) 
+                    d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                    c = True
+
+                    # Grade
                     grade = 3
+                    pygame.time.delay(200)
+
+            # Answer D
             if d_button.is_pressed(mouse_pos, mouse_pressed): 
-                d += 1
-                if d % 10 == 0: d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
+                if d: d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20); d = False; pygame.time.delay(200)
                 else:
                     a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
                     b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
                     c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
                     d_button = Button(101, 286, 25, 27, fg=WHITE, bg=GREEN, content="d)", fontsize=20)
-                    
+                    d = True
+
+                    # Grade
                     grade = 3
+                    pygame.time.delay(200)
             
 
             # Events
@@ -1139,5 +1164,175 @@ class Quest:
             self.game.clock.tick(FPS)
             pygame.display.update()
 
-        
+    def haram(self):
+        """
+        Haramgozo likes to bully his students\n
+        Sometimes the answer is weird (2.7800000000000002 i.e) Idk why. pls fix :pray:
+        """
+
+        pygame.mixer.Sound.play(self.game.wrong_house)
+
+        # Talk before
+        self.game.talking("You picked the wrong classroom fool!", True, RED)
+        pygame.time.delay(400)
+        self.game.talking("I am gonna test your knowledge on resistors.", True, RED)
+        self.game.talking("Don't forget the unit.", True, RED)
+
+        haraming = True
+        test = 0
+        points = 0
+
+        colors_values = [(NEARLY_BLACK, 0), (BROWN, 1), (RED, 2), (ORANGE, 3), (YELLOW, 4), (GREEN, 5), (BLUE, 6), (VIOLET, 7), (GRAY, 8), (WHITE, 9)]
+        colors_multi = [(PINK, -3), (SILVER, -2), (GOLD, -1), (NEARLY_BLACK, 0), (BROWN, 1), (RED, 2), (ORANGE, 3), (YELLOW, 4), (GREEN, 5), (BLUE, 6), (VIOLET, 7), (GRAY, 8), (WHITE, 9)]
+
+        # Background
+        bg = pygame.image.load("img/resistor_test.png")
+
+        # Answer rect
+        answer_rect = pygame.Rect(150, 100, 314, 72)
+
+        # Clickable
+        ohm = pygame.Rect(350, 100, 115, 72)
+        number = pygame.Rect(150, 100, 200, 72)
+
+        while test < 10:
+
+            # Choosing values
+            first = (NEARLY_BLACK, 0)
+            while first == (NEARLY_BLACK, 0):
+                first = r.choice(colors_values)
+            second = r.choice(colors_values)
+            third = r.choice(colors_values)
+            fourth = r.choice(colors_multi)
+
+            # Rectangles
+            first_rect = pygame.Rect(175, 293, 32, 72)
+            second_rect = pygame.Rect(220, 293, 32, 72)
+            third_rect = pygame.Rect(265, 293, 32, 72)
+            fourth_rect = pygame.Rect(310, 293, 32, 72)
+
+            correct_answer = str(float(str(first[1]) + str(second[1]) + str(third[1])) * (10 ** fourth[1]))
+            player_answer = ""
+            units = ["mOHM", "OHM", "kOHM", "MOHM", "GOHM"]
+            unit = 1
+
+            while haraming:
             
+                # Events
+                for event in pygame.event.get():
+                    
+                    # Close button
+                    if event.type == pygame.QUIT: self.game.saved_room_data = "Hall"; self.game.exiting()
+
+                    # Keyboard
+                    if event.type == pygame.KEYDOWN:
+
+                        # Arrow up
+                        if event.key == pygame.K_UP: 
+                            if unit < len(units) - 1: unit += 1
+
+                        elif event.key == pygame.K_DOWN:
+                            if unit != 0: unit -= 1
+
+                        # Enter
+                        elif event.key == pygame.K_RETURN and player_answer != "": 
+                            test += 1
+                            match unit:
+                                case 0: 
+                                    if str(float(player_answer) / 1000) == correct_answer: points += 1
+                                case 1:
+                                    if str(float(player_answer)) == correct_answer: points += 1
+                                case 2: 
+                                    if str(float(player_answer) * 1000) == correct_answer: points += 1
+                                case 3: 
+                                    if str(float(player_answer) * 1000000) == correct_answer: points += 1
+                                case 4: 
+                                    if str(float(player_answer) * 1000000000) == correct_answer: points += 1
+                            haraming = False
+                            print(correct_answer)
+
+                        # Check for backspace
+                        elif event.key == pygame.K_BACKSPACE: player_answer = player_answer[:-1]
+
+                        # Unicode
+                        else: player_answer += event.unicode
+
+
+                # Background
+                self.game.screen.blit(bg, (0, 0))
+
+                # Rectangles
+                pygame.draw.rect(self.game.screen, first[0], first_rect)
+                pygame.draw.rect(self.game.screen, second[0], second_rect)
+                pygame.draw.rect(self.game.screen, third[0], third_rect)
+                pygame.draw.rect(self.game.screen, fourth[0], fourth_rect)
+
+                # Clickable
+                pygame.draw.rect(self.game.screen, WHITE, number, 1)
+                pygame.draw.rect(self.game.screen, WHITE, ohm, 1)
+
+                # Text
+                text_surface_answer = self.game.big_font.render(player_answer, True, BLACK)
+                pygame.draw.rect(self.game.screen, WHITE, answer_rect)
+                self.game.screen.blit(self.game.big_font.render(units[unit], True, BLACK), (answer_rect.x+210, answer_rect.y+5))
+                self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
+
+
+                # Updates
+                self.game.clock.tick(FPS)
+                pygame.display.update()
+
+            haraming = True
+            
+        # After test talk
+        self.game.draw(); self.game.update()
+
+        # Everything correct
+        if points == 10: self.game.talking("I-Impossible. You got everything correct.", True, RED)
+
+        # Atleast something correct
+        elif 5 <= points < 10: self.game.talking("You knew at least something. Great", True, RED)
+
+        # Nearly nothing
+        elif points <= 5: self.game.talking("What did I expect? Students actually knowing something?", True, RED)
+
+        # Bananky
+        self.game.talking("Here, take these bananky as reward for taking the test.", True, RED) if points > 0 else self.game.talking("I am not giving you any bananky for this.", True, RED)
+        if "bananok" in self.game.inv.keys(): self.game.number_bananok += points * 5
+        else: self.game.inv["bananok"] = "img/bananok.png"; self.game.number_bananok += points * 5
+
+        # Return
+        return False
+
+    def amper(self):
+        """
+        Shopping in Amper
+        """
+
+        shopping = True
+
+        # Background
+        bg = pygame.image.load("img/amper_background.png")
+
+        while shopping:
+
+                # Events
+                for event in pygame.event.get():
+
+                    # Close button
+                    if event.type == pygame.QUIT: self.game.exiting()
+                        
+                    # Keyboard
+                    if event.type == pygame.KEYDOWN:
+        
+                        # Esc
+                        if event.key == pygame.K_ESCAPE: shopping = False
+
+                # Background
+                self.game.screen.blit(bg, (0, 0))
+
+                # Updates
+                self.game.clock.tick(FPS)
+                pygame.display.update()
+
+        print("Amper moment")

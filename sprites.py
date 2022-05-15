@@ -453,6 +453,7 @@ class Npc(pygame.sprite.Sprite):
     def move_towards_player(self):
         dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
                                       self.game.player.rect.y - self.rect.y)
+                                      
         # if player is in the hall and has more than 6 quests done then VUJ is goona go after him
         if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and len(self.game.grades) > 4:
             dirvect.normalize(); dirvect.scale_to_length(VUJ_SPEED)
@@ -461,6 +462,7 @@ class Npc(pygame.sprite.Sprite):
             elif round(dirvect[0]) > 0: self.facing = "right"
             elif round(dirvect[0]) < 0: self.facing = "left"
             self.rect.move_ip(dirvect)
+
         # Or he's just gonna behave like any other npc
         else: 
             if self.facing == "left":
@@ -584,7 +586,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -674,7 +676,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "ô": self.image = self.game.terrain_spritesheet.get_sprite(342, 36, self.width, self.height)
         elif type == "Ž": self.image = self.game.terrain_spritesheet.get_sprite(342, 70, self.width, self.height)
         elif type == "ˇ": self.image = self.game.terrain_spritesheet.get_sprite(342, 104, self.width, self.height)
-        
+        elif type == "A": self.image = self.game.terrain_spritesheet.get_sprite(342, 2, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -739,6 +741,54 @@ class Ground(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+class Banana(pygame.sprite.Sprite):
+    """
+    Class for Bananky
+    """
+
+    def __init__(self, game, x: int, y: int):
+        """
+        Initialization
+        """
+
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.bananky
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
+
+        self.image = pygame.image.load("img/bananok_small.png")
+        
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.floors = ["ground floor", "first floor", "second floor", "third floor", "fourth floor", "ending hallway", "basement"]
+
+    def update(self):
+        """
+        Update for bananok
+        """
+
+        self.collect_bananok()
+
+    def collect_bananok(self):
+        """
+        When player takes bananok
+        """
+
+        hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
+
+        if hits:
+            self.kill() 
+            if "bananok" in self.game.inv.keys(): self.game.number_bananok += 1
+            else: self.game.inv["bananok"] = "img/bananok.png"; self.game.number_bananok += 1
+            self.game.bananky_on_ground[self.floors[self.game.rooms.index(self.game.in_room)]][str(int(self.x / TILE_SIZE)) + str(int(self.y / TILE_SIZE))] = False
+
 class Interact(pygame.sprite.Sprite):
     """
     Class for intracting
@@ -786,13 +836,13 @@ class Interact(pygame.sprite.Sprite):
                 for j, _ in enumerate(row):
 
                     # Trashcan
-                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]; print(i, j)
+                    if self.interactive[hits[0]] == "t" + str(i) + str(j): self.game.interacted = ["Trashcan", i ,j]
 
                     # Toilet
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
+                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]
 
                     # Locker
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
@@ -830,16 +880,14 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "E" + str(i) + str(j): self.game.interacted = ["Router", i, j]
                     
                     # Taburetky
-                    elif self.interactive[hits[0]] == "ý" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "ž" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "ú" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "ň" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "č" + str(i) + str(j): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("ý" + str(i) + str(j), "ž" + str(i) + str(j), "ú" + str(i) + str(j), "ň" + str(i) + str(j), "č" + str(i) + str(j)): self.game.interacted = ["Taburetka", hits[0].rect.left, hits[0].rect.top]
                     
                     # Green chairs
-                    elif self.interactive[hits[0]] == "@" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "#" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
-                    elif self.interactive[hits[0]] == "*" + str(i) + str(j): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("@" + str(i) + str(j), "*" + str(i) + str(j), "#" + str(i) + str(j)): self.game.interacted = ["Green_chair", hits[0].rect.left, hits[0].rect.top]
+
+                    # Pult
+                    elif self.interactive[hits[0]] == "A" + str(i) + str(j): self.game.interacted = ["Pult", i, j]
+
 class Button:
     """
     Class for button
