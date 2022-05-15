@@ -553,6 +553,122 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+            
+    def obn_testo(self):
+        """
+        High effort quest, obn skusanie
+        """
+        
+        obning: bool = True
+        
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
+
+        
+        # active
+        active_text: bool = True
+
+        # To fill
+        fill_ans = pygame.Rect(100, 100, 100, 30)
+        
+        # text
+        text_ans = ""
+        
+        # Question counter
+        q = 1
+        
+        # Points
+        p = 0
+        
+        # Answers
+        answer: List[str] = ["ambutsman", "27", "zuzana caputova", "slovenska republika", "prvej"]
+        
+        # Guess
+        guess: List[str] = []
+        
+        # Questions
+        question: List[str] = ["Advokat po svedsky?", "Kolko je statov v EU?", "Kto je prezident SR?", "Co znamena skratka SR?", "Pravo na zivot parti medzi prava ktorej generacie?"]
+        
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        grade_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Grade", fontsize=32)
+        
+        question_text = self.game.font.render("To divne svedske slovo?", True, RED)
+        
+
+        while obning:
+            
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Click
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                    if fill_ans.collidepoint(event.pos): active_text = True
+                    else: active_text = False
+                    
+                # Keyboard
+                if event.type == pygame.KEYDOWN:
+    
+                    # Esc
+                    if event.key == pygame.K_ESCAPE: obning = False
+                    
+                    # Enter
+                    if event.key == pygame.K_RETURN: q += 1; guess.append(text_ans); text_ans = ""
+
+                    # Check for backspace
+                    elif event.key == pygame.K_BACKSPACE: 
+                        if active_text: text_ans = text_ans[:-1]
+
+                    elif active_text: text_ans += event.unicode
+
+            # Back button
+            if back_button.is_pressed(mouse_pos, mouse_pressed): obning = False
+
+            # Grade button
+            elif grade_button.is_pressed(mouse_pos, mouse_pressed): 
+                obning = False
+                for i in range(len(guess)):
+                    if guess[i].lower() == answer[i]: p += 1
+                if p == 5: return 1
+                elif p == 4: return 2
+                elif p == 3: return 3
+                elif p == 2: return 4
+                else: return 5
+                
+            if q == 1: first = True ; one = self.game.font.render("To divne svedske slovo?", True, RED)
+            elif q == 2: second = True; two = self.game.font.render("Kolko je statov v EU?", True, RED)
+            elif q == 3: three = self.game.font.render("yes", True, RED)
+            elif q == 4: fourth = True; four = self.game.font.render("Ben?", True, RED)
+            else: fifth = True; five = self.game.font.render("no", True, RED)
+            if first: self.game.screen.blit(one, (10, 10))
+            elif second: self.game.screen.blit(two, (10, 10)); first = False
+            elif third: self.game.screen.blit(three, (10, 10)); second = False
+            elif fourth: self.game.screen.blit(four, (10, 10)); third = False
+            else: self.game.screen.blit(five, (10, 10)); fourth = False
+
+            # Button
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(grade_button.image, grade_button.rect)
+
+            # Bash
+            pygame.draw.rect(self.game.screen, BLACK, fill_ans) if active_text else None
+            text_surface_def = self.game.lrob_font.render(text_ans, True, (255, 255, 255))
+            self.game.screen.blit(text_surface_def, (fill_ans.x+1, fill_ans.y-1))
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+        
     
     def maths(self):
         """

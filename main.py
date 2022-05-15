@@ -175,6 +175,8 @@ class Game:
         self.anj_test: bool = True
         self.mat_test: bool = True
         self.sjl_test: bool = True
+        self.obn_test: bool = True
+        self.referat: bool = True
         self.gul_quest: bool = True
         self.nepusti: bool = True
         self.five_min_sooner: bool = True
@@ -816,6 +818,8 @@ class Game:
             self.phone_in_trash = data["quests"]["phone"]
             self.anj_test = data["quests"]["anj_test"]
             self.sjl_test = data["quests"]["sjl_test"]
+            self.obn_test = data["quests"]["obn_test"]
+            self.referat = data["quests"]["referat"]
             self.gul_quest = data["quests"]['GUL_quest']
             self.__gul_counter = data["quests"]["gul_counter"]
             self.nepusti = data["quests"]["nepusti"]
@@ -1098,6 +1102,7 @@ class Game:
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
             case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.teleporter_map() # Teleport-Map
+            case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
 
     def show_kokosky(self, img: str):
         """
@@ -1325,6 +1330,8 @@ class Game:
                         "suplovanie": self.suplovanie,
                         "anj_test": self.anj_test,
                         "sjl_test": self.sjl_test,
+                        "obn_test": self.obn_test,
+                        "referat": self.referat,
                         "GUL_quest": self.gul_quest,
                         "gul_counter": self.__gul_counter,
                         "nepusti": self.nepusti,
@@ -1835,6 +1842,13 @@ class Game:
 
             # Empty
             else: self.talking("Wow, you found nothing.")
+        # Referat in 2.SA
+        elif self.interacted[1] == 13 and self.interacted[2] == 163 and self.in_room == self.rooms[GROUND_FLOOR]:
+                self.talking("OMG!")
+                self.talking("Why would someone throw this in the trash")
+                self.talking("It's someone's OBN referat")
+                self.inv["referat"] = "img/referat.png"
+                self.referat = False
 
         # Bananky
         else:
@@ -2697,6 +2711,37 @@ class Game:
                     elif self.grades["SJL"] in (3, 4, 5): 
                         self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
                         self.talking("None of you ever do." + str(self.grades["SJL"]), True, RED)
+                        
+                # OBN test 
+                elif self.obn_test:
+                    self.talking("Well while you're still here", True, RED)
+                    self.talking("You need a mark for OBN too", True, RED)
+                    
+                    # Easy cop out if you found a referat
+                    if not self.referat:
+                        self.talking("Is that a referat in your hand?", True, RED)
+                        self.talking("What is it about?", True, RED)
+                        self.talking("Uhh")
+                        self.talking("Oh, it's about the OSN!")
+                        self.talking("And I made it myself!")
+                        self.talking("Well, that makes my job easier", True, RED)
+                        self.talking("I'll just take it", True, RED)
+                        self.talking("And give you a mark.", True, RED)
+                        self.inv.pop["referat"]
+                        self.obn = False
+                        
+                    # Other way if you don't have a referat
+                    else: 
+                        self.talking("I don't see that you made a referat.", True, RED)
+                        self.talking("So I'll make sure to test you some other way.", True, RED)
+                        self.grades["OBN"] = self.quest.obn_testo()
+                        self.obn = False
+                        if self.grades["OBN"] == 1: self.talking("I'll give you a 1. You did great.", True, RED)
+                        elif self.grades["OBN"] == 2: self.talking("I'll give you a 2. That's not bad.", True, RED)
+                        elif self.grades["OBN"] == 3: self.talking("I'll give you a 3. That's not the worst.", True, RED)
+                        elif self.grades["OBN"] == 4: self.talking("I'll give you a 4. That's not bad.", True, RED)
+                        else: self.talking("Just go away! 5!", True, RED)
+                        
 
                 # After test
                 else: self.talking("What do you want? Get lost", True, RED)
