@@ -480,7 +480,7 @@ class Quest:
         word: int = 0
         
         # Answers/Questions
-        assignment: List[str] = ["Ako __ sa má babička?".upper(), "Čo __ __ večer?".upper(), "__ máš namierené?".upper(), "V diaľke som videl lietať v_ra".upper(), "Kr_štálový".upper(), "prer_vaný".upper(), "__ Botto".upper(), "materinský".upper(), "ˇ%053!4P3%!".upper(), "1#!@%^d6n".upper()]
+        assignment: List[str] = ["Ako __ má babička?".upper(), "Čo __ __ večer?".upper(), "__ máš namierené?".upper(), "V diaľke som videl lietať v_ra".upper(), "Kr_štálový".upper(), "prer_vaný".upper(), "__ Botto".upper(), "materinský".upper(), "ˇ%053!4P3%!".upper(), "1#!@%^d6n".upper()]
         assignment_answers: List[str] = ["sa", "budeš robiť", "kam", "ý", "y", "ý", "Ján", "jazyk", "/(§)\\", "LK:{DA"]
         answer: List[str] = []
         answer_rect = pygame.Rect(155, 215, 302, 67)

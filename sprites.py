@@ -327,7 +327,7 @@ class Npc(pygame.sprite.Sprite):
 
         colors = [0, 99, 198, 297, 396, 495, 594, 693, 792]
         if self.type == "C": self.color = colors[-1]
-        else: self.color = r.choice(colors) 
+        else: self.color = r.choice(colors[:-1]) 
 
         self.image = self.game.npcs_spritesheet.get_sprite(self.color, 2, self.width, self.height)
 

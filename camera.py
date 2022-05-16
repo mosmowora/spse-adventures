@@ -164,11 +164,19 @@ class Camera:
             # Lit 2
             case "122/2": 
                 for sprite in self.game.all_sprites:
-                    sprite.rect.y += 5 * TILE_SIZE
+                    sprite.rect.y += 1 * TILE_SIZE
                     sprite.rect.x -= 167 * TILE_SIZE
                 self.game.player.rect.y -= 16 * TILE_SIZE
                 self.game.player.rect.x -= 3 * TILE_SIZE
             
+            # Toilets 1
+            case "Toilets_1":
+                for sprite in self.game.all_sprites:
+                    sprite.rect.y -= 6 * TILE_SIZE
+                    sprite.rect.x -= 157 * TILE_SIZE
+                self.game.player.rect.y -= 11 * TILE_SIZE
+                self.game.player.rect.x -= 15 * TILE_SIZE
+
             # OUC
             case "117": 
                 for sprite in self.game.all_sprites:
@@ -190,6 +198,14 @@ class Camera:
                     sprite.rect.y -= 16 * TILE_SIZE
                 self.game.player.rect.x -= 87 * TILE_SIZE
 
+            # LIA
+            case "114": 
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x -= 89 * TILE_SIZE
+                    sprite.rect.y -= 14 * TILE_SIZE
+                self.game.player.rect.x -= 82 * TILE_SIZE
+                self.game.player.rect.y -= 2 * TILE_SIZE
+
             # LELM 1
             case "112": 
                 for sprite in self.game.all_sprites:
@@ -204,7 +220,15 @@ class Camera:
                     sprite.rect.y -= 24 * TILE_SIZE
                 self.game.player.rect.x -= 20 * TILE_SIZE
                 self.game.player.rect.y += 8 * TILE_SIZE
-
+                
+            # Cabinet MohyLa     
+            case "123":
+                for sprite in self.game.all_sprites:
+                    sprite.rect.y -= 11 * TILE_SIZE
+                    sprite.rect.x -= 166 * TILE_SIZE
+                self.game.player.rect.y -= 5 * TILE_SIZE
+                self.game.player.rect.x -= 6 * TILE_SIZE
+ 
             # LSIE 2
             case "126": 
                 for sprite in self.game.all_sprites:
@@ -277,12 +301,20 @@ class Camera:
                 self.game.player.rect.x -= 139 * TILE_SIZE
 
             # Left toilets
-            case "Toilets_1":
+            case "Toilets_21":
                 for sprite in self.game.all_sprites:
                     sprite.rect.x -= 31 * TILE_SIZE
                     sprite.rect.y -= 25 * TILE_SIZE
                 self.game.player.rect.x -= 140 * TILE_SIZE
                 self.game.player.rect.y += 8 * TILE_SIZE
+
+            # Right toilets
+            case "Toilets_22":
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x -= 155 * TILE_SIZE
+                    sprite.rect.y -= 9 * TILE_SIZE
+                self.game.player.rect.x -= 15 * TILE_SIZE
+                self.game.player.rect.y -= 8 * TILE_SIZE
 
             # I.A
             case "208":
@@ -298,21 +330,36 @@ class Camera:
                     sprite.rect.y -= 17 * TILE_SIZE
                 self.game.player.rect.x -= 87 * TILE_SIZE
 
+            # I.SB
+            case "218":
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x -= 149 * TILE_SIZE
+                    sprite.rect.y -= 25 * TILE_SIZE
+                self.game.player.rect.x -= 22 * TILE_SIZE
+                self.game.player.rect.y += 8 * TILE_SIZE
+
             # I.SA
             case "219":
                 for sprite in self.game.all_sprites:
-                    sprite.rect.x -= 108 * TILE_SIZE
+                    sprite.rect.x -= 130 * TILE_SIZE
                     sprite.rect.y -= 25 * TILE_SIZE
-                self.game.player.rect.x -= 63 * TILE_SIZE
+                self.game.player.rect.x -= 41 * TILE_SIZE
                 self.game.player.rect.y += 8 * TILE_SIZE
 
             # III.SB
             case "210":
                 for sprite in self.game.all_sprites:
+                    sprite.rect.x -= 149 * TILE_SIZE
+                    sprite.rect.y -= 17 * TILE_SIZE
+                self.game.player.rect.x -= 12 * TILE_SIZE
+                
+            # IV.A
+            case "212":
+                for sprite in self.game.all_sprites:
                     sprite.rect.x -= 119 * TILE_SIZE
                     sprite.rect.y -= 17 * TILE_SIZE
                 self.game.player.rect.x -= 52 * TILE_SIZE
-
+                
             # OUF
             case "216":
                 for sprite in self.game.all_sprites:

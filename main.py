@@ -920,28 +920,31 @@ class Game:
                     case "Window": self.window()
                     case "Taburetka": self.taburetka()
                     case "Green_chair": self.green_chair()
-                    case "Router": 
-
-                        # Doing the (Ne)Pusti mission
-                        if type(self.connected_router) == list:
-                            router_outcome = "I rather leave it be."
-
-                            # Already connected
-                            if self.saved_room_data in self.connected_router: self.info("I already connected this.")
-                            else: router_outcome = self.quest.router()
-
-                            # After connecting
-                            if router_outcome != "I rather leave it be.": 
-                                self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
-                                self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
-                        
-                        # Didn't talk to (Ne)Pusti yet
-                        else: self.talking("I don't know what to do with this.")
-
+                    case "Router": self.routering()
                     case "Pult": self.quest.amper()
 
                 # Reset
                 self.interacted = ["", "", ""]
+
+    def routering(self):
+        """
+        Checks if you know routering
+        """
+        
+        if type(self.connected_router) == list:
+            router_outcome = "I rather leave it be."
+
+                            # Already connected
+            if self.saved_room_data in self.connected_router: self.info("I already connected this.")
+            else: router_outcome = self.quest.router()
+
+                            # After connecting
+            if router_outcome != "I rather leave it be.": 
+                self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
+                self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+                        
+                        # Didn't talk to (Ne)Pusti yet
+        else: self.talking("I don't know what to do with this.")
 
     def update(self):
         """
@@ -982,6 +985,7 @@ class Game:
                     elif event.key == pygame.K_s: self.settings()
 
             if exit_pause: break
+
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
@@ -1068,7 +1072,7 @@ class Game:
                 # Items in inv
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for i in inventory_coords:
-                        if inventory_coords[i].collidepoint(event.pos): self.inventory_item_info(i); break
+                        if inventory_coords[i].collidepoint(event.pos): open_inventory = self.inventory_item_info(i); break
 
             # Updates
             self.clock.tick(FPS)
@@ -1101,8 +1105,10 @@ class Game:
             case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
-            case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.teleporter_map() # Teleport-Map
+            case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.draw(); self.update(); return self.teleporter_map() # Teleport-Map
             case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
+
+        return True
 
     def show_kokosky(self, img: str):
         """
@@ -1248,9 +1254,79 @@ class Game:
         
         mapping = True 
 
-        maps = ["img/gound_floor_map.png", "img/first_floor_map.png", "img/second_floor_map.png", "img/third_floor_map.png", "img/fourth_floor_map.png"]
-
-        bg = maps[self.rooms.index(self.in_room)]
+        maps = ["img/ground_floor_map.png", "img/first_floor_map.png", "img/second_floor_map.png", "img/third_floor_map.png", "img/fourth_floor_map.png"]
+        
+        rooms_to_rooms: dict[str, dict[str, pygame.Rect]] = {
+            "ground_floor": {
+                "002": pygame.Rect(168, 253, 48, 102),
+                "003": pygame.Rect(119, 253, 49, 102),
+                "004": pygame.Rect(61, 253, 58, 102),
+                "006": pygame.Rect(3, 250, 58, 105),
+                "007": pygame.Rect(4, 357, 58, 108),
+                "008": pygame.Rect(62, 404, 56, 60),
+                "010": pygame.Rect(160, 404, 40, 62),
+                "012": pygame.Rect(243, 252, 65, 104),
+                "013": pygame.Rect(308, 252, 65, 104),
+                "014": pygame.Rect(373, 252, 45, 103),
+                "015": pygame.Rect(418, 252, 65, 102),
+                "016": pygame.Rect(483, 252, 65, 102),
+                "017": pygame.Rect(548, 252, 21, 103),
+                "019": pygame.Rect(569, 402, 65, 63),
+                "023": pygame.Rect(438, 402, 65, 64),
+                "025": pygame.Rect(329, 402, 44, 64)
+            },
+            
+            "first_floor": {
+                "112": pygame.Rect(248, 333, 60, 61),
+                "113": pygame.Rect(306, 333, 67, 60),
+                "114": pygame.Rect(371, 333, 48, 59),
+                "115": pygame.Rect(417, 333, 67, 59),
+                "117": pygame.Rect(499, 333, 58, 59),
+                "Toilets_1": pygame.Rect(556, 333, 15, 59),
+                "122/2": pygame.Rect(588, 220, 48, 61),
+                "122/1": pygame.Rect(588, 281, 48, 57),
+                "123": pygame.Rect(588, 338, 46, 32),
+                "124": pygame.Rect(536, 414, 83, 63),
+                "126": pygame.Rect(473, 414, 46, 63),
+                "127": pygame.Rect(414, 414, 57, 63),
+                "130": pygame.Rect(305, 414, 69, 37)
+            },
+            
+            "second_floor": {
+                "202": pygame.Rect(74, 328, 63, 60),
+                "201": pygame.Rect(140, 330, 68, 58),
+                "204": pygame.Rect(8, 329, 64, 28),
+                "208": pygame.Rect(237, 327, 64, 62),
+                "209": pygame.Rect(304, 330, 58, 56),
+                "210": pygame.Rect(412, 330, 60, 55),
+                "212": pygame.Rect(496, 330, 60, 57),
+                "216": pygame.Rect(572, 243, 60, 89),
+                "217": pygame.Rect(589, 333, 41, 33),
+                "218": pygame.Rect(543, 410, 72, 60),
+                "219": pygame.Rect(480, 410, 61, 61),
+                "220": pygame.Rect(412, 410, 64, 59),
+                "Toilets_21": pygame.Rect(169, 411, 24, 35),
+                "Toilets_22": pygame.Rect(558, 327, 12, 19),
+                "205": pygame.Rect(73, 410, 75, 38),
+                "203": pygame.Rect(8, 359, 65, 91),
+            },
+            
+            "third_floor": {
+                "304": pygame.Rect(28, 274, 416, 189),
+                "302": pygame.Rect(132, 237, 313, 30),
+                "Gym - chr": pygame.Rect(447, 236, 46, 55),
+                "305": pygame.Rect(448, 354, 112, 112),
+                "Showers": pygame.Rect(565, 353, 49, 116)
+            },
+            
+            "fourth_floor": {
+                "402": pygame.Rect(123, 262, 323, 35),
+                "403": pygame.Rect(446, 368, 171, 108)
+            }
+        }
+        
+        on_level = self.rooms.index(self.in_room)
+        bg = pygame.image.load(maps[on_level])
 
         while mapping:
 
@@ -1263,9 +1339,81 @@ class Game:
                 # Esc
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: mapping = False
 
+                # Mouse
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    
+                    for room in rooms_to_rooms[maps[on_level][4:-8]]:
+                        if rooms_to_rooms[maps[on_level][4:-8]][room].collidepoint(event.pos): 
+                            match room:
+                                case "002": self.saved_room_data = "002"
+                                case "003": self.saved_room_data = "003"
+                                case "004": self.saved_room_data = "004"
+                                case "006": self.saved_room_data = "006"
+                                case "007": self.saved_room_data = "007"
+                                case "008": self.saved_room_data = "008"
+                                case "010": self.saved_room_data = "010"
+                                case "012": self.saved_room_data = "012"
+                                case "013": self.saved_room_data = "013"
+                                case "014": self.saved_room_data = "014"
+                                case "015": self.saved_room_data = "015"
+                                case "016": self.saved_room_data = "016"
+                                case "017": self.saved_room_data = "017"
+                                case "019": self.saved_room_data = "Amper"
+                                case "023": self.saved_room_data = "023"
+                                case "025": self.saved_room_data = "025"
+                                case "112": self.saved_room_data = "112"
+                                case "113": self.saved_room_data = "113"
+                                case "114": self.saved_room_data = "114"
+                                case "115": self.saved_room_data = "115"
+                                case "117": self.saved_room_data = "117"
+                                case "Toilets_1": self.saved_room_data = "Toilets_1"
+                                case "122/2":self.saved_room_data = "122/2"
+                                case "122/1":self.saved_room_data = "122/1"
+                                case "123": self.saved_room_data = "123"
+                                case "124": self.saved_room_data = "124"
+                                case "126": self.saved_room_data = "126"
+                                case "127": self.saved_room_data = "127"
+                                case "130": self.saved_room_data = "130"
+                                case "202": self.saved_room_data = "202"
+                                case "201": self.saved_room_data = "201"
+                                case "204": self.saved_room_data = "Cabinet HAR"
+                                case "208": self.saved_room_data = "208"
+                                case "209": self.saved_room_data = "209"
+                                case "210": self.saved_room_data = "210"
+                                case "212": self.saved_room_data = "212"
+                                case "216": self.saved_room_data = "216"
+                                case "217": self.saved_room_data = "217"
+                                case "218": self.saved_room_data = "218"
+                                case "219": self.saved_room_data = "219"
+                                case "220": self.saved_room_data = "220"
+                                case "Toilets_21": self.saved_room_data = "Toilets_21"
+                                case "Toilets_22": self.saved_room_data = "Toilets_22"
+                                case "205": self.saved_room_data = "205"
+                                case "203": self.saved_room_data = "203"
+                                case "204": self.saved_room_data = "204"
+                                case "304": self.saved_room_data = "304" 
+                                case "302": self.saved_room_data = "302" 
+                                case "Gym - chr": self.saved_room_data = "Gym - chr"
+                                case "305": self.saved_room_data = "Gymnasium - chr"
+                                case "Showers": self.saved_room_data = "Showers"
+                                case "402": self.saved_room_data = "402" 
+                                case "403": self.saved_room_data = "403" 
+
+                            self.create_tile_map()
+                            if on_level == 0: self.camera.set_ground_camera()
+                            elif on_level == 1: self.camera.set_first_camera()
+                            elif on_level == 2: self.camera.set_second_camera()
+                            elif on_level == 3: self.camera.set_third_camera()
+                            elif on_level == 4: self.camera.set_fourth_camera()
+
+                            mapping = False
+
+                            return False
+
             # Bg
             self.screen.blit(bg, (0, 0))
-
+            for room in rooms_to_rooms[maps[on_level][4:-8]]: pygame.draw.rect(self.screen, BLACK, rooms_to_rooms[maps[on_level][4:-8]][room], 2)
+            
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -1842,8 +1990,9 @@ class Game:
 
             # Empty
             else: self.talking("Wow, you found nothing.")
+            
         # Referat in 2.SA
-        elif self.interacted[1] == 13 and self.interacted[2] == 163 and self.in_room == self.rooms[GROUND_FLOOR]:
+        elif self.interacted[1] == 13 and self.interacted[2] == 163 and self.in_room == self.rooms[GROUND_FLOOR] and self.referat:
                 self.talking("OMG!")
                 self.talking("Why would someone throw this in the trash")
                 self.talking("It's someone's OBN referat")
@@ -2051,20 +2200,17 @@ class Game:
         # Hall -> ???
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 123: self.door_info("??? - not a classroom", "???")
 
-                # Hall -> 025
+        # Hall -> 025
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("025 - LCUJ 4", "025"); self.center_player_after_doors()
 
         # 025 -> Hall 
         elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 96: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 026
-        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: self.door_info("026 - not a classroom")
-
-        # 026 -> Hall
-        elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 88: self.door_info("026 - not a classroom", "026")
+        elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 88: self.talking("026 - not a classroom")
 
         # Hall -> 027
-        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.door_info("027 - not a classroom", "027")
+        elif self.player.facing == "right" and self.interacted[1] == 25 and self.interacted[2] == 76: self.talking("027 - not a classroom")
 
         # Hall -> 010
         elif self.player.facing == "down" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("010 - Toilets", "010"); self.center_player_after_doors()
@@ -2183,7 +2329,7 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 169 and self.interacted[1] == 7: self.door_info("Hall", "Hall"); self.center_player_after_doors()
             
         # Hall -> Toilets
-        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12: self.talking("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Toilets", "Toilets_1"); self.center_player_after_doors()
         
         # Toilets -> Stall
         elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("PeePeePooPoo Time"); self.center_player_after_doors()
@@ -2213,7 +2359,7 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 93 and self.interacted[1] == 24: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
         # 113 -> Cabinet LIA
-        elif self.player.facing == "right" and self.interacted[2] == 97 and self.interacted[1] == 21: self.talking("Cabinet LIA"); self.center_player_after_doors()
+        elif self.player.facing == "right" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("Cabinet LIA", "114"); self.center_player_after_doors()
         
         # Cabinet LIA -> 113
         elif self.player.facing == "left" and self.interacted[2] == 97 and self.interacted[1] == 21: self.door_info("113 - III.C", "113"); self.center_player_after_doors()
@@ -2286,7 +2432,7 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
     
         # Hall -> Toilets
-        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Toilets", "Toilets_1"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Toilets", "Toilets_21"); self.center_player_after_doors()
 
         # Toilets -> Hall
         elif self.player.facing == "up" and self.interacted[2] == 40 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -2340,7 +2486,7 @@ class Game:
         elif self.player.facing == "down" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> Toilets
-        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16: self.talking("Toilets"); self.center_player_after_doors()
+        elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 16: self.door_info("Toilets", "Toilets_22"); self.center_player_after_doors()
 
         # Toilets -> Hall
         elif self.player.facing == "right" and self.interacted[2] == 166 and self.interacted[1] == 16: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -2363,20 +2509,17 @@ class Game:
         # 217 -> Hall
         elif self.player.facing == "left" and self.interacted[2] == 173 and self.interacted[1] == 19: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
-        # 218 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 141 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-
         # Hall -> 219
-        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("219 - I.SA", "219"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("219 - I.SA", "219"); self.center_player_after_doors()
 
         # 219 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-
+        elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        
         # Hall -> 220
-        elif self.player.facing == "down" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("220 - I.C", "220"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("220 - I.C", "220"); self.center_player_after_doors()
 
         # 220 -> Hall
-        elif self.player.facing == "up" and self.interacted[2] == 139 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 117 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
         
     def third_floor_doors(self):
         """
@@ -2389,8 +2532,8 @@ class Game:
         # Gym changing rooms -> Hall
         elif self.player.facing in ("down", "right") and self.interacted[2] == 63 and self.interacted[1] == 8: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
-        # Gym changing rooms -> Toielet
-        elif self.player.facing == "left" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Toilets", "Toilets"); self.center_player_after_doors()
+        # Gym changing rooms -> Toilets
+        elif self.player.facing == "left" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Toilets", "Toilets_3"); self.center_player_after_doors()
 
         # Toilet -> Gym changing rooms
         elif self.player.facing == "right" and self.interacted[2] == 57 and self.interacted[1] == 7: self.door_info("Gym - Changing rooms", "Gym - chr"); self.center_player_after_doors()
@@ -2509,15 +2652,15 @@ class Game:
                     # Gets the name of the current machine user (account) 4th WALL BREAK
                     self.talking("Thank you {}".format(getpass.getuser()))
                     self.talking_speed_number = temp_speed
-                    quit()
-                
+                    self.game_over("img/early.png") # TODO: change the background
+                    
                 # No
                 elif no_button.is_pressed(mouse_pos, mouse_pressed):
                     self.talking("At least I got the thing I wanted.")
                     self.talking("And that is all there can be to it.")
                     self.talking("We both can rest now.")
                     self.talking_speed_number = temp_speed
-                    quit()
+                    self.game_over("img/early.png") # TODO: change the background
                 
                 # Buttons
                 self.screen.blit(yes_button.image, yes_button.rect)
@@ -2706,11 +2849,12 @@ class Game:
                     self.draw(); self.update()
 
                     # Grade talk
-                    if self.grades["SJL"] == 1: self.talking("You got 1. That's great.", True, RED)
-                    elif self.grades["SJL"] == 2: self.talking("Nearly perfect. 2 is your grade.", True, RED)
-                    elif self.grades["SJL"] in (3, 4, 5): 
-                        self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
-                        self.talking("None of you ever do." + str(self.grades["SJL"]), True, RED)
+                    if "SJL" in self.grades.keys():
+                        if self.grades["SJL"] == 1: self.talking("You got 1. That's great.", True, RED)
+                        elif self.grades["SJL"] == 2: self.talking("Nearly perfect. 2 is your grade.", True, RED)
+                        elif self.grades["SJL"] in (3, 4, 5): 
+                            self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
+                            self.talking("None of you ever do." + str(self.grades["SJL"]), True, RED)
                         
                 # OBN test 
                 elif self.obn_test:
