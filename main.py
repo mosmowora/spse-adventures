@@ -1521,7 +1521,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif"]
         all_endings = (f"img/{ending}.png" for ending in self.endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
@@ -1551,7 +1551,7 @@ class Game:
 
         # Early
         elif img == "img/early.png" and self.music_on: pygame.mixer.Sound.play(self.speed, -1)
-
+        
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
 
@@ -1594,7 +1594,13 @@ class Game:
                 if car_dead_move >= 1000:
                     car_oops_move = -270
                     car_dead_move = -700
-
+            
+            elif img == "img/unofficial_ending.png": 
+                self.screen.blit(self.game_over_background, (0, 0))
+                self.screen.blit(restart_button.image, restart_button.rect)
+                self.screen.blit(iamdone_button.image, iamdone_button.rect)
+                
+                
             self.clock.tick(FPS)
             pygame.display.update()
 
@@ -2652,7 +2658,7 @@ class Game:
                     # Gets the name of the current machine user (account) 4th WALL BREAK
                     self.talking("Thank you {}".format(getpass.getuser()))
                     self.talking_speed_number = temp_speed
-                    self.game_over("img/early.png") # TODO: change the background
+                    self.game_over("img/unofficial_ending.png")
                     
                 # No
                 elif no_button.is_pressed(mouse_pos, mouse_pressed):
@@ -2660,7 +2666,7 @@ class Game:
                     self.talking("And that is all there can be to it.")
                     self.talking("We both can rest now.")
                     self.talking_speed_number = temp_speed
-                    self.game_over("img/early.png") # TODO: change the background
+                    self.game_over("img/unofficial_ending.png")
                 
                 # Buttons
                 self.screen.blit(yes_button.image, yes_button.rect)
