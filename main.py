@@ -2032,7 +2032,7 @@ class Game:
 
             # Key
             if self.amper_key_in_trash:
-                self.talking("Why is there this key?")
+                self.talking("Why is this key there?")
                 self.amper_key_in_trash = False
                 self.inv["amper key"] = "img/amper key.png"
 

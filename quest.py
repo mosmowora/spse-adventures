@@ -570,13 +570,13 @@ class Quest:
         active_text: bool = True
 
         # To fill
-        fill_ans = pygame.Rect(100, 100, 100, 30)
+        fill_ans = pygame.Rect(10, 150, 150, 40)
         
         # text
         text_ans = ""
         
         # Question counter
-        q = 1
+        guesses = 1
         
         # Points
         p = 0
@@ -590,12 +590,16 @@ class Quest:
         # Questions
         question: List[str] = ["Advokat po svedsky?", "Kolko je statov v EU?", "Kto je prezident SR?", "Co znamena skratka SR?", "Pravo na zivot parti medzi prava ktorej generacie?"]
         
+        # Bools to control text blitted
+        first = True
+        second = False
+        third = False
+        fourth = False
+        fifth = False
+
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
-        grade_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Grade", fontsize=32)
-        
-        question_text = self.game.font.render("To divne svedske slovo?", True, RED)
-        
+         
 
         while obning:
             
@@ -623,7 +627,7 @@ class Quest:
                     if event.key == pygame.K_ESCAPE: obning = False
                     
                     # Enter
-                    if event.key == pygame.K_RETURN: q += 1; guess.append(text_ans); text_ans = ""
+                    if event.key == pygame.K_RETURN: guesses += 1; guess.append(text_ans); text_ans = ""
 
                     # Check for backspace
                     elif event.key == pygame.K_BACKSPACE: 
@@ -634,8 +638,8 @@ class Quest:
             # Back button
             if back_button.is_pressed(mouse_pos, mouse_pressed): obning = False
 
-            # Grade button
-            elif grade_button.is_pressed(mouse_pos, mouse_pressed): 
+            # Grading
+            if guesses == 6: 
                 obning = False
                 for i in range(len(guess)):
                     if guess[i].lower() == answer[i]: p += 1
@@ -645,25 +649,28 @@ class Quest:
                 elif p == 2: return 4
                 else: return 5
                 
-            if q == 1: first = True ; one = self.game.font.render("To divne svedske slovo?", True, RED)
-            elif q == 2: second = True; two = self.game.font.render("Kolko je statov v EU?", True, RED)
-            elif q == 3: three = self.game.font.render("yes", True, RED)
-            elif q == 4: fourth = True; four = self.game.font.render("Ben?", True, RED)
-            else: fifth = True; five = self.game.font.render("no", True, RED)
-            if first: self.game.screen.blit(one, (10, 10))
-            elif second: self.game.screen.blit(two, (10, 10)); first = False
-            elif third: self.game.screen.blit(three, (10, 10)); second = False
-            elif fourth: self.game.screen.blit(four, (10, 10)); third = False
-            else: self.game.screen.blit(five, (10, 10)); fourth = False
+
 
             # Button
             self.game.screen.blit(back_button.image, back_button.rect)
-            self.game.screen.blit(grade_button.image, grade_button.rect)
 
-            # Bash
+            # Text stuffs
             pygame.draw.rect(self.game.screen, BLACK, fill_ans) if active_text else None
             text_surface_def = self.game.lrob_font.render(text_ans, True, (255, 255, 255))
             self.game.screen.blit(text_surface_def, (fill_ans.x+1, fill_ans.y-1))
+            
+            # Heres where it goes south
+            if guesses == 1: first = True 
+            elif guesses == 2: second = True; first = False
+            elif guesses == 3: third = True; second = False
+            elif guesses == 4: fourth = True; third = False
+            else: fifth = True; fourth = False
+            if first == True: one = self.game.font.render("To divne svedske slovo?", True, RED); self.game.screen.blit(one, (10, 10)); self.game.clock.tick(FPS); pygame.display.update()
+            elif second == True: two = self.game.font.render("Kolko je statov v EU?", True, RED); self.game.screen.blit(two, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); first = False
+            elif third == True: three = self.game.font.render("yes", True, RED); self.game.screen.blit(three, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); second = False
+            elif fourth == True: four = self.game.font.render("Ben?", True, RED); self.game.screen.blit(four, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); third = False
+            elif fifth == True: five = self.game.font.render("no", True, RED); self.game.screen.blit(five, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); fourth = False
+            print(guesses, first, second, third, fourth, fifth)
             
             # Updates
             self.game.clock.tick(FPS)
@@ -1351,7 +1358,7 @@ class Quest:
                             if unit != 0: unit -= 1
 
                         # Enter
-                        elif event.key == pygame.K_RETURN and player_answer != "": 
+                        elif event.key == pygame.K_RETURN and player_answer.isnumeric(): 
                             test += 1
                             match unit:
                                 case 0: 
@@ -1366,6 +1373,8 @@ class Quest:
                                     if str(float(player_answer) * 1000000000) == correct_answer: points += 1
                             haraming = False
                             print(correct_answer)
+                        elif event.key == pygame.K_RETURN and player_answer.isalpha(): player_answer = ""; test += 1; haraming = False
+                        
 
                         # Check for backspace
                         elif event.key == pygame.K_BACKSPACE: player_answer = player_answer[:-1]
@@ -1461,8 +1470,8 @@ class Quest:
                 self.game.screen.blit(self.game.big_font.render("Cost: " + str(list(things_to_buy.values())[link][1]), True, WHITE), (10, 40))
                 self.game.screen.blit(list(things_to_buy.values())[link][0], (0, 0))
                 self.game.screen.blit(buy.image, buy.rect)
-                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(things_to_buy.values())[link][1]: self.game.number_bananok -= list(things_to_buy.values())[link]; things_to_buy.pop(list(things_to_buy.keys())[link])
-                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < list(things_to_buy.values())[link][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20))
+                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(things_to_buy.values())[link][1]: self.game.number_bananok -= list(things_to_buy.values())[link][1]; things_to_buy.pop(list(things_to_buy.keys())[link]); self.game.inv["level_teleporter"] = "img/level_teleporter.png"
+                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < list(things_to_buy.values())[link][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
                 
                 # Updates
                 self.game.clock.tick(FPS)
