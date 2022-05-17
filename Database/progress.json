@@ -1564,7 +1564,8 @@
         "inventory": {
             "locker key": "img/locker key.png",
             "changing_room key": "img/changing_room key.png",
-            "teleporter": "img/level_teleporter.png"
+            "teleporter": "img/level_teleporter.png",
+            "amper key": "img/amper key.png"
         },
         "endings": [
             "early",
@@ -1574,7 +1575,7 @@
             "key_in_trash": false,
             "locked_locker": false,
             "locked_changing_room": false,
-            "amper_locked": true,
+            "amper_locked": false,
             "amper_key_in_trash": true,
             "number_kokosky": 0,
             "kokosky_in_locker": true,
@@ -1607,7 +1608,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "number_bananok": 0,
+        "number_bananok": 120,
         "bananky_in_trash": {
             "ground floor": {
                 "2113": 2,
@@ -2073,8 +2074,8 @@
                 "7726": true
             }
         },
-        "level": 2,
-        "room_number": "Hall",
+        "level": 0,
+        "room_number": "Amper",
         "grades": {
             "SIE": 1,
             "MAT": 1,

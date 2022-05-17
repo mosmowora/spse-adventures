@@ -3663,6 +3663,7 @@ class Game:
         self.talking(f"{self.player_name} has PeePeePooPoo time now.")
         
 
+# main program
 g = Game()
 g.intro_screen().new("new").main()
 pygame.quit()

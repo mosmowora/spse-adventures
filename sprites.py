@@ -308,7 +308,7 @@ class Npc(pygame.sprite.Sprite):
         self.type = type
         self.game = game
         self._layer = NPC_LAYER
-        if self.type in ("C", "K", "9"): self.groups = self.game.all_sprites, self.game.npcs, self.game.cleaner
+        if self.type in ("C"): self.groups = self.game.all_sprites, self.game.npcs, self.game.cleaner
         else: self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
         pygame.sprite.Sprite.__init__(self, self.groups)
 

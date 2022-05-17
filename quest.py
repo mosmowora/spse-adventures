@@ -1426,12 +1426,19 @@ class Quest:
         """
 
         shopping = True
-
+        link: int = 0
+        buy = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="BUY", fontsize=32)
+        things_to_buy = {"teleporter": (pygame.image.load("img/amper_teleporter.png"), 25), "referat": (pygame.image.load("img/amper_referat.png"), 30)}
+        
         # Background
         bg = pygame.image.load("img/amper_background.png")
 
         while shopping:
 
+                # Position and click of the mouse
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()
+                
                 # Events
                 for event in pygame.event.get():
 
@@ -1443,10 +1450,20 @@ class Quest:
         
                         # Esc
                         if event.key == pygame.K_ESCAPE: shopping = False
+                        
+                        # Arrows
+                        elif event.key == pygame.K_RIGHT and link < len(things_to_buy) - 1: link += 1
+                        elif event.key == pygame.K_LEFT and link > 0: link -= 1 
 
                 # Background
                 self.game.screen.blit(bg, (0, 0))
-
+                self.game.screen.blit(self.game.big_font.render(list(things_to_buy.keys())[link], True, WHITE), (10, 5))
+                self.game.screen.blit(self.game.big_font.render("Cost: " + str(list(things_to_buy.values())[link][1]), True, WHITE), (10, 40))
+                self.game.screen.blit(list(things_to_buy.values())[link][0], (0, 0))
+                self.game.screen.blit(buy.image, buy.rect)
+                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(things_to_buy.values())[link][1]: self.game.number_bananok -= list(things_to_buy.values())[link]; things_to_buy.pop(list(things_to_buy.keys())[link])
+                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < list(things_to_buy.values())[link][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20))
+                
                 # Updates
                 self.game.clock.tick(FPS)
                 pygame.display.update()
