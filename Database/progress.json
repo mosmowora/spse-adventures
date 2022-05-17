@@ -1563,7 +1563,8 @@
         "name": "tomas",
         "inventory": {
             "locker key": "img/locker key.png",
-            "changing_room key": "img/changing_room key.png"
+            "changing_room key": "img/changing_room key.png",
+            "teleporter": "img/level_teleporter.png"
         },
         "endings": [
             "early",
@@ -2072,7 +2073,7 @@
                 "7726": true
             }
         },
-        "level": 5,
+        "level": 2,
         "room_number": "Hall",
         "grades": {
             "SIE": 1,

@@ -1106,6 +1106,7 @@ class Game:
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
             case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.draw(); self.update(); return self.teleporter_map() # Teleport-Map
+            case "img/level_teleporter.png": return self.level_teleporter()
             case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
 
         return True
@@ -1245,11 +1246,52 @@ class Game:
         if "Kokosky234" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
             self.inv["Kokosky"] = "img/kokosky_small.png"
+            
+            
+    def level_teleporter(self):
+        """
+        Device that let's you teleport through various levels of our school
+        """
+        
+        solo_leveling = True
+        
+        zero = Button(40, 300, 50, 50, fg=DIM_GRAY, bg=NEARLY_BLACK, content="0", fontsize=32)
+        one = Button(40, 250, 50, 50, fg=DIM_GRAY, bg=NEARLY_BLACK, content="1", fontsize=32)
+        two = Button(40, 200, 50, 50, fg=DIM_GRAY, bg=NEARLY_BLACK, content="2", fontsize=32)
+        three = Button(40, 150, 50, 50, fg=DIM_GRAY, bg=NEARLY_BLACK, content="3", fontsize=32)
+        four = Button(40, 100, 50, 50, fg=DIM_GRAY, bg=NEARLY_BLACK, content="4", fontsize=32)
+        
+        while solo_leveling:
+            
+            # Event loop
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+                
+                # Keys pressed
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE: solo_leveling = False; return True
+                    elif event.key == pygame.K_0: solo_leveling = False; self.in_room = self.rooms[GROUND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+                    elif event.key == pygame.K_1: solo_leveling = False; self.in_room = self.rooms[FIRST_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+                    elif event.key == pygame.K_2: solo_leveling = False; self.in_room = self.rooms[SECOND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+                    elif event.key == pygame.K_3: solo_leveling = False; self.in_room = self.rooms[THIRD_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+                    elif event.key == pygame.K_4: solo_leveling = False; self.in_room = self.rooms[FOURTH_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # Draws buttons on screen
+            self.screen.blit(zero.image, zero.rect)
+            self.screen.blit(one.image, one.rect)
+            self.screen.blit(two.image, two.rect)
+            self.screen.blit(three.image, three.rect)
+            self.screen.blit(four.image, four.rect)
+            
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
 
     def teleporter_map(self):
         """
-        Map that teleports you to selected room on your current floor\n
-        TODO: complete this
+        Map that teleports you to selected room on your current floor
         """
         
         mapping = True 
@@ -2406,9 +2448,15 @@ class Game:
         """
 
         # Hall -> 203
-        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28: 
+        if self.player.facing == "left" and self.interacted[2] == 11 and self.interacted[1] == 28:
             self.door_info("203 - III.A", "203"); self.center_player_after_doors()
             if self.haram_test: self.haram_test = self.quest.haram()
+        
+        # Women's Toilets 1
+        elif self.player.facing == "down" and self.interacted[2] == 69 and self.interacted[1] == 31: self.talking("I don't know what this is", False, PINK)
+        
+        # Women's Toilets 2
+        elif self.player.facing == "down" and self.interacted[2] == 99 and self.interacted[1] == 31: self.talking("I don't know what this is", False, PINK)
 
         # 203 -> Hall 
         elif self.player.facing == "right" and self.interacted[2] == 11 and self.interacted[1] == 28: self.door_info("Hall", "Hall"); self.center_player_after_doors()
