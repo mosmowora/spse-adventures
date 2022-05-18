@@ -11,6 +11,7 @@ class SaveProgress():
     number_bananok: int
     bananky_in_trash: dict[str, dict[str, int]]
     bananky_on_ground: dict[str, dict[str, bool]]
+    amper_stuff: dict[str, tuple]
     level: List[str]
     room_number: str
     grades: dict[str, int]
@@ -45,7 +46,7 @@ class SaveProgress():
         loaded_data: List = json.load(open(SaveProgress.file_dest))
 
         # New data
-        write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
+        write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
 
         has_profile = False
 

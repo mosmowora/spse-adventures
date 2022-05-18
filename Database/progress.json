@@ -2102,7 +2102,8 @@
             "locker key": "img/locker key.png",
             "changing_room key": "img/changing_room key.png",
             "bananok": "img/bananok.png",
-            "amper key": "img/amper key.png"
+            "amper key": "img/amper key.png",
+            "level_teleporter": "img/level_teleporter.png"
         },
         "endings": [],
         "quests": {
@@ -2143,7 +2144,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "number_bananok": 29,
+        "number_bananok": 4,
         "bananky_in_trash": {
             "ground floor": {
                 "2113": 2,
@@ -2609,8 +2610,11 @@
                 "7726": true
             }
         },
-        "level": 2,
-        "room_number": "208",
+        "amper_stuff": [
+            "referat"
+        ],
+        "level": 0,
+        "room_number": "Amper",
         "grades": {
             "SJL": 5
         },
@@ -3133,6 +3137,10 @@
                 "7726": true
             }
         },
+        "amper_stuff": [
+            "level_teleporter",
+            "referat"
+        ],
         "level": 0,
         "room_number": "Amper",
         "grades": {},

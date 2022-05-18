@@ -1461,19 +1461,25 @@ class Quest:
             self.game.clock.tick(FPS)
             pygame.display.update()
 
-    def amper(self):
+    def amper(self, things):
         """
         Shopping in Amper
         """
 
+        self.things = things
+
         shopping = True
         link: int = 0
+        
+        # Buttons
         buy = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="BUY", fontsize=32)
+        back = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
         
         # Background
         bg = pygame.image.load("img/amper_background.png")
 
-        if len(self.things_to_buy) != 0:
+        if len(self.things) != 0:
+
             while shopping:
     
                 # Position and click of the mouse
@@ -1493,22 +1499,30 @@ class Quest:
                         if event.key == pygame.K_ESCAPE: shopping = False
                         
                         # Arrows
-                        elif event.key == pygame.K_RIGHT and link < len(self.things_to_buy) - 1: link += 1
+                        elif event.key == pygame.K_RIGHT and link < len(self.things) - 1: link += 1
                         elif event.key == pygame.K_LEFT and link > 0: link -= 1 
 
                 # Background
                 self.game.screen.blit(bg, (0, 0))
-                self.game.screen.blit(self.game.big_font.render(list(self.things_to_buy.keys())[link], True, WHITE), (10, 5))
-                self.game.screen.blit(self.game.big_font.render("Cost: " + str(list(self.things_to_buy.values())[link][1]), True, WHITE), (10, 40))
-                self.game.screen.blit(list(self.things_to_buy.values())[link][0], (0, 0))
+                self.game.screen.blit(self.game.big_font.render(self.things[link], True, WHITE), (10, 5))
+                self.game.screen.blit(self.game.big_font.render("Cost: " + str(self.things_to_buy[self.things[link]][1]), True, WHITE), (10, 40))
+                self.game.screen.blit(self.things_to_buy[self.things[link]][0], (0, 0))
                 self.game.screen.blit(buy.image, buy.rect)
-                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(self.things_to_buy.values())[link][1]: 
-                    self.game.number_bananok -= list(self.things_to_buy.values())[link][1]
-                    if f"img/{list(self.things_to_buy.keys())[link]}.png" not in self.game.inv.keys(): self.game.inv[list(self.things_to_buy.keys())[link]] = f"img/{list(self.things_to_buy.keys())[link]}.png"
-                    self.things_to_buy.pop(list(self.things_to_buy.keys())[link])
-                    link = len(self.things_to_buy) - 1
+                self.game.screen.blit(back.image, back.rect)
+
+                # Back button
+                if back.is_pressed(mouse_pos, mouse_pressed): shopping = False
+
+                # Buying
+                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= self.things_to_buy[self.things[link]][1]: 
+                    self.game.number_bananok -= self.things_to_buy[self.things[link]][1]
+                    if f"img/{self.things[link]}.png" not in self.game.inv.keys(): self.game.inv[self.things[link]] = f"img/{self.things[link]}.png"
+                    self.things.remove(self.things[link])
+                    link = len(self.things) - 1
                     break
-                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < list(self.things_to_buy.values())[link][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
+
+                # Bying but broke
+                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < self.things_to_buy[self.things[link]][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
                 
                 # Updates
                 self.game.clock.tick(FPS)
@@ -1519,4 +1533,4 @@ class Quest:
 
         # After buying a thing
         self.game.draw(); self.game.update()
-        self.game.talking("Pleasure doing business with you", True, BLUE)
+        self.game.talking("Come again.", True, BLUE)

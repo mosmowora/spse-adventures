@@ -655,6 +655,9 @@ class Game:
             }
         }
 
+        # Amper stuff
+        self.amper_stuff = ["level_teleporter", "referat"]
+
         # Grader
         self.grades: dict[str, int] = {}
 
@@ -837,6 +840,9 @@ class Game:
             self.bananky_in_trash = data["bananky_in_trash"]
             self.bananky_on_ground = data["bananky_on_ground"]
 
+            # Amper stuff
+            self.amper_stuff = data["amper_stuff"]
+
             # Grades
             self.grades = data['grades']
 
@@ -923,7 +929,7 @@ class Game:
                     case "Taburetka": self.taburetka()
                     case "Green_chair": self.green_chair()
                     case "Router": self.routering()
-                    case "Pult": self.quest.amper()
+                    case "Pult": self.quest.amper(self.amper_stuff)
 
                 # Reset
                 self.interacted = ["", "", ""]
@@ -1107,8 +1113,8 @@ class Game:
             case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
-            case "img/map_small.png": self.info("Teleporter-Map", BRITISH_WHITE, 90); self.draw(); self.update(); return self.teleporter_map() # Teleport-Map
-            case "img/level_teleporter.png": return self.level_teleporter()
+            case "img/map_small.png": return self.teleporter_map() # Teleport-Map
+            case "img/level_teleporter.png": return self.level_teleporter() # Portable elevator
             case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
 
         return True
@@ -1248,8 +1254,7 @@ class Game:
         if "Kokosky234" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
             self.inv["Kokosky"] = "img/kokosky_small.png"
-            
-            
+               
     def level_teleporter(self):
         """
         Device that let's you teleport through various levels of our school
@@ -1265,6 +1270,10 @@ class Game:
         
         while solo_leveling:
             
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
             # Event loop
             for event in pygame.event.get():
                 
@@ -1273,12 +1282,39 @@ class Game:
                 
                 # Keys pressed
                 if event.type == pygame.KEYDOWN:
+
+                    # Escape
                     if event.key == pygame.K_ESCAPE: solo_leveling = False; return True
+
+                    # Ground floor
                     elif event.key == pygame.K_0: solo_leveling = False; self.in_room = self.rooms[GROUND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+                    # First floor
                     elif event.key == pygame.K_1: solo_leveling = False; self.in_room = self.rooms[FIRST_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+                    # Second floor
                     elif event.key == pygame.K_2: solo_leveling = False; self.in_room = self.rooms[SECOND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+                    # Third floor
                     elif event.key == pygame.K_3: solo_leveling = False; self.in_room = self.rooms[THIRD_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+                    # Fourth floor
                     elif event.key == pygame.K_4: solo_leveling = False; self.in_room = self.rooms[FOURTH_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # Ground floor
+            if zero.is_pressed(mouse_pos, mouse_pressed): solo_leveling = False; self.in_room = self.rooms[GROUND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # First floor
+            if one.is_pressed(mouse_pos, mouse_pressed): solo_leveling = False; self.in_room = self.rooms[FIRST_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # Second floor
+            if two.is_pressed(mouse_pos, mouse_pressed): solo_leveling = False; self.in_room = self.rooms[SECOND_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # Third floor
+            if three.is_pressed(mouse_pos, mouse_pressed): solo_leveling = False; self.in_room = self.rooms[THIRD_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
+
+            # Fourth floor
+            if four.is_pressed(mouse_pos, mouse_pressed): solo_leveling = False; self.in_room = self.rooms[FOURTH_FLOOR]; self.create_tile_map(); self.saved_room_data = "Hall"; self.set_level_camera(self.in_room); return False
 
             # Draws buttons on screen
             self.screen.blit(zero.image, zero.rect)
@@ -1443,6 +1479,7 @@ class Game:
                                 case "402": self.saved_room_data = "402" 
                                 case "403": self.saved_room_data = "403" 
 
+                            # Moving the player
                             self.create_tile_map()
                             if on_level == 0: self.camera.set_ground_camera()
                             elif on_level == 1: self.camera.set_first_camera()
@@ -1547,6 +1584,7 @@ class Game:
                                     self.number_bananok,
                                     self.bananky_in_trash,
                                     self.bananky_on_ground,
+                                    self.amper_stuff,
                                     self.rooms.index(self.in_room),
                                     self.saved_room_data,
                                     self.grades,
