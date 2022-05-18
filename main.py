@@ -2908,7 +2908,7 @@ class Game:
                         elif self.grades["SJL"] == 2: self.talking("Nearly perfect. 2 is your grade.", True, RED)
                         elif self.grades["SJL"] in (3, 4, 5): 
                             self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
-                            self.talking("None of you ever do." + str(self.grades["SJL"]), True, RED)
+                            self.talking("None of you ever do." + str(self.grades["SJL"]+ "."), True, RED)
                         
                 # OBN test 
                 elif self.obn_test:
@@ -2926,14 +2926,14 @@ class Game:
                         self.talking("I'll just take it", True, RED)
                         self.talking("And give you a mark.", True, RED)
                         self.inv.pop["referat"]
-                        self.obn = False
+                        self.obn_test = False
                         
                     # Other way if you don't have a referat
                     else: 
                         self.talking("I don't see that you made a referat.", True, RED)
                         self.talking("So I'll make sure to test you some other way.", True, RED)
                         self.grades["OBN"] = self.quest.obn_testo()
-                        self.obn = False
+                        self.obn_test = False
                         if self.grades["OBN"] == 1: self.talking("I'll give you a 1. You did great.", True, RED)
                         elif self.grades["OBN"] == 2: self.talking("I'll give you a 2. That's not bad.", True, RED)
                         elif self.grades["OBN"] == 3: self.talking("I'll give you a 3. That's not the worst.", True, RED)

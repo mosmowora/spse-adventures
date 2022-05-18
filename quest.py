@@ -571,7 +571,7 @@ class Quest:
         active_text: bool = True
 
         # To fill
-        fill_ans = pygame.Rect(10, 150, 150, 40)
+        fill_ans = pygame.Rect(10, 150, 200, 40)
         
         # text
         text_ans = ""
@@ -602,11 +602,12 @@ class Quest:
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        assign: str = questions[guesses]
          
 
         while obning:
             
-            assign: str = questions[guesses]
+
             
             # Question
             
@@ -633,7 +634,8 @@ class Quest:
                     if event.key == pygame.K_ESCAPE: obning = False
                     
                     # Enter
-                    if event.key == pygame.K_RETURN: guesses += 1; self.game.draw(); self.game.update(); guess.append(text_ans); text_ans = ""
+                    if event.key == pygame.K_RETURN and guesses < 4: guesses += 1; self.game.draw(); self.game.update(); guess.append(text_ans); text_ans = ""; assign: str = questions[guesses]
+                    elif event.key == pygame.K_RETURN and guesses == 4: guesses += 1; self.game.draw(); self.game.update(); guess.append(text_ans)
 
                     # Check for backspace
                     elif event.key == pygame.K_BACKSPACE: 
@@ -662,8 +664,9 @@ class Quest:
 
             # Text stuff
             pygame.draw.rect(self.game.screen, BLACK, fill_ans) if active_text else None
-            text_surface = self.game.lrob_font.render(text_ans, True, (255, 255, 255))
-            self.game.screen.blit(text_surface, (fill_ans.x+1, fill_ans.y-1))
+            text_surface = self.game.font.render(text_ans, True, (255, 255, 255))
+            self.game.screen.blit(text_surface, (fill_ans.x+5, fill_ans.y+5))
+            
             question = self.game.font.render(assign, True, RED)
             
             self.game.screen.blit(question, (10, 10))
@@ -671,6 +674,7 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+        pygame.delay(600)
         
     
     def maths(self):

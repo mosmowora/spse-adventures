@@ -2606,8 +2606,7 @@
         "level": 2,
         "room_number": "208",
         "grades": {
-            "SJL": 5,
-            "OBN": 5
+            "SJL": 5
         },
         "settings": {
             "music": true,
