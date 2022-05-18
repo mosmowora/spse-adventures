@@ -183,6 +183,7 @@ class Game:
         self.resistor: bool = True
         self.osy: bool = True
         self.iot: bool = True
+        self.icdl: bool = True
         self.haram_test: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
@@ -828,6 +829,7 @@ class Game:
             self.resistor = data["quests"]["resistor"]
             self.osy = data["quests"]["osy"]
             self.iot = data["quests"]["iot"]
+            self.icdl = data["quests"]["icdl"]
             self.haram_test = data["quests"]["haram_test"]
 
             # Bananok
@@ -1530,6 +1532,7 @@ class Game:
                         "resistor": self.resistor,
                         "osy": self.osy,
                         "iot": self.iot,
+                        "icdl": self.icdl,
                         "haram_test": self.haram_test,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,

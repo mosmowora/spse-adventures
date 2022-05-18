@@ -2133,6 +2133,7 @@
             "resistor": true,
             "osy": true,
             "iot": true,
+            "icdl": true,
             "haram_test": true,
             "locker_stuff": {
                 "crocs": false,
