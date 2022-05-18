@@ -12,7 +12,7 @@ class Quest:
         """
 
         self.game = game
-        self.things_to_buy = {"teleporter": (pygame.image.load("img/amper_teleporter.png"), 25), "referat": (pygame.image.load("img/amper_referat.png"), 30)}
+        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/amper_teleporter.png"), 25), "referat": (pygame.image.load("img/amper_referat.png"), 30)}
     
     def bench_press(self, bench_done: bool):
         """
@@ -526,7 +526,7 @@ class Quest:
             # Grading
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
-                self.game.anj_test = False
+                self.game.sjl_test = False
                 self.game.info("You've recieved a grade for SJL", DIM_GRAY)
                 return grade if grade != 0 else 1, False
 
@@ -577,7 +577,7 @@ class Quest:
         text_ans = ""
         
         # Question counter
-        guesses = 1
+        guesses = 0
         
         # Points
         p = 0
@@ -589,14 +589,16 @@ class Quest:
         guess: List[str] = []
         
         # Questions
-        question: List[str] = ["Advokat po svedsky?", "Kolko je statov v EU?", "Kto je prezident SR?", "Co znamena skratka SR?", "Pravo na zivot parti medzi prava ktorej generacie?"]
+        questions: List[str] = ["Advokat po svedsky?", "Kolko je statov v EU?", "Kto je prezident SR?", "Co znamena skratka SR?", "Pravo na zivot parti medzi prava ktorej generacie?"]
         
         # Bools to control text blitted
-        first = True
-        second = False
-        third = False
-        fourth = False
-        fifth = False
+        # first = True
+        # second = False
+        # third = False
+        # fourth = False
+        # fifth = False
+        
+        
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
@@ -604,6 +606,9 @@ class Quest:
 
         while obning:
             
+            assign: str = questions[guesses]
+            
+            # Question
             
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -628,7 +633,7 @@ class Quest:
                     if event.key == pygame.K_ESCAPE: obning = False
                     
                     # Enter
-                    if event.key == pygame.K_RETURN: guesses += 1; guess.append(text_ans); text_ans = ""
+                    if event.key == pygame.K_RETURN: guesses += 1; self.game.draw(); self.game.update(); guess.append(text_ans); text_ans = ""
 
                     # Check for backspace
                     elif event.key == pygame.K_BACKSPACE: 
@@ -640,7 +645,7 @@ class Quest:
             if back_button.is_pressed(mouse_pos, mouse_pressed): obning = False
 
             # Grading
-            if guesses == 6: 
+            if guesses == len(questions): 
                 obning = False
                 for i in range(len(guess)):
                     if guess[i].lower() == answer[i]: p += 1
@@ -655,23 +660,13 @@ class Quest:
             # Button
             self.game.screen.blit(back_button.image, back_button.rect)
 
-            # Text stuffs
+            # Text stuff
             pygame.draw.rect(self.game.screen, BLACK, fill_ans) if active_text else None
-            text_surface_def = self.game.lrob_font.render(text_ans, True, (255, 255, 255))
-            self.game.screen.blit(text_surface_def, (fill_ans.x+1, fill_ans.y-1))
+            text_surface = self.game.lrob_font.render(text_ans, True, (255, 255, 255))
+            self.game.screen.blit(text_surface, (fill_ans.x+1, fill_ans.y-1))
+            question = self.game.font.render(assign, True, RED)
             
-            # Heres where it goes south
-            if guesses == 1: first = True 
-            elif guesses == 2: second = True; first = False
-            elif guesses == 3: third = True; second = False
-            elif guesses == 4: fourth = True; third = False
-            else: fifth = True; fourth = False
-            if first == True: one = self.game.font.render("To divne svedske slovo?", True, RED); self.game.screen.blit(one, (10, 10)); self.game.clock.tick(FPS); pygame.display.update()
-            elif second == True: two = self.game.font.render("Kolko je statov v EU?", True, RED); self.game.screen.blit(two, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); first = False
-            elif third == True: three = self.game.font.render("yes", True, RED); self.game.screen.blit(three, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); second = False
-            elif fourth == True: four = self.game.font.render("Ben?", True, RED); self.game.screen.blit(four, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); third = False
-            elif fifth == True: five = self.game.font.render("no", True, RED); self.game.screen.blit(five, (10, 10)); self.game.clock.tick(FPS); pygame.display.update(); fourth = False
-            print(guesses, first, second, third, fourth, fifth)
+            self.game.screen.blit(question, (10, 10))
             
             # Updates
             self.game.clock.tick(FPS)
@@ -690,6 +685,7 @@ class Quest:
         # Answers/Questions
         assignment: List[str] = ["10x - 1 = 15 - 6x".upper(), "9x - 8 = 11x - 10".upper(), "7 + x/3 = 8 + x/4".upper(), "x/2 + x/3 = 5".upper(), "x - 2/3 = 5x/7 + 1/2".upper(), "2x - x/2 + 4 = x + x/3".upper(), "5x - 9 - 4/15 = (2x - 1)/3".upper(), "-1 - (3x - x)/4 = (2x - 5)/6".upper(), "(-17/19)x + 51 = 0".upper(), "|x - 7| = 0".upper()]
         assignment_answers: List[str] = ["1", "1", "12", "6", "49/12", "-24", "3/5", "-1/5", "57", "7"]
+        
         # print(assignment_answers) # for maths quest debugging
         answer: List[str] = []
         answer_rect = pygame.Rect(155, 215, 302, 67)
@@ -734,7 +730,7 @@ class Quest:
             # Grading
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
-                self.game.anj_test = False
+                self.game.mat_test = False
                 self.game.info("You've recieved a grade for MAT", DIM_GRAY)
                 return grade if grade != 0 else 1, False
 
@@ -1373,7 +1369,6 @@ class Quest:
                                 case 4: 
                                     if str(float(player_answer) * 1000000000) == correct_answer: points += 1
                             haraming = False
-                            print(correct_answer)
                         elif event.key == pygame.K_RETURN and player_answer.isalpha(): player_answer = ""; test += 1; haraming = False
                         
 
@@ -1442,8 +1437,9 @@ class Quest:
         # Background
         bg = pygame.image.load("img/amper_background.png")
 
-        while shopping and len(self.things_to_buy) > 0:
-
+        if len(self.things_to_buy) != 0:
+            while shopping:
+    
                 # Position and click of the mouse
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pressed = pygame.mouse.get_pressed()
@@ -1472,13 +1468,19 @@ class Quest:
                 self.game.screen.blit(buy.image, buy.rect)
                 if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(self.things_to_buy.values())[link][1]: 
                     self.game.number_bananok -= list(self.things_to_buy.values())[link][1]
-                    self.things_to_buy.pop(list(self.things_to_buy.keys())[link])
+                    # print(list(self.things_to_buy.keys())[link])
                     self.game.inv[list(self.things_to_buy.keys())[link]] = f"img/{list(self.things_to_buy.keys())[link]}.png"
+                    self.things_to_buy.pop(list(self.things_to_buy.keys())[link])
                     link = len(self.things_to_buy) - 1
+                    break
                 elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < list(self.things_to_buy.values())[link][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
                 
                 # Updates
                 self.game.clock.tick(FPS)
                 pygame.display.update()
+                
+        
+        else: self.game.draw(); self.game.update(); self.game.talking("We're sold out", True, BLUE); return
 
-        print("Come back next time")
+        self.game.draw(); self.game.update()
+        self.game.talking("Pleasure doing business with you", True, BLUE)
