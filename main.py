@@ -2820,9 +2820,9 @@ class Game:
                     self.draw(); self.update()
 
                     # Grade talk
-                    if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True, BLUE)
-                    elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True, BLUE)
-                    elif self.grades["AEN"] == 5: self.talking("At least try. Sorry, but that's a 5!", True, BLUE)
+                    if self.grades["AEN"] == 1: self.talking("You did well my student, that's a 1 for you.", True, WHITE)
+                    elif self.grades["AEN"] == 3: self.talking("Not the best, but I'll give you a 3.", True, WHITE)
+                    elif self.grades["AEN"] == 5: self.talking("At least try. Sorry, but that's a 5!", True, WHITE)
                     self.resistor = False
                 
                 # 5 Minutes sooner
@@ -2993,6 +2993,14 @@ class Game:
             elif self.interacted[2] == 8 and self.interacted[1] == 28: 
                 self.talking("Ohm's law is used to calculate....", True, RED)
                 self.talking("I rather leave him be.")
+            
+            # Mohyla
+            elif self.interacted[2] == 190 and self.interacted[1] == 19:
+                self.talking("Oh... hello Nosil", True, WHITE)
+                self.talking("Well you're not him, nevermind", True, WHITE)
+                self.talking("You still haven't done previous exam", True, WHITE)
+                self.talking("You can use my PC", True, WHITE)
+                # self.grades["ICD"] = self.quest.icdl() TODO: do this quest
                 
     def shoes_on(self):
         """

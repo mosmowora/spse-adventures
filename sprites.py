@@ -362,17 +362,6 @@ class Npc(pygame.sprite.Sprite):
             self.game.npcs_spritesheet.get_sprite(self.color + 35, 66, self.width, self.height),
             self.game.npcs_spritesheet.get_sprite(self.color + 67, 66, self.width, self.height)
         ]
-        
-    def look_at_player(self):
-        """
-        NPC looks at player\n
-        TODO: needs to be placed in correct method, but it works
-        """
-
-        if self.game.player.x > self.x: self.facing = "right"
-        elif self.game.player.x < self.x: self.facing = "left"
-        elif self.game.player.y > self.y: self.facing = "down"
-        elif self.game.player.y < self.y: self.facing = "up"
 
     def update(self):
         """

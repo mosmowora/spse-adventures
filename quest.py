@@ -443,7 +443,7 @@ class Quest:
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
                 self.game.anj_test = False
-                self.game.info("You've recieved a grade for ANJ", DIM_GRAY)
+                self.game.info("You've recieved a grade for ANJ", WHITE)
                 return grade if grade != 0 else 1, False
 
             # Background
@@ -527,7 +527,7 @@ class Quest:
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
                 self.game.sjl_test = False
-                self.game.info("You've recieved a grade for SJL", DIM_GRAY)
+                self.game.info("You've recieved a grade for SJL", WHITE)
                 return grade if grade != 0 else 1, False
 
             # Background
@@ -583,7 +583,7 @@ class Quest:
         p = 0
         
         # Answers
-        answer: List[str] = ["ambutsman", "27", "zuzana caputova", "slovenska republika", "prvej"]
+        answer: List[str] = ["ombutsman", "27", "zuzana caputova", "slovenska republika", "prvej"]
         
         # Guess
         guess: List[str] = []
@@ -735,7 +735,7 @@ class Quest:
             if word == len(assignment_answers):
                 grade: int = 5 - math.floor(len(tuple(i for i in zip(assignment_answers, answer) if i[0] == i[1])) / 2)
                 self.game.mat_test = False
-                self.game.info("You've recieved a grade for MAT", DIM_GRAY)
+                self.game.info("You've recieved a grade for MAT", WHITE)
                 return grade if grade != 0 else 1, False
 
             # Background
@@ -1428,6 +1428,38 @@ class Quest:
 
         # Return
         return False
+    
+    def icdl(self):
+        """
+        Method for doing ICDL test
+        """
+        
+        in_potitat = True
+
+        # Background
+        bg = pygame.image.load("img/LROB.png")
+        
+        # Doing the test
+        while in_potitat:
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE: in_potitat = False
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN: pass
+                    
+                
+            # Background
+            self.game.screen.blit(bg, (0, 0))
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
 
     def amper(self):
         """
@@ -1472,8 +1504,7 @@ class Quest:
                 self.game.screen.blit(buy.image, buy.rect)
                 if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= list(self.things_to_buy.values())[link][1]: 
                     self.game.number_bananok -= list(self.things_to_buy.values())[link][1]
-                    # print(list(self.things_to_buy.keys())[link])
-                    self.game.inv[list(self.things_to_buy.keys())[link]] = f"img/{list(self.things_to_buy.keys())[link]}.png"
+                    if f"img/{list(self.things_to_buy.keys())[link]}.png" not in self.game.inv.keys(): self.game.inv[list(self.things_to_buy.keys())[link]] = f"img/{list(self.things_to_buy.keys())[link]}.png"
                     self.things_to_buy.pop(list(self.things_to_buy.keys())[link])
                     link = len(self.things_to_buy) - 1
                     break
@@ -1483,8 +1514,9 @@ class Quest:
                 self.game.clock.tick(FPS)
                 pygame.display.update()
                 
-        
+        # Nothing to sell in Amper
         else: self.game.draw(); self.game.update(); self.game.talking("We're sold out", True, BLUE); return
 
+        # After buying a thing
         self.game.draw(); self.game.update()
         self.game.talking("Pleasure doing business with you", True, BLUE)
