@@ -888,7 +888,7 @@ class Game:
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
 
             # Pressed I
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_i: 
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_i and len(self.inv) != 0: 
                 pygame.image.save(self.screen, "img/screen.png")
                 self.inventory() 
 
