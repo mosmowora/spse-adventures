@@ -2103,7 +2103,7 @@
             "changing_room key": "img/changing_room key.png",
             "bananok": "img/bananok.png",
             "amper key": "img/amper key.png",
-            "level_teleporter": "img/level_teleporter.png"
+            "ultra_teleporter": "img/ultra_teleporter.png"
         },
         "endings": [],
         "quests": {
@@ -2134,7 +2134,7 @@
             "resistor": true,
             "osy": true,
             "iot": true,
-            "icdl": true,
+            "icdl": false,
             "haram_test": true,
             "locker_stuff": {
                 "crocs": false,
@@ -2144,7 +2144,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "number_bananok": 4,
+        "number_bananok": 75,
         "bananky_in_trash": {
             "ground floor": {
                 "2113": 2,
@@ -2613,10 +2613,11 @@
         "amper_stuff": [
             "referat"
         ],
-        "level": 0,
-        "room_number": "Amper",
+        "level": 1,
+        "room_number": "123",
         "grades": {
-            "SJL": 5
+            "SJL": 5,
+            "ICD": 1
         },
         "settings": {
             "music": true,

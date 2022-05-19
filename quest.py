@@ -12,7 +12,7 @@ class Quest:
         """
 
         self.game = game
-        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/amper_teleporter.png"), 25), "referat": (pygame.image.load("img/amper_referat.png"), 30)}
+        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/doctor_who.png"), 100), "referat": (pygame.image.load("img/amper_referat.png"), 30), "map":(pygame.image.load("img/amper_map.png"), 125)}
     
     def bench_press(self, bench_done: bool):
         """
@@ -590,15 +590,6 @@ class Quest:
         
         # Questions
         questions: List[str] = ["Advokat po svedsky?", "Kolko je statov v EU?", "Kto je prezident SR?", "Co znamena skratka SR?", "Pravo na zivot parti medzi prava ktorej generacie?"]
-        
-        # Bools to control text blitted
-        # first = True
-        # second = False
-        # third = False
-        # fourth = False
-        # fifth = False
-        
-        
 
         # Button
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
@@ -606,10 +597,6 @@ class Quest:
          
 
         while obning:
-            
-
-            
-            # Question
             
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -656,9 +643,7 @@ class Quest:
                 elif p == 3: return 3
                 elif p == 2: return 4
                 else: return 5
-                
-
-
+            
             # Button
             self.game.screen.blit(back_button.image, back_button.rect)
 
@@ -676,7 +661,6 @@ class Quest:
             pygame.display.update()
         pygame.delay(600)
         
-    
     def maths(self):
         """
         MAT quest
@@ -1176,13 +1160,13 @@ class Quest:
         back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
         done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
 
-        # Anwer button
+        # Answer button
         a_button = Button(101, 145, 25, 27, fg=BLACK, bg=WHITE, content="a)", fontsize=20)
         b_button = Button(101, 192, 25, 27, fg=BLACK, bg=WHITE, content="b)", fontsize=20)
         c_button = Button(101, 238, 25, 27, fg=BLACK, bg=WHITE, content="c)", fontsize=20)
         d_button = Button(101, 286, 25, 27, fg=BLACK, bg=WHITE, content="d)", fontsize=20)
 
-        # Counters for pressed buttons
+        # Bools for pressed buttons
         a = False
         b = False
         c = False
@@ -1437,11 +1421,47 @@ class Quest:
         in_potitat = True
 
         # Background
-        bg = pygame.image.load("img/LROB.png")
+        bg = pygame.image.load("img/normal_text.png")
+
+        # Button
+        back_button = Button(10, 400, 120, 50, fg=WHITE, bg=BLACK, content="Back", fontsize=32)
+        done_button = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="Done", fontsize=32)
+
+        # Points 
+        p = 0
+
+        # Answer button
+        u_button = Button(104, 77, 24, 24, fg=BLACK, bg=WHITE, content="U", fontsize=20)
+        b_button = Button(135, 77, 24, 24, fg=BLACK, bg=WHITE, content="B", fontsize=20)
+
+        # Bools for pressed buttons
+        u = False
+        b = False
         
         # Doing the test
         while in_potitat:
-            
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Buttons pressed
+            if back_button.is_pressed(mouse_pos, mouse_pressed): in_potitat = False; return 5
+            if done_button.is_pressed(mouse_pos, mouse_pressed): 
+                in_potitat = False
+                if b and u: return 1
+                elif b and not u or u and not b: return 3
+                else: return 5
+
+            # Buttons pressed
+            if u_button.is_pressed(mouse_pos, mouse_pressed): 
+                if u: u_button = Button(104, 77, 24, 24, fg=BLACK, bg=WHITE, content="U", fontsize=20); u = False; pygame.time.delay(200)
+                else: u_button = Button(104, 77, 24, 24, fg=WHITE, bg=GREEN, content="U", fontsize=20); u = True; pygame.time.delay(200)
+
+            if b_button.is_pressed(mouse_pos, mouse_pressed): 
+                if b: b_button = Button(135, 77, 24, 24, fg=BLACK, bg=WHITE, content="B", fontsize=20); b = False; pygame.time.delay(200)
+                else: b_button = Button(135, 77, 24, 24, fg=WHITE, bg=GREEN, content="B", fontsize=20); b = True; pygame.time.delay(200)
+
             # Events
             for event in pygame.event.get():
 
@@ -1450,12 +1470,22 @@ class Quest:
                 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE: in_potitat = False
-                
-                elif event.type == pygame.MOUSEBUTTONDOWN: pass
-                    
-                
+
+                # BG
+                if u and b: bg = pygame.image.load("img/italicbold_text.png")
+                elif u and not b: bg = pygame.image.load("img/italic_text.png")
+                elif b and not u: bg = pygame.image.load("img/bold_text.png")
+                else: bg = pygame.image.load("img/normal_text.png")
+
+
             # Background
             self.game.screen.blit(bg, (0, 0))
+
+            # Buttons
+            self.game.screen.blit(back_button.image, back_button.rect)
+            self.game.screen.blit(done_button.image, done_button.rect)
+            self.game.screen.blit(u_button.image, u_button.rect)
+            self.game.screen.blit(b_button.image, b_button.rect)
             
             # Updates
             self.game.clock.tick(FPS)

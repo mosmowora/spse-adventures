@@ -1,7 +1,6 @@
 # Imports
 import pygame, math, random as r
 from config import *
-from save_progress import SaveProgress
 
 class Spritesheet:
     """
@@ -309,6 +308,7 @@ class Npc(pygame.sprite.Sprite):
         self.game = game
         self._layer = NPC_LAYER
         if self.type in ("C", "K", "9"): self.groups = self.game.all_sprites, self.game.npcs, self.game.cleaner
+        elif self.type == "p": self.groups = self.game.all_sprites, self.game.npcs
         else: self.groups = self.game.all_sprites, self.game.npcs, self.game.interactible
         pygame.sprite.Sprite.__init__(self, self.groups)
 
@@ -324,9 +324,57 @@ class Npc(pygame.sprite.Sprite):
         self.animation_loop = 1
         self.movement_loop = 0
         self.max_travel = r.randint(7, 30)
+        if self.type == "p": self.max_travel = r.randint(7, 15)
 
-        colors = [0, 99, 198, 297, 396, 495, 594, 693, 792]
+        colors = [
+            0, # Purple 0
+            99, # Green 1
+            198, # Red 2
+            297, # Yellow 3
+            396, # Orange 4
+            495, # Blue 5 
+            594, # Pink 6 
+            693, # Black 7 (-2)
+            792 # White (For cleaners) 8 (-1)
+        ]
+
+        # Cleaner - White
         if self.type == "C": self.color = colors[-1]
+
+        # Kvôňtura - Green
+        elif x == 21 and y == 3: self.color = colors[1]
+
+        # Koky - Black
+        elif x == 111 and y == 9: self.color = colors[-2]
+
+        # Guydosova - Purple
+        elif x == 94 and y == 24: self.color = colors[0]
+        
+        # Martin Shreky - Black
+        elif x == 180 and y == 5: self.color = colors[-2]
+
+        # Liascinska - Green
+        elif x == 100 and y == 19: self.color = colors[1]
+
+        # Mohyla - Pink
+        elif x == 190 and y == 19: self.color = colors[6]
+
+        # (Ne)Pusti - Red
+        elif x == 188 and y == 13: self.color = colors[2]
+        
+        # NiguSova - Black
+        elif x == 77 and y == 16: self.color = colors[-2]
+
+        # HaramBozo - Orange
+        elif x == 8 and y == 28: self.color = colors[4]
+
+        # Gone-valova - Yellow
+        elif x == 155 and y == 37: self.color = colors[3]
+
+        # Gulbaka - Blue
+        elif x == 57 and y == 22: self.color = colors[5]
+
+        # Random shirt color cause just random side character
         else: self.color = r.choice(colors[:-1]) 
 
         self.image = self.game.npcs_spritesheet.get_sprite(self.color, 2, self.width, self.height)
@@ -369,7 +417,7 @@ class Npc(pygame.sprite.Sprite):
         """
 
         # Moving
-        if self.type in ("C", "9"): self.movement()
+        if self.type in ("C", "9", "p"): self.movement()
         self.animate()
         
         # Collision
@@ -575,7 +623,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -666,6 +714,12 @@ class Block(pygame.sprite.Sprite):
         elif type == "Ž": self.image = self.game.terrain_spritesheet.get_sprite(342, 70, self.width, self.height)
         elif type == "ˇ": self.image = self.game.terrain_spritesheet.get_sprite(342, 104, self.width, self.height)
         elif type == "A": self.image = self.game.terrain_spritesheet.get_sprite(342, 2, self.width, self.height)
+        elif type == "3": self.image = self.game.terrain_spritesheet.get_sprite(376, 2, self.width, self.height)
+        elif type == "4": self.image = self.game.terrain_spritesheet.get_sprite(409, 2, self.width, self.height)
+        elif type == "5": self.image = self.game.terrain_spritesheet.get_sprite(376, 36, self.width, self.height)
+        elif type == "6": self.image = self.game.terrain_spritesheet.get_sprite(409, 36, self.width, self.height)
+        elif type == "7": self.image = self.game.terrain_spritesheet.get_sprite(376, 70, self.width, self.height)
+        elif type == "8": self.image = self.game.terrain_spritesheet.get_sprite(409, 70, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
