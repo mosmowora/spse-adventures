@@ -179,6 +179,7 @@ class Game:
         self.referat: bool = True
         self.gul_quest: bool = True
         self.nepusti: bool = True
+        self.closed_window: bool = True
         self.five_min_sooner: bool = True
         self.resistor: bool = True
         self.osy: bool = True
@@ -656,7 +657,7 @@ class Game:
         }
 
         # Amper stuff
-        self.amper_stuff = ["level_teleporter", "referat"]
+        self.amper_stuff = ["level_teleporter", "referat", "map"]
 
         # Grader
         self.grades: dict[str, int] = {}
@@ -760,7 +761,7 @@ class Game:
                 elif column == "6": self.interactive[Block(self, j, i, "6")] = "6" + str(i) + str(j) # Pong ping
                 elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
                 elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
-                elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j); print(j, i) # NPC
+                elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                 elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
@@ -1092,6 +1093,7 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+            
                   
     def inventory_item_info(self, img: str):
         """
@@ -1120,11 +1122,12 @@ class Game:
             case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
-            case "img/map_small.png": return self.teleporter_map() # Teleport-Map
+            case "img/map.png": return self.teleporter_map() # Teleport-Map
             case "img/level_teleporter.png": return self.level_teleporter() # Portable elevator
             case "img/ultra_teleporter.png": return self.ultra_teleporter() # Ultra teleporter
             case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
             case "img/master_key.png": self.info("Now I can escape this mansion", BRITISH_WHITE, 90) # Master key
+            case "img/retake.png": return self.retake() # Retake
 
         return True
 
@@ -1738,6 +1741,59 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
+    def retake(self):
+        """
+        Player can retake any test that could go wrong
+        """
+        
+        retaking = True
+        
+        x: int = 2.5
+        y: int = 200
+
+        retakeable = ["MAT", "SJL", "OBN", "OSY", "AEN", "IOT", "TSV", "ICD", "PRO", "ANJ"]
+        
+        # Button
+        lessons: list[Button] = [Button(x + retakeable.index(lesson) * 64, y, 60, 60, fg=BRITISH_WHITE, bg=BLACK, content=lesson, fontsize=28) for lesson in retakeable]
+        
+        while retaking:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+
+                # Esc
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: retaking = False
+                
+            # Buttons
+            for button in lessons: self.screen.blit(button.image, button.rect)
+            
+            for index in range(len(lessons)): 
+                if lessons[index].is_pressed(mouse_pos, mouse_pressed) and lessons[index].content in self.grades.keys():
+                    self.grades.pop(lessons[index].content); self.inv.pop("retake")
+                    match lessons[index].content:
+                        case "MAT": self.mat_test = True
+                        case "SJL": self.sjl_test = True
+                        case "OBN": self.obn_test = True  
+                        case "OSY": self.osy = True
+                        case "AEN": self.resistor = True
+                        case "IOT": self.iot = True
+                        case "TSV": self.dumbbell_lifted= True
+                        case "ICD": self.icdl = True
+                        case "PRO": self.program_test = True
+                        case "ANJ": self.anj_test = True
+                    return False
+
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
     def open_vtipnicek(self):
         """
         Player can read funny jokes from vtipnicek (not a quest)\n
@@ -1800,6 +1856,7 @@ class Game:
                         "sjl_test": self.sjl_test,
                         "obn_test": self.obn_test,
                         "referat": self.referat,
+                        "window": self.closed_window,
                         "GUL_quest": self.gul_quest,
                         "gul_counter": self.__gul_counter,
                         "nepusti": self.nepusti,
@@ -1843,8 +1900,8 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif"]
-        all_endings = (f"img/{ending}.png" for ending in self.endings)
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/game_over_background.png"]
+        all_endings = tuple(endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
         end = True if img in endings else False
@@ -2350,8 +2407,13 @@ class Game:
         # Window fail ending
         if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
+        # Vyvetraj
+        elif self.interacted[1] == 28 and self.interacted[2] in (138, 139) and self.closed_window and self.in_room == self.rooms[GROUND_FLOOR]: 
+            self.quest.vetry()
+            if "DSY" in self.grades.keys(): self.draw(); self.update(); self.info("You've recieved a grade for DSY"); self.closed_window = False
+
         # Windows between classrooms
-        if self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
+        elif self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
 
     def sans(self):
         """
@@ -3189,7 +3251,7 @@ class Game:
                         elif self.grades["SJL"] == 2: self.talking("Nearly perfect. 2 is your grade.", True, RED)
                         elif self.grades["SJL"] in (3, 4, 5): 
                             self.talking("Of course, you didn't study for the test you didn't expect.", True, RED)
-                            self.talking("None of you ever do." + str(self.grades["SJL"]+ "."), True, RED)
+                            self.talking("None of you ever do." + str(self.grades["SJL"]) + ".", True, RED)
                         
                 # OBN test 
                 elif self.obn_test:
@@ -3277,6 +3339,8 @@ class Game:
             
             # Mohyla
             elif self.interacted[2] == 190 and self.interacted[1] == 19:
+
+                # Before test
                 if self.icdl:
                     self.talking("Oh... hello Nosil", True, WHITE)
                     self.talking("Well you're not him, nevermind", True, WHITE)
@@ -3284,18 +3348,44 @@ class Game:
                     self.talking("You can use my PC", True, WHITE)
                     self.grades["ICD"] = self.quest.icdl()
                     self.icdl = False
+
+                # After test
                 else: self.talking("Uh, let me be.", True, WHITE); self.talking("I have... Uh", True, WHITE); self.talking("Important work to do...", True, WHITE)
             
             # Bartin Moda
             elif self.interacted[2] == 25 and self.interacted[1] == 36:
-                if len(self.grades) == ALL_GRADES:
-                    self.talking("So... you've finally finished the game", True)
-                    self.talking("You've done well, so in return", True)
-                    self.talking("I'll give you this key", True)
+
+                # Getting the key
+                if len(self.grades) == ALL_GRADES and "master_key" not in self.inv.keys():
+                    self.talking("So... you've finally finished the game.", True)
+                    self.talking("You've done well, so in return.", True)
+                    self.talking("I'll give you this key.", True)
                     self.info("You have revicieved the master key", GREEN)
                     self.inv["master_key"] = "img/master_key.png"
-                else: self.talking("This is not the time to chat", True); self.talking("Come back later", True)
 
+                # Not enough grades
+                else: self.talking("This is not the time to chat.", True); self.talking("Come back later.", True)
+
+            # Gabriela 2-metrova
+            elif self.interacted[2] == 130 and self.interacted[1] == 26:
+
+                # Before quest
+                if self.closed_window:
+                    self.talking("We finally entered the room.", True, YELLOW)
+                    self.talking("You know what to do.", True, YELLOW)
+
+                # Completed quest
+                else: self.talking("At least I teached you how to open window.", True, YELLOW)
+
+            # HeadWeedGone Wa
+            elif self.interacted[2] == 28 and self.interacted[1] == 1:
+                
+                # Has grade
+                if "PRO" in self.grades.keys(): self.talking("Congrats on your test.", True, ORANGE); self.talking("I sent a student to find my rovnitko.", True, ORANGE)
+
+                #  No grade? (insert megamind meme here)
+                else: self.talking("I'll get to you in a minute.", True, ORANGE)
+                
 
     def shoes_on(self):
         """

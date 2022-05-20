@@ -52,7 +52,7 @@ ENDING_HALLWAY = 5
 BASEMENT_FLOOR = -1
 
 # Number of grades
-ALL_GRADES: int = 10
+ALL_GRADES: int = 13
 
 # Basement
 basement: List[str]  = [
@@ -98,7 +98,7 @@ ground_floor: List[str] = [
     "w..........Wk........[.........W....W.W.W...a...............................W.......W.......]............W...............W......]....................W......W......W.........W...............!!!!..W",
     "Wqmqmqmq...Wl.......u[.........W....WDWDW...e...............................W.......W.......].N..........W....ľľľľľľľľľľľW......W...................EW......W......W.........W..................A..W",
     "w..........Wk.......e[.........W........W...e...............................D.......W.......W............W....WWWWWWWWWWWW......].....g..g..g..g..g..W......W......W.........W..................AN.W",
-    "w..........Wl.......uW.........W........Wmmmm....K..........................W.......W.......].a..U.U.U.U.W...........dd??W......]..a..k..k..k..k..k..W......W......W.........W...ul...ul...ul...A..W",
+    "w..........Wl.......uW.........W........Wmmmm....K..........................W.......W.......].a..U.U.U.U.W...........dd??W......].Na..k..k..k..k..k..W......W......W.........W...ul...ul...ul...A..W",
     "W2222222222W!nininin!W.........W........W...................................W.......W.......].e..J.J.J.J2W...........dd??W......]..e..g..g..g..g..g..W......W......W.........W...ul...ul...ul...A..W",
     "WwwWwwWWwwWWWWwwWWwwWWWWwWwWwWWWwWwWwWwWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWwwWwwWwwWwwWWwWWwWWwWWwWWwWWWWwWWwWWWwWWWwwWWwwWWwwWWwwWWWwwwWWWWwWWwWWWwWwWwWwWWWwwWwwWwwWwwWwwWwwWwWW"
 ]
@@ -227,7 +227,7 @@ third_floor: List[str] = [
 # Fourth floor
 fourth_floor: List[str] = [
     "?????????WWWWWWWWWWWWWwwWWWWwwwwWWwwwWWwwwWWwwwWWwwwWWWWWWwwwWWWWWWWWWWWWWWWWWWWWWWW",
-    "?????????W..........WE!m!.....qmqmqmqmqmqmqmqmqmq.k...[.........W..................W",
+    "?????????W..........WE!m!..N..qmqmqmqmqmqmqmqmqmq.k...[.........W..................W",
     "?????????W..........W.k.e.........................g...[.........W..................W",
     "?????????W..........W.!n!.........p....p.....p........[.........W..................W",
     "?????????W..........D........p........................W.........W..................W",

@@ -376,6 +376,9 @@ class Npc(pygame.sprite.Sprite):
 
         # Gulbaka - Blue
         elif x == 57 and y == 22: self.color = colors[5]
+        
+        # Metrova - Orange
+        elif x == 130 and y == 26: self.color = colors[4]
 
         # Random shirt color cause just random side character
         else: self.color = r.choice(colors[:-1]) 
@@ -920,7 +923,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "g" + str(i) + str(j): self.game.interacted = ["Computer", i, j]
 
                     # Special window
-                    elif self.interactive[hits[0]] == "w" + str(i) + str(j): self.game.interacted = ["Window", i, j]
+                    elif self.interactive[hits[0]] == "w" + str(i) + str(j): self.game.interacted = ["Window", i, j]; print(j, i)
 
                     # Router
                     elif self.interactive[hits[0]] == "E" + str(i) + str(j): self.game.interacted = ["Router", i, j]

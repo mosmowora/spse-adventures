@@ -12,7 +12,11 @@ class Quest:
         """
 
         self.game = game
-        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/doctor_who.png"), 100), "referat": (pygame.image.load("img/amper_referat.png"), 30), "map":(pygame.image.load("img/amper_map.png"), 125)}
+        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/doctor_who.png"), 150), 
+                              "referat": (pygame.image.load("img/amper_referat.png"), 30), 
+                              "map": (pygame.image.load("img/amper_map.png"), 175),
+                              "retake": (pygame.image.load("img/amper_retake.png"), 50)
+        }
     
     def bench_press(self, bench_done: bool):
         """
@@ -659,7 +663,7 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
-        pygame.delay(600)
+        pygame.time.delay(600)
         
     def maths(self):
         """
@@ -1491,7 +1495,78 @@ class Quest:
             self.game.clock.tick(FPS)
             pygame.display.update()
 
-    def amper(self, things):
+    def vetry(self):
+        """
+        Vyvetraj v DSY
+        """
+
+        vetrying = True
+
+        # Cursor
+        pygame.mouse.set_pos((330, 475))
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+
+        # Background
+        bg = pygame.image.load("img/maze.png")
+        
+        # Rect
+        first_rect = pygame.Rect(340, 180, 300, 300)
+        second_rect = pygame.Rect(540, 0, 100, 480)
+        third_rect = pygame.Rect(323, 26, 195, 139)
+        fourth_rect = pygame.Rect(90, 0, 460, 18)
+        fifth_rect = pygame.Rect(0, 0, 69, 480)
+        sixth_rect = pygame.Rect(90, 18, 201, 102)
+        seventh_rect = pygame.Rect(69, 140, 254, 25)
+        eigth_rect = pygame.Rect(250, 399, 69, 81)
+        ninth_rect = pygame.Rect(69, 275, 161, 205)
+        tenth_rect = pygame.Rect(250, 275, 69, 71)
+        eleventh_rect = pygame.Rect(242, 190, 98, 76)
+        twelveth_rect = pygame.Rect(240, 134, 91, 40)
+        thirteenth_rect = pygame.Rect(230, 472, 20, 8)
+        fouteenth_rect = pygame.Rect(319, 479, 21, 1)
+        fifteenth_rect = pygame.Rect(87, 182, 155, 83)
+        finitto_rect = pygame.Rect(69, 0, 21, 8) # Finish
+        all_rects = [first_rect, second_rect, third_rect, fourth_rect, fifth_rect, sixth_rect, seventh_rect, eigth_rect, ninth_rect, tenth_rect, eleventh_rect, twelveth_rect, thirteenth_rect, fouteenth_rect, fifteenth_rect]
+
+        # Outside of screen
+        if not pygame.mouse.get_focused(): vetrying = False; pygame.mouse.set_pos((330, 205)); pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        
+        while vetrying:
+
+            # Events
+            for event in pygame.event.get():
+                
+                if event.type == pygame.ACTIVEEVENT:
+                    if not event.gain: pygame.mouse.set_pos((330, 205)); pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW); vetrying = False
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Escape
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: vetrying = False
+                
+                # Vetrying
+                if event.type == pygame.MOUSEMOTION and pygame.mouse.get_focused():
+
+                    # Black Rect
+                    for rect in all_rects:
+                        if rect.collidepoint(event.pos): pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW); vetrying = False
+
+                    # Finish Rect
+                    if finitto_rect.collidepoint(event.pos): self.game.grades["DSY"] = 1; pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW); vetrying = False
+                
+            # Bg
+            self.game.screen.blit(bg, (0, 0))
+            
+            # bliting all the rects
+            for rect in all_rects: pygame.draw.rect(self.game.screen, BLACK, rect, 1)
+            pygame.draw.rect(self.game.screen, GREEN, finitto_rect)      
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+
+    def amper(self, things: list[str]):
         """
         Shopping in Amper
         """
@@ -1499,7 +1574,7 @@ class Quest:
         self.things = things
 
         shopping = True
-        link: int = 0
+        index_of_thing: int = 0
         
         # Buttons
         buy = Button(500, 400, 120, 50, fg=WHITE, bg=BLACK, content="BUY", fontsize=32)
@@ -1529,14 +1604,14 @@ class Quest:
                         if event.key == pygame.K_ESCAPE: shopping = False
                         
                         # Arrows
-                        elif event.key == pygame.K_RIGHT and link < len(self.things) - 1: link += 1
-                        elif event.key == pygame.K_LEFT and link > 0: link -= 1 
+                        elif event.key == pygame.K_RIGHT and index_of_thing < len(self.things) - 1: index_of_thing += 1
+                        elif event.key == pygame.K_LEFT and index_of_thing > 0: index_of_thing -= 1 
 
                 # Background
                 self.game.screen.blit(bg, (0, 0))
-                self.game.screen.blit(self.game.big_font.render(self.things[link], True, WHITE), (10, 5))
-                self.game.screen.blit(self.game.big_font.render("Cost: " + str(self.things_to_buy[self.things[link]][1]), True, WHITE), (10, 40))
-                self.game.screen.blit(self.things_to_buy[self.things[link]][0], (0, 0))
+                self.game.screen.blit(self.game.big_font.render(self.things[index_of_thing], True, WHITE), (10, 5))
+                self.game.screen.blit(self.game.big_font.render("Cost: " + str(self.things_to_buy[self.things[index_of_thing]][1]), True, GREEN), (10, 40)) if self.game.number_bananok >= self.things_to_buy[self.things[index_of_thing]][1] else self.game.screen.blit(self.game.big_font.render("Cost: " + str(self.things_to_buy[self.things[index_of_thing]][1]), True, RED), (10, 40))
+                self.game.screen.blit(self.things_to_buy[self.things[index_of_thing]][0], (0, 0))
                 self.game.screen.blit(buy.image, buy.rect)
                 self.game.screen.blit(back.image, back.rect)
 
@@ -1544,15 +1619,16 @@ class Quest:
                 if back.is_pressed(mouse_pos, mouse_pressed): shopping = False
 
                 # Buying
-                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= self.things_to_buy[self.things[link]][1]: 
-                    self.game.number_bananok -= self.things_to_buy[self.things[link]][1]
-                    if f"img/{self.things[link]}.png" not in self.game.inv.keys(): self.game.inv[self.things[link]] = f"img/{self.things[link]}.png"
-                    self.things.remove(self.things[link])
-                    link = len(self.things) - 1
+                if buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok >= self.things_to_buy[self.things[index_of_thing]][1]:
+                    if self.things[index_of_thing] == "retake" and "retake" in self.game.inv.keys(): pass
+                    else:
+                        self.game.number_bananok -= self.things_to_buy[self.things[index_of_thing]][1]
+                        if f"img/{self.things[index_of_thing]}.png" not in self.game.inv.keys(): self.game.inv[self.things[index_of_thing]] = f"img/{self.things[index_of_thing]}.png"
+                        if self.things[index_of_thing] != "retake": self.things.remove(self.things[index_of_thing]); index_of_thing = len(self.things) - 1
                     break
 
-                # Bying but broke
-                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < self.things_to_buy[self.things[link]][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
+                # BE MORE RICHER
+                elif buy.is_pressed(mouse_pos, mouse_pressed) and self.game.number_bananok < self.things_to_buy[self.things[index_of_thing]][1]: self.game.screen.blit(self.game.big_font.render("You can't buy this thingy", True, RED), (280, 20)); pygame.time.delay(400)
                 
                 # Updates
                 self.game.clock.tick(FPS)
@@ -1564,3 +1640,5 @@ class Quest:
         # After buying a thing
         self.game.draw(); self.game.update()
         self.game.talking("Come again.", True, BLUE)
+        
+        
