@@ -1124,6 +1124,7 @@ class Game:
             case "img/level_teleporter.png": return self.level_teleporter() # Portable elevator
             case "img/ultra_teleporter.png": return self.ultra_teleporter() # Ultra teleporter
             case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
+            case "img/master_key.png": self.info("Now I can escape this mansion", BRITISH_WHITE, 90) # Master key
 
         return True
 
@@ -2480,8 +2481,9 @@ class Game:
 
             # Has everything
             if len(self.grades) == ALL_GRADES:
-                if sum(self.grades.values()) // len(self.grades) <= 1.5: self.talking("This is the end"); self.ending_hallway() # self.end()
-                elif 1.5 < sum(self.grades.values()) // len(self.grades) <= 3.5: self.talking("Well, I got everything"); self.end(tried=True)
+                if sum(self.grades.values()) // len(self.grades) <= 1.5 and "master_key" in self.inv.keys(): self.talking("This is the end"); self.ending_hallway() # self.end()
+                elif 1.5 < sum(self.grades.values()) // len(self.grades) <= 3.5 and "master_key" in self.inv.keys(): self.talking("Well, I got everything"); self.end(tried=True)
+                else: self.talking("I don't have the master key to this door."); self.talking("Maybe someone from the school can has it.")
 
             # Permission to go home sooner
             elif self.five_min_sooner == self.nepusti == self.gul_quest == False: self.talking("Now I can go home sooner!"); self.game_over("img/early.png")
@@ -3283,6 +3285,16 @@ class Game:
                     self.grades["ICD"] = self.quest.icdl()
                     self.icdl = False
                 else: self.talking("Uh, let me be.", True, WHITE); self.talking("I have... Uh", True, WHITE); self.talking("Important work to do...", True, WHITE)
+            
+            # Bartin Moda
+            elif self.interacted[2] == 25 and self.interacted[1] == 36:
+                if len(self.grades) == ALL_GRADES:
+                    self.talking("So... you've finally finished the game", True)
+                    self.talking("You've done well, so in return", True)
+                    self.talking("I'll give you this key", True)
+                    self.info("You have revicieved the master key", GREEN)
+                    self.inv["master_key"] = "img/master_key.png"
+                else: self.talking("This is not the time to chat", True); self.talking("Come back later", True)
 
 
     def shoes_on(self):

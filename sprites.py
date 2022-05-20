@@ -364,6 +364,9 @@ class Npc(pygame.sprite.Sprite):
         
         # NiguSova - Black
         elif x == 77 and y == 16: self.color = colors[-2]
+        
+        # Bartin Moda - Black
+        elif x == 25 and y == 36: self.color = colors[-2]
 
         # HaramBozo - Orange
         elif x == 8 and y == 28: self.color = colors[4]

@@ -1588,6 +1588,7 @@
             "dumbbells": true,
             "program": false,
             "phone": false,
+            "icdl": false,
             "suplovanie": null,
             "anj_test": true,
             "sjl_test": false,
@@ -1610,6 +1611,9 @@
             "without_light": 0,
             "caught": 1
         },
+        "amper_stuff": [
+            "referat"
+        ],
         "number_bananok": 221,
         "bananky_in_trash": {
             "ground floor": {
@@ -2083,7 +2087,6 @@
             "MAT": 1,
             "ANJ": 1,
             "DEJ": 1,
-            "TSV": 1,
             "AEN": 1,
             "OSY": 1,
             "SJL": 2,
