@@ -629,7 +629,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -669,6 +669,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "k": self.image = self.game.terrain_spritesheet.get_sprite(241, 138, self.width, self.height)
         elif type == "é": self.image = self.game.terrain_spritesheet.get_sprite(274, 172, self.width, self.height)
         elif type == "u": self.image = self.game.terrain_spritesheet.get_sprite(241, 172, self.width, self.height)
+        elif type == "ä": self.image = self.game.terrain_spritesheet.get_sprite(241, 240, self.width, self.height)
         elif type == "e": self.image = self.game.terrain_spritesheet.get_sprite(274, 172, self.width, self.height)
         elif type == "Ř": self.image = self.game.terrain_spritesheet.get_sprite(138, 36, self.width, self.height)
         elif type == "ř": self.image = self.game.terrain_spritesheet.get_sprite(70, 70, self.width, self.height)
@@ -936,6 +937,12 @@ class Interact(pygame.sprite.Sprite):
 
                     # Pult
                     elif self.interactive[hits[0]] == "A" + str(i) + str(j): self.game.interacted = ["Pult", i, j]
+
+                    # Baterries
+                    elif self.interactive[hits[0]] == "ä" + str(i) + str(j): self.game.interacted = ["Baterry", i, j]
+                    
+                    # Flashlight
+                    elif self.interactive[hits[0]] == "8" + str(i) + str(j): self.game.interacted = ["Flashlight", i, j]; print(j, i)
 
 class Button:
     """

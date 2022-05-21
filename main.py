@@ -700,6 +700,7 @@ class Game:
                 elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
                 elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
                 elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
+                elif column == "ä": self.interactive[Block(self, j, i, "ä")] = "ä" + str(i) + str(j) # Desk + chair (vertical) right
                 elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
                 elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Desk + chair + PC (vertical) right
                 elif column == "a": self.interactive[Block(self, j, i, "a")] = "a" + str(i) + str(j) # Desk + chair + PC (vertical) left
@@ -873,7 +874,7 @@ class Game:
 
             # Moving camera
             for sprite in self.all_sprites: sprite.rect.x -= 158 * TILE_SIZE
-
+            
         return self
     
     def main(self):
@@ -938,9 +939,24 @@ class Game:
                     case "Green_chair": self.green_chair()
                     case "Router": self.routering()
                     case "Pult": self.quest.amper(self.amper_stuff)
+                    case "Baterry": self.baterries(); self.info("A baterry for crafting a flashlight", GREEN)
+                    case "Flashlight": self.flashlight(); self.craft()
 
                 # Reset
                 self.interacted = ["", "", ""]
+                
+                
+    def flashlight(self):
+        '''
+        Player finds a flashlight
+        '''
+        if self.interacted[2] == 63 and self.interacted[1] == 23 and "flashlight" not in self.inv.keys() and self.in_room == self.rooms[THIRD_FLOOR]: self.inv['light'] = "img/light.png"
+    
+    def baterries(self):
+        '''
+        Player finds baterries for crafting the flashlight
+        '''
+        if self.interacted[2] == 26 and self.interacted[1] == 5 and "Baterry" not in self.inv.keys() and self.in_room == self.rooms[GROUND_FLOOR]: self.inv['baterry'] = "img/baterry.png"
 
     def routering(self):
         """
@@ -1103,6 +1119,8 @@ class Game:
         match img:
             
             case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", BRITISH_WHITE, 90) # Locker key
+            case "img/light.png": self.info("A light, but without baterries", BRITISH_WHITE, 90) # Light without baterries
+            case "img/flashlight.png": self.info("A flashlight", BRITISH_WHITE, 90) # Flashlight for basement
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BRITISH_WHITE, 90) # Changing room key
             case "img/vtipnicek_small.png": self.info("I can read you.", BRITISH_WHITE, 90); self.open_vtipnicek() # Vtipnicek
             case "img/Iphone_small.png": self.info("Let's check my phone", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
@@ -1178,6 +1196,11 @@ class Game:
         """
 
         inv = self.inv.keys()
+        
+        if "baterry" in inv and "light" in inv:
+            self.inv.pop("baterry"); self.inv.pop("light")
+            self.inv['flashlight'] = "img/flashlight.png"
+            self.info("You have a light now", GREEN)
         
         if "level_teleporter" in inv and "map" in inv:
             self.inv.pop("level_teleporter"); self.inv.pop("map")
@@ -3291,7 +3314,7 @@ class Game:
             elif self.interacted[2] == 180 and self.interacted[1] == 5:
 
                 # Quest here
-                if self.osy: 
+                if self.osy:
                     self.talking("Oh, hey there", True, YELLOW)
                     self.talking("I wasn't planning to give you a test today", True, YELLOW)
                     self.talking("But while you're here", True, YELLOW)
@@ -3513,6 +3536,10 @@ class Game:
             # Button
             self.screen.blit(back_button.image, back_button.rect)
             if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
+            if not looking and "phone" not in self.inv.keys():
+                self.talking("Crap, I don't have my phone with me.")
+                self.talking("I think I left it somewhere in our class.")
+                self.info("Find your iPhone", GREEN)
             self.clock.tick(FPS)
             pygame.display.update()
             
@@ -3600,7 +3627,7 @@ class Game:
         """
         
         # Light in inventory
-        if "light" in self.inv:
+        if "flashlight" in self.inv.keys():
 
             # Going in
             self.talking("I got light with me.")
