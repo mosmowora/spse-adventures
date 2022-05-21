@@ -186,6 +186,7 @@ class Game:
         self.iot: bool = True
         self.icdl: bool = True
         self.haram_test: bool = True
+        self.lost_guy: bool = True
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
         # Bananok
@@ -657,7 +658,7 @@ class Game:
         }
 
         # Amper stuff
-        self.amper_stuff = ["level_teleporter", "referat", "map"]
+        self.amper_stuff = ["level teleporter", "referat", "map", "retake", "vujcheek fender"]
 
         # Grader
         self.grades: dict[str, int] = {}
@@ -762,11 +763,12 @@ class Game:
                 elif column == "6": self.interactive[Block(self, j, i, "6")] = "6" + str(i) + str(j) # Pong ping
                 elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
                 elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
+                elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                 elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
-                elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
+                elif column in ("p", "ô"): self.npc.append(Npc(self, j, i, column)) # People
                 elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
 
     def set_camera(self, level: List[str]):
@@ -830,6 +832,7 @@ class Game:
             self.suplovanie = data["quests"]['suplovanie']
             self.phone_in_trash = data["quests"]["phone"]
             self.anj_test = data["quests"]["anj_test"]
+            self.mat_test = data["quests"]["mat_test"]
             self.sjl_test = data["quests"]["sjl_test"]
             self.obn_test = data["quests"]["obn_test"]
             self.referat = data["quests"]["referat"]
@@ -843,6 +846,7 @@ class Game:
             self.iot = data["quests"]["iot"]
             self.icdl = data["quests"]["icdl"]
             self.haram_test = data["quests"]["haram_test"]
+            self.lost_gyt = data["quests"]["lost_guy"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -939,24 +943,52 @@ class Game:
                     case "Green_chair": self.green_chair()
                     case "Router": self.routering()
                     case "Pult": self.quest.amper(self.amper_stuff)
-                    case "Baterry": self.baterries(); self.info("A baterry for crafting a flashlight", GREEN)
-                    case "Flashlight": self.flashlight(); self.craft()
+                    case "Battery": self.batteries()
+                    case "Flashlight": self.flashlight()
+                    case "Ladder": self.ladder()
 
                 # Reset
-                self.interacted = ["", "", ""]
-                
+                self.interacted = ["", "", ""]  
                 
     def flashlight(self):
-        '''
+        """
         Player finds a flashlight
-        '''
-        if self.interacted[2] == 63 and self.interacted[1] == 23 and "flashlight" not in self.inv.keys() and self.in_room == self.rooms[THIRD_FLOOR]: self.inv['light'] = "img/light.png"
+        """
+
+        # Found flashlight
+        if self.interacted[2] == 63 and self.interacted[1] == 23 and list(self.inv.keys()).count("light") == 0 and list(self.inv.keys()).count("flashlight") == 0 and self.in_room == self.rooms[THIRD_FLOOR]: 
+            self.inv['light'] = "img/light.png"
+            self.info("Shit. It doesn't have any batteries.")
+
+        # Has flashlight
+        else: 
+            self.talking("Why are there 2 flashlights?")
+            self.talking("Well, I already have one. I don't need more.")
     
-    def baterries(self):
-        '''
-        Player finds baterries for crafting the flashlight
-        '''
-        if self.interacted[2] == 26 and self.interacted[1] == 5 and "Baterry" not in self.inv.keys() and self.in_room == self.rooms[GROUND_FLOOR]: self.inv['baterry'] = "img/baterry.png"
+    def batteries(self):
+        """
+        Player finds batteries for crafting the flashlight
+        """
+
+        # Found batteries
+        if self.interacted[2] == 26 and self.interacted[1] == 5 and list(self.inv.keys()).count("battery") == 0 and list(self.inv.keys()).count("flashlight") == 0 and self.in_room == self.rooms[GROUND_FLOOR]: 
+            self.inv['battery'] = "img/battery.png"
+            self.info("Batteries. I wonder how I can use them.")
+
+        # Has batteries
+        else: self.info("I already took some.")
+
+    def ladder(self):
+        """
+        Somehow putting ladder into pocket
+        """
+
+        if "ladder" not in self.inv.keys():
+            self.inv["ladder"] = "img/ladder.png"
+            self.talking("I might need this ladder. Yoink.")
+            self.talking("How did I managed to put that in my pocket?")
+        
+        else: self.talking("There sure is a lot of ladders down here.")
 
     def routering(self):
         """
@@ -966,16 +998,25 @@ class Game:
         if type(self.connected_router) == list:
             router_outcome = "I rather leave it be."
 
-                            # Already connected
+            # Already connected
             if self.saved_room_data in self.connected_router: self.info("I already connected this.")
             else: router_outcome = self.quest.router()
 
-                            # After connecting
+            # After connecting
             if router_outcome != "I rather leave it be.": 
-                self.info("Connected routers {}/4".format(len(self.connected_router) + 1), BLACK)
-                self.connected_router.append(router_outcome) if len(router_outcome) == 3 else self.info(router_outcome, BLACK)
+
+                # Correct
+                if len(router_outcome) == 3:
+                    self.connected_router.append(router_outcome) 
+                    self.info("Connected routers {}/4".format(len(self.connected_router)))
+
+                # Wrong
+                else: self.info(router_outcome)
+
+            # Left
+            else: self.info(router_outcome)
                         
-                        # Didn't talk to (Ne)Pusti yet
+        # Didn't talk to (Ne)Pusti yet
         else: self.talking("I don't know what to do with this.")
 
     def update(self):
@@ -1096,10 +1137,10 @@ class Game:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == pygame.K_i: open_inventory = False; break
 
                 # Right arrow
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7; inventory_coords = {}
 
                 # Left arrow
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: max_items -= 7; min_items -= 7
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: max_items -= 7; min_items -= 7; inventory_coords = {}
                 
                 # Items in inv
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1119,33 +1160,36 @@ class Game:
         match img:
             
             case "img/locker key.png": self.info("A key from my locker. It's 10th from the door.", BRITISH_WHITE, 90) # Locker key
-            case "img/light.png": self.info("A light, but without baterries", BRITISH_WHITE, 90) # Light without baterries
-            case "img/flashlight.png": self.info("A flashlight", BRITISH_WHITE, 90) # Flashlight for basement
+            case "img/light.png": self.info("A flashlight without batteries.", BRITISH_WHITE, 90) # Light without batteries
+            case "img/flashlight.png": self.info("Working flashlight.", BRITISH_WHITE, 90) # Flashlight for basement
+            case "img/battery.png": self.info("Batteries. I wonder how I can use them.", BRITISH_WHITE, 90), # Batteries
             case "img/changing_room key.png": self.info("This key is used for OUR changing room.", BRITISH_WHITE, 90) # Changing room key
             case "img/vtipnicek_small.png": self.info("I can read you.", BRITISH_WHITE, 90); self.open_vtipnicek() # Vtipnicek
-            case "img/Iphone_small.png": self.info("Let's check my phone", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
-            case "img/amper key.png": self.info("A suspicious key from buffet Amper", BRITISH_WHITE, 90) # Amper key
-            case "img/kokosky1_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky2_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky3_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky4_small.png": self.info("1 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky12_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky13_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky14_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky23_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky24_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky34_small.png": self.info("2 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky123_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky124_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/Iphone_small.png": self.info("Let's check my phone.", BRITISH_WHITE, 90); self.suplovanie = self.quest.check_suplovanie() # Iphone
+            case "img/amper key.png": self.info("A suspicious key from buffet Amper,", BRITISH_WHITE, 90) # Amper key
+            case "img/kokosky1_small.png": self.info("1 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky2_small.png": self.info("1 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky3_small.png": self.info("1 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky4_small.png": self.info("1 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky12_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky13_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky14_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky23_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky24_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky34_small.png": self.info("2 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky123_small.png": self.info("3 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky124_small.png": self.info("3 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
+            case "img/kokosky234_small.png": self.info("3 of 4 parts of Forbidden Kokosky.", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
             case "img/kokosky_small.png": self.info("Forbidden Kokosky", BRITISH_WHITE, 90); self.show_kokosky(img) # Kokosky
-            case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks", BRITISH_WHITE, 90) # Bananok
+            case "img/bananok.png": self.info("You have " + str(self.number_bananok) + " of bananoks.", BRITISH_WHITE, 90) # Bananok
             case "img/map.png": return self.teleporter_map() # Teleport-Map
-            case "img/level_teleporter.png": return self.level_teleporter() # Portable elevator
+            case "img/level teleporter.png": return self.level_teleporter() # Portable elevator
             case "img/ultra_teleporter.png": return self.ultra_teleporter() # Ultra teleporter
-            case "img/referat.png": self.info("This might help with my grades", BRITISH_WHITE, 90) # Referat
-            case "img/master_key.png": self.info("Now I can escape this mansion", BRITISH_WHITE, 90) # Master key
+            case "img/referat.png": self.info("This might help with my grades.", BRITISH_WHITE, 90) # Referat
+            case "img/master_key.png": self.info("Now I can escape this mansion.", BRITISH_WHITE, 90) # Master key
             case "img/retake.png": return self.retake() # Retake
+            case "img/vujcheek fender.png": self.info("That old geezer can't touch me with this.", BRITISH_WHITE, 90) # Vujcheek fender
+            case "img/ladder.png": self.info("I still don't know how I put it in my pocket.", BRITISH_WHITE, 90) # Ladder
 
         return True
 
@@ -1197,102 +1241,125 @@ class Game:
 
         inv = self.inv.keys()
         
-        if "baterry" in inv and "light" in inv:
-            self.inv.pop("baterry"); self.inv.pop("light")
+        if "battery" in inv and "light" in inv:
+            self.inv.pop("battery"); self.inv.pop("light")
             self.inv['flashlight'] = "img/flashlight.png"
-            self.info("You have a light now", GREEN)
+            self.talking("I put the batteries in the flashlight.")
+            self.talking("Now the flashlight has batteries and works.")
         
-        if "level_teleporter" in inv and "map" in inv:
-            self.inv.pop("level_teleporter"); self.inv.pop("map")
+        if "level teleporter" in inv and "map" in inv:
+            self.inv.pop("level teleporter"); self.inv.pop("map")
             self.inv["ultra_teleporter"] = "img/ultra_teleporter.png" # for now
 
         if "Kokosky1" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky2")
             self.inv["Kokosky12"] = "img/kokosky12_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky1" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky3")
             self.inv["Kokosky13"] = "img/kokosky13_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky1" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky4")
             self.inv["Kokosky14"] = "img/kokosky14_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky2" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky2"); self.inv.pop("Kokosky3")
             self.inv["Kokosky23"] = "img/kokosky23_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky2" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky2"); self.inv.pop("Kokosky4")
             self.inv["Kokosky24"] = "img/kokosky24_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky3" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky3"); self.inv.pop("Kokosky4")
             self.inv["Kokosky34"] = "img/kokosky34_small.png"
+            self.info("Your Kokosky are now level 2.", True, GREEN)
 
         if "Kokosky12" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky12"); self.inv.pop("Kokosky3")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky12" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky12"); self.inv.pop("Kokosky4")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky13" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky13"); self.inv.pop("Kokosky2")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky13" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky13"); self.inv.pop("Kokosky4")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky14" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky14"); self.inv.pop("Kokosky2")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky14" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky14"); self.inv.pop("Kokosky3")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky23" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky23"); self.inv.pop("Kokosky1")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky23" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky23"); self.inv.pop("Kokosky4")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky24" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky24"); self.inv.pop("Kokosky1")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky24" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky24"); self.inv.pop("Kokosky3")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky34" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky34"); self.inv.pop("Kokosky1")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky34" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky34"); self.inv.pop("Kokosky3")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
+            self.info("Your Kokosky are now level 3.", True, GREEN)
 
         if "Kokosky123" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky123"); self.inv.pop("Kokosky4")
             self.inv["Kokosky"] = "img/kokosky_small.png"
+            self.info("Your Kokosky are now max level.", True, GREEN)
 
         if "Kokosky124" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky124"); self.inv.pop("Kokosky3")
             self.inv["Kokosky"] = "img/kokosky_small.png"
+            self.info("Your Kokosky are now max level.", True, GREEN)
 
         if "Kokosky134" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky134"); self.inv.pop("Kokosky2")
             self.inv["Kokosky"] = "img/kokosky_small.png"
+            self.info("Your Kokosky are now max level.", True, GREEN)
 
         if "Kokosky234" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
             self.inv["Kokosky"] = "img/kokosky_small.png"
+            self.info("Your Kokosky are now max level.", True, GREEN)
                
     def level_teleporter(self):
         """
@@ -1876,6 +1943,7 @@ class Game:
                         "phone": self.phone_in_trash,
                         "suplovanie": self.suplovanie,
                         "anj_test": self.anj_test,
+                        "mat_test": self.mat_test,
                         "sjl_test": self.sjl_test,
                         "obn_test": self.obn_test,
                         "referat": self.referat,
@@ -1890,6 +1958,7 @@ class Game:
                         "iot": self.iot,
                         "icdl": self.icdl,
                         "haram_test": self.haram_test,
+                        "lost_gut": self.lost_guy,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -2212,10 +2281,16 @@ class Game:
                 # Close button
                 if event.type == pygame.QUIT: quit()
                 
-                # Esc
+                # Keyboard
                 elif event.type == pygame.KEYDOWN:
+
+                    # Esc
                     if event.key == pygame.K_ESCAPE: opened = not opened
+
+                    # M
                     elif event.key == pygame.K_m:
+                        
+                        # Turning on
                         if self.music_on:
                             for _ in range(12):
                                 slider.rect.x -= 4
@@ -2224,6 +2299,8 @@ class Game:
                             self.music_on = not self.music_on
                             slider_inside.rect.x -= 2
                             slider = Button(250, 140, 50, 50, fg=BLACK, bg=RED, content="", fontsize=0)
+
+                        # Turning off
                         else:
                             for _ in range(12):
                                 slider.rect.x += 4
@@ -2232,6 +2309,7 @@ class Game:
                             self.music_on = not self.music_on
                             slider_inside.rect.x += 2
                             slider = Button(300, 140, 50, 50, fg=BLACK, bg=GREEN, content="", fontsize=0)
+                            
             # Back button
             if back.is_pressed(mouse_pos, mouse_pressed): opened = not opened
         
@@ -2306,6 +2384,8 @@ class Game:
         for _ in range(45):
             text = self.font.render(msg_content, True, WHITE)
             text_rect = text.get_rect(x=10, y=10)
+            r = pygame.Rect(5, 10-2.5, text_rect.width+5, text_rect.height+5)
+            pygame.draw.rect(self.screen, BLACK, r)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
             pygame.display.update()
@@ -2321,6 +2401,8 @@ class Game:
         for _ in range(self.talking_speed_number):
             text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, additional_color)
             text_rect = text.get_rect(x=10, y=10)
+            r = pygame.Rect(5, 10-2.5, text_rect.width+5, text_rect.height+5)
+            pygame.draw.rect(self.screen, BLACK, r)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
             pygame.display.update()
@@ -2336,6 +2418,8 @@ class Game:
         for _ in range(self.talking_speed_number):
             text = self.font.render(msg_content, True, color)
             text_rect = text.get_rect(x=10, y=i)
+            r = pygame.Rect(5, i-2.5, text_rect.width+5, text_rect.height+5)
+            pygame.draw.rect(self.screen, BLACK, r)
             self.screen.blit(text, text_rect)
             self.clock.tick(FPS)
             pygame.display.update()
@@ -2431,9 +2515,17 @@ class Game:
         if self.interacted[1] == 27 and self.interacted[2] in (65, 66): pygame.mixer.Sound.play(self.fall); pygame.time.delay(500); self.game_over("img/window_fail.png")
 
         # Vyvetraj
-        elif self.interacted[1] == 28 and self.interacted[2] in (138, 139) and self.closed_window and self.in_room == self.rooms[GROUND_FLOOR]: 
-            self.quest.vetry()
-            if "DSY" in self.grades.keys(): self.draw(); self.update(); self.info("You've recieved a grade for DSY"); self.closed_window = False
+        elif self.interacted[1] == 28 and self.interacted[2] in (138, 139) and self.closed_window and self.in_room == self.rooms[GROUND_FLOOR]:
+
+            # Has ladder
+            if "ladder" in self.inv.keys(): 
+                self.quest.vetry()
+                if "DSY" in self.grades.keys(): self.draw(); self.update(); self.info("You've recieved a grade for DSY"); self.closed_window = False
+
+            # No ladder
+            else: 
+                self.talking("I can't reach it.")
+                self.talking("Maybe I can find something that will help me in basement.")
 
         # Windows between classrooms
         elif self.interacted[1] not in (11, 14, 25) and self.interacted[2] not in (98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 110, 111, 112, 113, 173): self.sans() if r.randint(1, 100) == 100 else self.talking("What a pretty day.")
@@ -3098,14 +3190,76 @@ class Game:
         if self.interacted[0] == "Teacher":
 
             # Liascinska
-            if self.interacted[2] == 100 and self.interacted[1] == 19 and self.mat_test: 
-                self.talking("LIA is just standing here")
-                self.talking("MENACINGLY")
-                self.talking("Oh, hey {}, fancy seeing you here".format(self.player_name), True, BLUE)
-                self.talking("School work can't be postponed", True, BLUE)
-                self.talking("I found something you can understand", True, BLUE)
-                math_values = self.quest.maths()
-                if isinstance(math_values, tuple): self.grades["MAT"], self.mat_test = math_values[0], math_values[1]
+            if self.interacted[2] == 100 and self.interacted[1] == 19:
+
+                # Before test 
+                if self.mat_test: 
+                    self.talking("LIA is just standing here.")
+                    self.talking("MENACINGLY!")
+                    self.talking("Oh, hey {}, fancy seeing you here.".format(self.player_name), True, LIGHTBLUE)
+                    self.talking("School work can't be postponed.", True, LIGHTBLUE)
+                    self.talking("I found something you can understand.", True, LIGHTBLUE)
+                    math_values = self.quest.maths()
+                    if isinstance(math_values, tuple): self.grades["MAT"], self.mat_test = math_values[0], math_values[1]
+                
+                # After test
+                else: 
+
+                    # Too many bananoks
+                    if self.number_bananok > 120:
+                        self.talking("Oh, hey {}.".format(self.player_name), True, LIGHTBLUE)
+                        self.talking("Sorry I gotta grade test.", True, LIGHTBLUE)
+                        self.talking("We can talk later.", True, LIGHTBLUE)
+
+                    # Grading tests
+                    else:
+                        self.talking("Oh, hey {}.".format(self.player_name), True, LIGHTBLUE)
+                        self.talking("I have a deal you may be interested in.", True, LIGHTBLUE) 
+                        self.talking("You help me grade tests and I give you bananoks.", True, LIGHTBLUE)
+                        self.talking("What do you say?", True, LIGHTBLUE)       
+
+                        # Buttons
+                        yes_button = Button(140, 190, 120, 50, fg=WHITE, bg=BLACK, content="Yes", fontsize=32)
+                        no_button = Button(360, 190, 120, 50, fg=WHITE, bg=BLACK, content="No", fontsize=32)
+
+                        deciding = True
+                        
+                        while deciding:
+
+                            # Position and click of the mouse
+                            mouse_pos = pygame.mouse.get_pos()
+                            mouse_pressed = pygame.mouse.get_pressed()
+                            
+                            # Events
+                            for event in pygame.event.get():
+
+                                # Close button
+                                if event.type == pygame.QUIT: self.exiting()
+
+                                # Keyboard
+                                elif event.type == pygame.KEYDOWN:
+
+                                    # Esc
+                                    if event.key == pygame.K_ESCAPE: deciding = False
+
+                            if no_button.is_pressed(mouse_pos, mouse_pressed): 
+                                deciding = False
+                                self.draw(); self.update()
+                                self.talking("Oh, I see. Well I have to do it by myself", True, LIGHTBLUE)
+
+                            if yes_button.is_pressed(mouse_pos, mouse_pressed):
+                                self.draw(); self.update()
+                                self.talking("Thank you very much for your help.", True, LIGHTBLUE)
+                                self.quest.grading_tests()
+                                break
+
+                            # Buttons
+                            self.screen.blit(yes_button.image, yes_button.rect)
+                            self.screen.blit(no_button.image, no_button.rect)
+                            
+                            # Updates
+                            self.clock.tick(FPS)
+                            pygame.display.update()  
                 
             # Gulbaga
             elif self.interacted[2] == 57 and self.interacted[1] == 22:
@@ -3396,6 +3550,7 @@ class Game:
                 if self.closed_window:
                     self.talking("We finally entered the room.", True, YELLOW)
                     self.talking("You know what to do.", True, YELLOW)
+                    self.talking("I hope you can reach the window.", True, YELLOW)
 
                 # Completed quest
                 else: self.talking("At least I teached you how to open window.", True, YELLOW)
@@ -3404,12 +3559,26 @@ class Game:
             elif self.interacted[2] == 28 and self.interacted[1] == 1:
                 
                 # Has grade
-                if "PRO" in self.grades.keys(): self.talking("Congrats on your test.", True, ORANGE); self.talking("I sent a student to find my rovnitko.", True, ORANGE)
+                if "PRO" in self.grades.keys(): self.talking("Congrats on your test.", True, ORANGE)
 
                 #  No grade? (insert megamind meme here)
-                else: self.talking("I'll get to you in a minute.", True, ORANGE)
-                
+                else: self.talking("I'll get to you in a minute.", True, ORANGE); self.talking("I need to find my rovnitko.", True, ORANGE)
 
+            # Rolada
+            elif self.interacted[2] == 42 and self.interacted[1] == 18: 
+
+                # Lost fella
+                if self.lost_guy:
+                    self.talking("Yooo {}, I need your help".format(self.player_name), True, LIGHTBLUE)
+                    self.talking("Someone got lost in school and I need you to find them.", True , LIGHTBLUE)
+                    self.talking("Could be please do that?", True, LIGHTBLUE)
+
+                else:
+                    self.talking("Good job finding them.", True, LIGHTBLUE)
+                    self.talking("Did you know that something similiar happened before?", True, LIGHTBLUE)
+                    self.talking("It was few years back...", True, LIGHTBLUE)
+                    self.talking("Oh no. He's at it again. Gotta go.")
+                
     def shoes_on(self):
         """
         Checks if player has shoes on
@@ -3536,10 +3705,15 @@ class Game:
             # Button
             self.screen.blit(back_button.image, back_button.rect)
             if back_button.is_pressed(mouse_pos, mouse_pressed): looking = False
+
+            # Phone
             if not looking and "phone" not in self.inv.keys():
+                self.draw(); self.update()
                 self.talking("Crap, I don't have my phone with me.")
                 self.talking("I think I left it somewhere in our class.")
                 self.info("Find your iPhone", GREEN)
+
+            # Updates
             self.clock.tick(FPS)
             pygame.display.update()
             
@@ -3605,21 +3779,25 @@ class Game:
         """
 
         # Ground floor
-        if self.in_room == ground_floor: self.ground_floor_doors()
+        if self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
 
         # First floor
-        elif self.in_room == first_floor: self.first_floor_doors()
+        elif self.in_room == self.rooms[FIRST_FLOOR]: self.first_floor_doors()
 
         # Second floor
-        elif self.in_room == second_floor: self.second_floor_doors()  
+        elif self.in_room == self.rooms[SECOND_FLOOR]: self.second_floor_doors()  
         
         # Third floor
-        elif self.in_room == third_floor: self.third_floor_doors()
+        elif self.in_room == self.rooms[THIRD_FLOOR]: self.third_floor_doors()
         
         # Fourth floor
-        elif self.in_room == fourth_floor: self.fourth_floor_doors()
+        elif self.in_room == self.rooms[FOURTH_FLOOR]: self.fourth_floor_doors()
         
+        # Ending hall
         elif self.in_room == self.rooms[ENDING_HALLWAY]: self.ending_hallway_doors()
+
+        # Lost guy
+        elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45: self.quest.guy_lost_in_school()
                
     def basement(self):
         """
@@ -3967,9 +4145,9 @@ class Game:
             # Right stairs
             if self.interacted[1] in (21, 22, 23, 24) and self.interacted[2] == 181:
                 for sprite in self.all_sprites:
-                    sprite.rect.x -= 173 * TILE_SIZE
+                    sprite.rect.x -= 174 * TILE_SIZE
                     sprite.rect.y -= 11 * TILE_SIZE
-                self.player.rect.x += 14 * TILE_SIZE
+                self.player.rect.x += 15 * TILE_SIZE
                 self.player.rect.y += 11 * TILE_SIZE
 
             # Left stairs

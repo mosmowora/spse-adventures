@@ -12,10 +12,11 @@ class Quest:
         """
 
         self.game = game
-        self.things_to_buy = {"level_teleporter": (pygame.image.load("img/doctor_who.png"), 150), 
+        self.things_to_buy = {"level teleporter": (pygame.image.load("img/doctor_who.png"), 125), 
                               "referat": (pygame.image.load("img/amper_referat.png"), 30), 
-                              "map": (pygame.image.load("img/amper_map.png"), 175),
-                              "retake": (pygame.image.load("img/amper_retake.png"), 50)
+                              "map": (pygame.image.load("img/amper_map.png"), 150),
+                              "retake": (pygame.image.load("img/amper_retake.png"), 50),
+                              "vujcheek fender": (pygame.image.load("img/amper_fender.png"), 90)
         }
     
     def bench_press(self, bench_done: bool):
@@ -377,19 +378,6 @@ class Quest:
             for i in grades:
                 if n > 5: self.game.screen.blit(self.game.font.render(str(grades[i]), True, WHITE), (425, 97 + 44 * (n - 6)))
                 n += 1
-
-    def open_window(self):
-        """
-        DSY quest to open windows but with a twist
-        """
-        
-        if self.game.interacted[1] == 28 and self.game.interacted[2] in (28, 29):
-            pass
-            
-        
-        # Updates
-        self.game.clock.tick(FPS)
-        pygame.display.update()
     
     def anglictina(self):
         """
@@ -738,7 +726,9 @@ class Quest:
             # Text
             text_surface_answer = self.game.big_font.render(answer_text, True, BLACK)
             pygame.draw.rect(self.game.screen, PAPER_WHITE, answer_rect)
-            self.game.screen.blit(text_surface_answer, (answer_rect.x+5, answer_rect.y+5))
+            xisequalto = self.game.big_font.render("x=", True, BLACK)
+            self.game.screen.blit(xisequalto, (answer_rect.x+5, answer_rect.y+5))
+            self.game.screen.blit(text_surface_answer, (answer_rect.x+35, answer_rect.y+5))
             assing_text_surface = self.game.font.render(assign, True, BLACK)
             self.game.screen.blit(assing_text_surface, (assign_rect.x+100, assign_rect.y+5))
             answer_text_surface = self.game.font.render(str(word + 1) + "/10", True, BLACK)
@@ -750,6 +740,100 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+
+    def grading_tests(self):
+        """
+        Grading tests for bananky
+        """
+
+        grading = True
+
+        # Questions
+        questions = [pygame.image.load("img/mat1.png"), pygame.image.load("img/mat2.png"), pygame.image.load("img/mat3.png"), pygame.image.load("img/mat4.png"), pygame.image.load("img/mat5.png"), pygame.image.load("img/mat6.png")]
+
+        # Correct answers
+        correct_ans = ["K = {-6; 6}", "K = {1; 4}", "K = {1}", "K = {4}", "K = {16/25}", "K = {6; 22/9}"]
+
+        # Answers
+        answers = [
+            "K = {}".format("{" + str(r.randint(-6, -4)) + "; " + str(r.randint(4, 6)) + "}"),
+            "K = {}".format("{" + str(r.randint(-1, 3)) + "; " + str(r.randint(2, 6)) + "}"),
+            "K = {}".format("{" + str(r.randint(-2, 3)) + "}"),
+            "K = {}".format("{" + str(r.randint(0, 8)) + "}"),
+            "K = {}".format("{" + str(r.randint(14, 17)) + "/" + str(r.randint(23, 26)) + "}"),
+            "K = {}".format("{" + str(r.randint(5, 6)) + "; " + str(r.randint(20, 25)) + "/" + str(r.randint(7, 11)) + "}")
+            ]
+
+        # Counter
+        c = 0
+        p = 0
+        click = pygame.time.get_ticks()
+
+        # Buttons
+        correct = Button(20, 190, 120, 50, fg=BLACK, bg=GREEN, content="Correct", fontsize=32)
+        incorrect = Button(500, 190, 120, 50, fg=BLACK, bg=RED, content="Wrong", fontsize=32)
+
+        # Background
+        bg = pygame.Rect(0, 0, 640, 480)
+        paper = pygame.image.load("img/paper.png")
+        paper_rect = paper.get_rect(x=20, y=0)
+
+        while grading:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+
+             # Events
+            for event in pygame.event.get():
+                
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+            
+                # Keyboard
+                if event.type == pygame.KEYDOWN:
+
+                    # Escape
+                    if event.key == pygame.K_ESCAPE: grading = False
+
+            if correct.is_pressed(mouse_pos, mouse_pressed) and click + 1000 < pygame.time.get_ticks(): 
+                if ans == correct_ans[c]: p += 1
+                c += 1
+                click = pygame.time.get_ticks()
+
+            if incorrect.is_pressed(mouse_pos, mouse_pressed) and click + 1000 < pygame.time.get_ticks():
+                if ans != correct_ans[c]: p += 1
+                c += 1
+                click = pygame.time.get_ticks()
+
+            if c == len(questions): break
+
+            # Background
+            pygame.draw.rect(self.game.screen, BROWN, bg)
+            self.game.screen.blit(paper, paper_rect)
+
+            # Question
+            self.game.screen.blit(questions[c], (200, 200))
+
+            # Anwer
+            ans = self.game.font.render(answers[c], True, BLACK)
+            self.game.screen.blit(ans, (250, 250))
+
+            # Buttons
+            self.game.screen.blit(correct.image, correct.rect)
+            self.game.screen.blit(incorrect.image, incorrect.rect)
+
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+
+        # After grading
+        self.game.draw(); self.game.update()
+
+        # Bananky
+        self.game.talking("Here, take these bananky as reward for helping me.", True, LIGHTBLUE) if p > 0 else self.game.talking("You didn't help at all. No bananky for you.", True, LIGHTBLUE)
+        if "bananok" in self.game.inv.keys(): self.game.number_bananok += p * 9
+        else: self.game.inv["bananok"] = "img/bananok.png"; self.game.number_bananok += p * 9
 
     def router(self): 
         """
@@ -1565,6 +1649,19 @@ class Quest:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+
+    def guy_lost_in_school(self):
+        """
+        Someone got lost in school
+        """
+
+        self.game.talking("Uhmm, hellooo? Is there anyone?")
+        self.game.talking("HERE! I'm here!", True, GOLD)
+        self.game.talking("Are those doors locked?")
+        self.game.talking("Yeah. I've been trying to open them for ages.", True, GOLD)
+        self.game.talking("Let me try.")
+        pygame.mixer.Sound.play(self.game.door_open)
+        self.game.talking("What how did you do that?", True, GOLD)
 
     def amper(self, things: list[str]):
         """

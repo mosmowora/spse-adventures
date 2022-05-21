@@ -323,8 +323,7 @@ class Npc(pygame.sprite.Sprite):
         self.facing = r.choice(["left", "right", "up", "down"])
         self.animation_loop = 1
         self.movement_loop = 0
-        self.max_travel = r.randint(7, 30)
-        if self.type == "p": self.max_travel = r.randint(7, 15)
+        self.max_travel = r.randint(7, 15)
 
         colors = [
             0, # Purple 0
@@ -334,24 +333,31 @@ class Npc(pygame.sprite.Sprite):
             396, # Orange 4
             495, # Blue 5 
             594, # Pink 6 
-            693, # Black 7 (-2)
-            792 # White (For cleaners) 8 (-1)
+            693, # Black 7
+            792, # Brown 8
+            894 # White (For cleaners) 9 (-1)
         ]
 
         # Cleaner - White
         if self.type == "C": self.color = colors[-1]
 
+        # Vujcheek - Blue
+        elif self.type == "9": self.color = colors[5]
+
+        # G.G - Purple
+        elif self.type == "ô": self.color = colors[0]
+
         # Kvôňtura - Green
         elif x == 21 and y == 3: self.color = colors[1]
 
-        # Koky - Black
-        elif x == 111 and y == 9: self.color = colors[-2]
+        # Koky - Brown
+        elif x == 111 and y == 9: self.color = colors[8]
 
         # Guydosova - Purple
         elif x == 94 and y == 24: self.color = colors[0]
         
         # Martin Shreky - Black
-        elif x == 180 and y == 5: self.color = colors[-2]
+        elif x == 180 and y == 5: self.color = colors[5]
 
         # Liascinska - Green
         elif x == 100 and y == 19: self.color = colors[1]
@@ -363,13 +369,16 @@ class Npc(pygame.sprite.Sprite):
         elif x == 188 and y == 13: self.color = colors[2]
         
         # NiguSova - Black
-        elif x == 77 and y == 16: self.color = colors[-2]
+        elif x == 77 and y == 16: self.color = colors[7]
         
         # Bartin Moda - Black
-        elif x == 25 and y == 36: self.color = colors[-2]
+        elif x == 25 and y == 36: self.color = colors[7]
 
         # HaramBozo - Orange
         elif x == 8 and y == 28: self.color = colors[4]
+
+        # Rolada - Green
+        elif x == 42 and y == 18: self.color = colors[1] 
 
         # Gone-valova - Yellow
         elif x == 155 and y == 37: self.color = colors[3]
@@ -429,10 +438,10 @@ class Npc(pygame.sprite.Sprite):
         # Collision
         self.rect.x += self.x_change
         self.collide_blocks("x")
-        self.collide_player("x")
+        self.collide_player()
         self.rect.y += self.y_change
         self.collide_blocks("y")
-        self.collide_player("y")
+        self.collide_player()
 
         self.x_change = 0
         self.y_change = 0
@@ -446,25 +455,25 @@ class Npc(pygame.sprite.Sprite):
             self.x_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "right":
             self.x_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "up":
             self.y_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "down":
             self.y_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
             
     def collide_blocks(self, direction: str):
         """
@@ -494,11 +503,15 @@ class Npc(pygame.sprite.Sprite):
                 if self.y_change < 0: self.rect.y = hits[0].rect.bottom
 
     def move_towards_player(self):
+        """
+        For Vujcheek to move closer to the player
+        """
+        
         dirvect = pygame.math.Vector2(self.game.player.rect.x - self.rect.x,
                                       self.game.player.rect.y - self.rect.y)
                                       
-        # if player is in the hall and has more than 6 quests done then VUJ is goona go after him
-        if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and len(self.game.grades) > 4:
+        # if player is in the hall and has more than 9 quests done then Vujcheek is goona go after him
+        if dirvect.length() > 0 and self.game.saved_room_data == "Hall" and len(self.game.grades) > 9:
             dirvect.normalize(); dirvect.scale_to_length(VUJ_SPEED)
             if round(dirvect[1]) < 0: self.facing = "up"
             elif round(dirvect[1]) > 0: self.facing = "down"
@@ -510,25 +523,21 @@ class Npc(pygame.sprite.Sprite):
         else: 
             if self.facing == "left":
                 self.x_change -= VUJ_SPEED / 2
-                self.movement_loop -= 1
                 if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
             elif self.facing == "right":
                 self.x_change += VUJ_SPEED / 2
-                self.movement_loop += 1
                 if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
             elif self.facing == "up":
                 self.y_change -= VUJ_SPEED / 2
-                self.movement_loop -= 1
                 if self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
             elif self.facing == "down":
                 self.y_change += VUJ_SPEED / 2
-                self.movement_loop += 1
                 if self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 30), r.choice(["left", "right", "up", "down"])
 
-    def collide_player(self, direction: str):
+    def collide_player(self):
         """
         Colliding with Player
         """
@@ -537,6 +546,8 @@ class Npc(pygame.sprite.Sprite):
         if self.type == "C": 
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
             if hits: self.game.shoes_on()
+
+        # Kacka
         elif self.type == "K":
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
             if hits and self.game.locker_stuff['crocs']: 
@@ -548,9 +559,11 @@ class Npc(pygame.sprite.Sprite):
                 self.game.talking("WHY you not wearin' yo boots?", True)
                 self.game.talking("You'll get in a lot of trouble for this", True)
                 self.game.talking("Who's yo' classteacher?", True)
-        elif self.type == "9":
+
+        # Vujcheek
+        elif self.type == "9" and "vujcheek fender" not in self.game.inv.keys():
             hits = pygame.sprite.spritecollide(self, self.game.player_sprite, False)
-            if hits and len(self.game.grades) > 4: self.game.game_over("img/game_over_background.png")
+            if hits and len(self.game.grades) > 9: self.game.game_over("img/game_over_background.png")
             
 
         """else:
@@ -629,7 +642,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -727,6 +740,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "6": self.image = self.game.terrain_spritesheet.get_sprite(409, 36, self.width, self.height)
         elif type == "7": self.image = self.game.terrain_spritesheet.get_sprite(376, 70, self.width, self.height)
         elif type == "8": self.image = self.game.terrain_spritesheet.get_sprite(409, 70, self.width, self.height)
+        elif type == "ď": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -924,7 +938,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "g" + str(i) + str(j): self.game.interacted = ["Computer", i, j]
 
                     # Special window
-                    elif self.interactive[hits[0]] == "w" + str(i) + str(j): self.game.interacted = ["Window", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "w" + str(i) + str(j): self.game.interacted = ["Window", i, j]
 
                     # Router
                     elif self.interactive[hits[0]] == "E" + str(i) + str(j): self.game.interacted = ["Router", i, j]
@@ -939,10 +953,13 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] == "A" + str(i) + str(j): self.game.interacted = ["Pult", i, j]
 
                     # Baterries
-                    elif self.interactive[hits[0]] == "ä" + str(i) + str(j): self.game.interacted = ["Baterry", i, j]
+                    elif self.interactive[hits[0]] == "ä" + str(i) + str(j): self.game.interacted = ["Battery", i, j]
                     
                     # Flashlight
-                    elif self.interactive[hits[0]] == "8" + str(i) + str(j): self.game.interacted = ["Flashlight", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "8" + str(i) + str(j): self.game.interacted = ["Flashlight", i, j]
+
+                    # Ladder
+                    elif self.interactive[hits[0]] == "ď" + str(i) + str(j): self.game.interacted = ["Ladder", i, j]
 
 class Button:
     """
@@ -964,7 +981,6 @@ class Button:
         self.width = width
         self.height = height
 
-        # self.colors
         self.fg = fg
         self.bg = bg
 
