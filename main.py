@@ -85,6 +85,13 @@ class Game:
         self.speed.set_volume(0.15)
         self.wrong_house = pygame.mixer.Sound("sounds/wrong_house.mp3")
         self.wrong_house.set_volume(0.5)
+        self.guy = pygame.mixer.Sound("sounds/lost_guy.mp3")
+        self.guy.set_volume(0.15)
+
+        # Lost guy
+        self.g_move = False
+        self.g_leave = False
+        self.player_follow = False
 
     def set_level_camera(self, level: List[str]):
         """
@@ -768,7 +775,8 @@ class Game:
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                 elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
                 elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
-                elif column in ("p", "ô"): self.npc.append(Npc(self, j, i, column)) # People
+                elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
+                elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
                 elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
 
     def set_camera(self, level: List[str]):
@@ -846,7 +854,7 @@ class Game:
             self.iot = data["quests"]["iot"]
             self.icdl = data["quests"]["icdl"]
             self.haram_test = data["quests"]["haram_test"]
-            self.lost_gyt = data["quests"]["lost_guy"]
+            self.lost_guy = data["quests"]["lost_guy"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -958,7 +966,7 @@ class Game:
         # Found flashlight
         if self.interacted[2] == 63 and self.interacted[1] == 23 and list(self.inv.keys()).count("light") == 0 and list(self.inv.keys()).count("flashlight") == 0 and self.in_room == self.rooms[THIRD_FLOOR]: 
             self.inv['light'] = "img/light.png"
-            self.info("Shit. It doesn't have any batteries.")
+            self.info("A flashlight. Shit. It doesn't have any batteries.")
 
         # Has flashlight
         else: 
@@ -1246,6 +1254,7 @@ class Game:
             self.inv['flashlight'] = "img/flashlight.png"
             self.talking("I put the batteries in the flashlight.")
             self.talking("Now the flashlight has batteries and works.")
+            self.info("You acquired working flashlight.", GREEN)
         
         if "level teleporter" in inv and "map" in inv:
             self.inv.pop("level teleporter"); self.inv.pop("map")
@@ -1254,112 +1263,112 @@ class Game:
         if "Kokosky1" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky2")
             self.inv["Kokosky12"] = "img/kokosky12_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky1" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky3")
             self.inv["Kokosky13"] = "img/kokosky13_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky1" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky1"); self.inv.pop("Kokosky4")
             self.inv["Kokosky14"] = "img/kokosky14_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky2" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky2"); self.inv.pop("Kokosky3")
             self.inv["Kokosky23"] = "img/kokosky23_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky2" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky2"); self.inv.pop("Kokosky4")
             self.inv["Kokosky24"] = "img/kokosky24_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky3" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky3"); self.inv.pop("Kokosky4")
             self.inv["Kokosky34"] = "img/kokosky34_small.png"
-            self.info("Your Kokosky are now level 2.", True, GREEN)
+            self.info("Your Kokosky are now level 2.", GREEN)
 
         if "Kokosky12" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky12"); self.inv.pop("Kokosky3")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky12" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky12"); self.inv.pop("Kokosky4")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky13" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky13"); self.inv.pop("Kokosky2")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky13" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky13"); self.inv.pop("Kokosky4")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky14" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky14"); self.inv.pop("Kokosky2")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky14" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky14"); self.inv.pop("Kokosky3")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky23" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky23"); self.inv.pop("Kokosky1")
             self.inv["Kokosky123"] = "img/kokosky123_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky23" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky23"); self.inv.pop("Kokosky4")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky24" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky24"); self.inv.pop("Kokosky1")
             self.inv["Kokosky124"] = "img/kokosky124_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky24" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky24"); self.inv.pop("Kokosky3")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky34" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky34"); self.inv.pop("Kokosky1")
             self.inv["Kokosky134"] = "img/kokosky134_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.", GREEN)
 
         if "Kokosky34" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky34"); self.inv.pop("Kokosky3")
             self.inv["Kokosky234"] = "img/kokosky234_small.png"
-            self.info("Your Kokosky are now level 3.", True, GREEN)
+            self.info("Your Kokosky are now level 3.",  GREEN)
 
         if "Kokosky123" in inv and "Kokosky4" in inv:
             self.inv.pop("Kokosky123"); self.inv.pop("Kokosky4")
             self.inv["Kokosky"] = "img/kokosky_small.png"
-            self.info("Your Kokosky are now max level.", True, GREEN)
+            self.info("Your Kokosky are now max level.", GREEN)
 
         if "Kokosky124" in inv and "Kokosky3" in inv:
             self.inv.pop("Kokosky124"); self.inv.pop("Kokosky3")
             self.inv["Kokosky"] = "img/kokosky_small.png"
-            self.info("Your Kokosky are now max level.", True, GREEN)
+            self.info("Your Kokosky are now max level.", GREEN)
 
         if "Kokosky134" in inv and "Kokosky2" in inv:
             self.inv.pop("Kokosky134"); self.inv.pop("Kokosky2")
             self.inv["Kokosky"] = "img/kokosky_small.png"
-            self.info("Your Kokosky are now max level.", True, GREEN)
+            self.info("Your Kokosky are now max level.", GREEN)
 
         if "Kokosky234" in inv and "Kokosky1" in inv:
             self.inv.pop("Kokosky234"); self.inv.pop("Kokosky1")
             self.inv["Kokosky"] = "img/kokosky_small.png"
-            self.info("Your Kokosky are now max level.", True, GREEN)
+            self.info("Your Kokosky are now max level.", GREEN)
                
     def level_teleporter(self):
         """
@@ -2393,13 +2402,13 @@ class Game:
         self.draw()
         self.saved_room_data = room_number
               
-    def talking(self, msg_content: str, teacher: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE):
+    def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
         """
         When character is talking
         """
 
-        for _ in range(self.talking_speed_number):
-            text = self.font.render(msg_content, True, WHITE) if not teacher else self.font.render(msg_content, True, additional_color)
+        for _ in range(self.talking_speed_number if not g else time):
+            text = self.font.render(msg_content, True, WHITE) if not change_color else self.font.render(msg_content, True, additional_color)
             text_rect = text.get_rect(x=10, y=10)
             r = pygame.Rect(5, 10-2.5, text_rect.width+5, text_rect.height+5)
             pygame.draw.rect(self.screen, BLACK, r)
@@ -3797,7 +3806,7 @@ class Game:
         elif self.in_room == self.rooms[ENDING_HALLWAY]: self.ending_hallway_doors()
 
         # Lost guy
-        elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45: self.quest.guy_lost_in_school()
+        elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45 and self.lost_guy: self.quest.guy_lost_in_school()
                
     def basement(self):
         """
@@ -4259,9 +4268,34 @@ class Game:
         """
 
         self.talking(f"{self.player_name} has PeePeePooPoo time now.")
+
+    def found_guy(self):
+        """
+        After you found the lost guy
+        """
+
+        self.g_leave = False
+        self.g_move = False
+        self.lost_guy = False
+        self.player_follow = False
+        self.in_room = self.rooms[GROUND_FLOOR]
+        self.create_tile_map()
+        for sprite in self.all_sprites: 
+            sprite.rect.x -= 107 * TILE_SIZE
+            sprite.rect.y -= 20 * TILE_SIZE
+        self.player.rect.x -= 52 * TILE_SIZE
+        self.player.rect.y += 20 * TILE_SIZE
+        pygame.mixer.Sound.stop(self.guy)
+        if self.music_on: pygame.mixer.Sound.play(self.theme)
+        self.talking("", True, WHITE, True, 1)
+        self.talking("Thanks for getting me out.", True, GOLD)
+        self.talking("Where did he run off?")
+        self.talking("And why was he spinning the entire time?")
+        self.talking("So many question and no answers.")
+        self.talking("Such is life at SPSE.")
         
 
-# main program
+# Main program
 g = Game()
 g.intro_screen().new("new").main()
 pygame.quit()

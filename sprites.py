@@ -87,13 +87,27 @@ class Player(pygame.sprite.Sprite):
             self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
         ]
 
+        # Lost guy
+        self.go_left = 0
+        self.go_down = 0
+
     def update(self):
         """
         Update for the player
         """
 
         # Moving
-        if not self.player_sitting: self.movement()
+        if self.game.player_follow:
+            if self.go_left < 470: 
+                self.facing = "left"
+                self.movement()
+            elif self.go_down < 40:
+                self.facing = "down"
+                self.movement()
+            else: 
+                self.facing = "left"
+                self.game.found_guy()
+        elif not self.player_sitting: self.movement()
         self.animate()
 
         # Movement
@@ -150,6 +164,15 @@ class Player(pygame.sprite.Sprite):
             for sprite in self.game.all_sprites: sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = "down"
+        elif self.game.player_follow: 
+            if self.facing == "left":
+                for sprite in self.game.all_sprites: sprite.rect.x += int(PLAYER_SPEED / 1.4)
+                self.x_change -= int(PLAYER_SPEED / 1.4)
+                self.go_left += 1
+            else:
+                for sprite in self.game.all_sprites: sprite.rect.y -= int(PLAYER_SPEED / 1.4)
+                self.y_change += int(PLAYER_SPEED / 1.4)
+                self.go_down += 1
 
     def collide_cleaner(self, direction: str):
         """
@@ -321,6 +344,7 @@ class Npc(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.facing = r.choice(["left", "right", "up", "down"])
+        if self.type == "§": self.facing = "down"
         self.animation_loop = 1
         self.movement_loop = 0
         self.max_travel = r.randint(7, 15)
@@ -345,7 +369,7 @@ class Npc(pygame.sprite.Sprite):
         elif self.type == "9": self.color = colors[5]
 
         # G.G - Purple
-        elif self.type == "ô": self.color = colors[0]
+        elif self.type == "§": self.color = colors[0]
 
         # Kvôňtura - Green
         elif x == 21 and y == 3: self.color = colors[1]
@@ -426,6 +450,10 @@ class Npc(pygame.sprite.Sprite):
             self.game.npcs_spritesheet.get_sprite(self.color + 67, 66, self.width, self.height)
         ]
 
+        # Lost guy
+        self.go_left = 0
+        self.go_down = 0
+
     def update(self):
         """
         Update for the npc
@@ -433,6 +461,16 @@ class Npc(pygame.sprite.Sprite):
 
         # Moving
         if self.type in ("C", "9", "p"): self.movement()
+        elif self.type == "§" and self.game.g_move: self.y_change += 1.95 * TILE_SIZE; self.movement()
+        elif self.type == "§" and self.game.g_leave:
+            if self.go_left < 470: 
+                self.facing = "left"
+                self.movement()
+            elif self.go_down < 40:
+                self.facing = "down"
+                self.movement()
+                self.facing = r.choice(["left", "right", "up"])
+            else: self.facing = "left"
         self.animate()
         
         # Collision
@@ -452,6 +490,7 @@ class Npc(pygame.sprite.Sprite):
         """
 
         if self.facing == "left":
+            if self.game.g_leave: self.go_left += 1
             self.x_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
@@ -470,6 +509,7 @@ class Npc(pygame.sprite.Sprite):
             elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "down":
+            if self.game.g_leave: self.go_down += 1
             self.y_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
@@ -929,7 +969,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
-                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(j, i)
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
 
                     # Bookshelf
                     elif self.interactive[hits[0]] in ("O" + str(i) + str(j), "o" + str(i) + str(j), "ó" + str(i) + str(j), "Ó" + str(i) + str(j)): self.game.interacted = ["Bookshelf", i, j]

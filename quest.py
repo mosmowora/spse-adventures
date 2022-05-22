@@ -1,6 +1,6 @@
 import pygame
 from config import *
-from sprites import Button
+from sprites import *
 from typing import List
 import math, random as r
 
@@ -1661,7 +1661,31 @@ class Quest:
         self.game.talking("Yeah. I've been trying to open them for ages.", True, GOLD)
         self.game.talking("Let me try.")
         pygame.mixer.Sound.play(self.game.door_open)
-        self.game.talking("What how did you do that?", True, GOLD)
+        pygame.time.delay(int(self.game.door_open.get_length()*1000)-500)
+        self.game.g_move = True
+        self.game.player.y_change += 1 * TILE_SIZE
+        self.game.update(); self.game.draw() 
+        self.game.clock.tick(FPS)
+        pygame.display.update()
+        self.game.g_move = False
+        self.game.talking("", True, WHITE, True, 1)
+        self.game.talking("What? How did you do that?", True, GOLD)
+        self.game.talking("Were you pushing or pulling?")
+        self.game.talking("Pushing, why are you asking?", True, GOLD)
+        self.game.talking("You know you have to pull to open those doors.")
+        self.game.talking("Wait, really?", True, GOLD)
+        self.game.talking("Now I see why you got lost in school.")
+        self.game.talking("Well whatever. We should go back up.")
+        self.game.talking("Sounds like a plan.", True, GOLD)
+        self.game.talking("Wait, I didn't introduce myself did I?", True, GOLD)
+        self.game.talking("Now that you mention it, you didn't.")
+        if self.game.music_on: pygame.mixer.Sound.stop(self.game.theme)
+        pygame.mixer.Sound.play(self.game.guy)
+        self.game.talking("My name is Giovanni Giorgio,", True, GOLD, True, 120)
+        self.game.talking("But everybody calls me", True, GOLD, True, 115)
+        self.game.talking("Giorgio.", True, GOLD, True, 80)
+        self.game.g_leave = True
+        self.game.player_follow = True
 
     def amper(self, things: list[str]):
         """

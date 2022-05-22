@@ -60,7 +60,7 @@ basement: List[str]  = [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
     "W.........W............W...........W...........W.........W............W......W....W......W",
     "W.........W............W...........W...........W.........W............W......W....W......W",
-    "W.........W............W...........W.........ô.W.........W............W......W....W......W",
+    "W.........W............W...........W.........§.W.........W............W......W....W......W",
     "WWWWWDWWWWWWWWWWDWWWWWWWWWWWWDWWWWWWWWWWWWWWWDWWWWWWWDWWWWWWWWWWDWWWWWWWWWDWWWWWDWWDWWWWWW",
     "W........................................................................................S",
     "W.......................................................................................PS",
