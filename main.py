@@ -1958,7 +1958,7 @@ class Game:
                         "iot": self.iot,
                         "icdl": self.icdl,
                         "haram_test": self.haram_test,
-                        "lost_gut": self.lost_guy,
+                        "lost_guy": self.lost_guy,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -1992,7 +1992,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/game_over_background.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif"]
         all_endings = tuple(endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
