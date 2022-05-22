@@ -359,7 +359,7 @@ class Npc(pygame.sprite.Sprite):
             594, # Pink 6 
             693, # Black 7
             792, # Brown 8
-            894 # White (For cleaners) 9 (-1)
+            891 # White (For cleaners) 9 (-1)
         ]
 
         # Cleaner - White
@@ -412,6 +412,9 @@ class Npc(pygame.sprite.Sprite):
         
         # Metrova - Orange
         elif x == 130 and y == 26: self.color = colors[4]
+        
+        # Zo Sarisa - Black
+        elif x == 139 and y == 7: self.color = colors[7]
 
         # Random shirt color cause just random side character
         else: self.color = r.choice(colors[:-1]) 
@@ -969,7 +972,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
-                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(i, j)
 
                     # Bookshelf
                     elif self.interactive[hits[0]] in ("O" + str(i) + str(j), "o" + str(i) + str(j), "ó" + str(i) + str(j), "Ó" + str(i) + str(j)): self.game.interacted = ["Bookshelf", i, j]

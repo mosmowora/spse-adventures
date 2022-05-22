@@ -1687,6 +1687,61 @@ class Quest:
         self.game.g_leave = True
         self.game.player_follow = True
 
+    def pray(self):
+        """
+        Choice pray or not
+        """
+
+        deciding = True
+
+        # Buttons
+        yes_button = Button(140, 190, 120, 50, fg=WHITE, bg=BLACK, content="Yes", fontsize=32)
+        no_button = Button(360, 190, 120, 50, fg=WHITE, bg=BLACK, content="No", fontsize=32)
+        
+        while deciding:
+
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.game.exiting()
+
+                # Keyboard
+                elif event.type == pygame.KEYDOWN:
+
+                    # Esc
+                    if event.key == pygame.K_ESCAPE: deciding = False
+
+            # Yes
+            if yes_button.is_pressed(mouse_pos, mouse_pressed):
+                self.game.not_saint = False
+                self.game.prayed = True
+                self.game.talking("", True, SILVER, True, 1)
+                self.game.talking("...Amen. Thank you for praying with me.", True, SILVER)
+                self.game.talking("You feel your luck growing in power.", True, GREEN)
+                break
+
+            # No
+            elif no_button.is_pressed(mouse_pos, mouse_pressed):
+                self.game.not_saint = False
+                self.game.prayed = False
+                self.game.talking("", True, SILVER, True, 1)
+                self.game.talking("Do whatever you want.", True, SILVER)
+                self.game.talking("You feel your luck decreasing in power.", True, RED)
+                break
+
+            # Buttons
+            self.game.screen.blit(yes_button.image, yes_button.rect)
+            self.game.screen.blit(no_button.image, no_button.rect)
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+
     def amper(self, things: list[str]):
         """
         Shopping in Amper
@@ -1761,5 +1816,3 @@ class Quest:
         # After buying a thing
         self.game.draw(); self.game.update()
         self.game.talking("Come again.", True, BLUE)
-        
-        

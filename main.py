@@ -87,6 +87,10 @@ class Game:
         self.wrong_house.set_volume(0.5)
         self.guy = pygame.mixer.Sound("sounds/lost_guy.mp3")
         self.guy.set_volume(0.15)
+        self.lucky = pygame.mixer.Sound("sounds/lucky.mp3")
+        self.lucky.set_volume(0.25)
+        self.unlucky = pygame.mixer.Sound("sounds/unlucky.mp3")
+        self.unlucky.set_volume(0.1)
 
         # Lost guy
         self.g_move = False
@@ -194,6 +198,8 @@ class Game:
         self.icdl: bool = True
         self.haram_test: bool = True
         self.lost_guy: bool = True
+        self.not_saint: bool = True
+        self.prayed: bool = False
         self.locker_stuff: dict[str, bool] = {"crocs": True, "boots": False, "key": True}
 
         # Bananok
@@ -808,7 +814,7 @@ class Game:
         data = SaveProgress.load_data(self.player_name)
         
         # Has profile
-        if data is not None and t == "new":
+        if data is not None and t == "new" and self.continue_game:
 
             # Level
             self.in_room = self.rooms[data["level"]]
@@ -855,6 +861,8 @@ class Game:
             self.icdl = data["quests"]["icdl"]
             self.haram_test = data["quests"]["haram_test"]
             self.lost_guy = data["quests"]["lost_guy"]
+            self.not_saint = data["quests"]["saint"]
+            self.prayed = data["quests"]["prayed"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -1968,6 +1976,8 @@ class Game:
                         "icdl": self.icdl,
                         "haram_test": self.haram_test,
                         "lost_guy": self.lost_guy,
+                        "saint": self.not_saint,
+                        "prayed": self.prayed,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught
@@ -2001,7 +2011,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png"]
         all_endings = tuple(endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
@@ -2031,6 +2041,12 @@ class Game:
 
         # Early
         elif img == "img/early.png" and self.music_on: pygame.mixer.Sound.play(self.speed, -1)
+
+        # Lucky
+        elif img == "img/lucky.png" and self.music_on: pygame.mixer.Sound.play(self.lucky, -1)
+
+        # Unlucky
+        elif img == "img/unlucky.png" and self.music_on: pygame.mixer.Sound.play(self.unlucky, -1)
         
         # Removing every sprite
         for sprite in self.all_sprites: sprite.kill()
@@ -2200,8 +2216,56 @@ class Game:
                     
                     # Enter
                     elif event.key == pygame.K_RETURN: 
-                        if len(self.player_name) > 0: picking_name = intro = False; break
+                        if len(self.player_name) > 0: 
 
+                            data = SaveProgress.load_data(self.player_name) 
+
+                            if data is not None:
+
+                                deciding = True
+
+                                # Buttons
+                                new_button = Button(140, 190, 150, 50, fg=WHITE, bg=BLACK, content="New", fontsize=32)
+                                con_button = Button(360, 190, 150, 50, fg=WHITE, bg=BLACK, content="Continue", fontsize=32)
+
+                                while deciding:
+    
+                                    # Position and click of the mouse
+                                    mouse_pos = pygame.mouse.get_pos()
+                                    mouse_pressed = pygame.mouse.get_pressed()
+                                    
+                                    # Events
+                                    for event in pygame.event.get():
+
+                                        # Close button
+                                        if event.type == pygame.QUIT: quit()
+
+                                        # Keyboard
+                                        elif event.type == pygame.KEYDOWN:
+
+                                            # Esc
+                                            if event.key == pygame.K_ESCAPE: deciding = False
+
+                                    # New
+                                    if new_button.is_pressed(mouse_pos, mouse_pressed):
+                                        picking_name = deciding = intro = False
+                                        self.continue_game = False
+                                        
+                                    # Continue
+                                    elif con_button.is_pressed(mouse_pos, mouse_pressed):
+                                        picking_name = deciding = intro = False
+                                        self.continue_game = True
+                                    
+                                    # Buttons
+                                    self.screen.blit(new_button.image, new_button.rect)
+                                    self.screen.blit(con_button.image, con_button.rect)
+                                    
+                                    # Updates
+                                    self.clock.tick(FPS)
+                                    pygame.display.update()
+
+                            else: picking_name = intro = False
+ 
                     # Unicode
                     elif active: self.player_name += event.unicode
 
@@ -2672,7 +2736,20 @@ class Game:
                 else: self.talking("I don't have the master key to this door."); self.talking("Maybe someone from the school can has it.")
 
             # Permission to go home sooner
-            elif self.five_min_sooner == self.nepusti == self.gul_quest == False: self.talking("Now I can go home sooner!"); self.game_over("img/early.png")
+            elif self.five_min_sooner == self.nepusti == self.gul_quest == False: 
+                self.talking("Now I can go home sooner!")
+
+                # Didn't have talk with Zo Sarisa
+                if self.not_saint: self.game_over("img/early.png")
+
+                # Had talk
+                else:
+
+                    # Prayed
+                    if self.prayed: self.game_over("img/lucky.png")
+
+                    # Didn't pray
+                    elif not self.prayed: self.game_over("img/unlucky.png")
 
             # Not yet
             elif len(self.grades) < ALL_GRADES: self.talking("I can't go home yet"); self.talking("I must fulfil what is left")
@@ -3587,6 +3664,25 @@ class Game:
                     self.talking("Did you know that something similiar happened before?", True, LIGHTBLUE)
                     self.talking("It was few years back...", True, LIGHTBLUE)
                     self.talking("Oh no. He's at it again. Gotta go.")
+
+            # Zo Sarisa
+            elif self.interacted[1] == 7 and self.interacted[2] == 139:
+
+                # Before praying
+                if self.not_saint:
+                    self.talking("Welcome my child.", True, SILVER)
+                    self.talking("Will you pray with me?", True, SILVER)
+                    self.quest.pray()
+
+                # Did pray
+                elif self.prayed:
+                    self.talking("I am glad you prayed with me.", True, SILVER)
+                    self.talking("May the Lord bless you.", True, SILVER)
+                
+                # Didn't pray
+                elif not self.prayed:
+                    self.talking("Why are you still here?", True, SILVER)
+                    self.talking("I believe the Lord will forgive you.", True, SILVER)
                 
     def shoes_on(self):
         """
