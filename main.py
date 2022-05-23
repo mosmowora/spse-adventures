@@ -2013,8 +2013,8 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png", "img/unlucky.png"]
-        all_endings = tuple(endings)
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png", "img/unlucky.png", "img/unofficial_ending.png"]
+        all_endings = tuple(self.endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
         end = True if img in endings else False
@@ -3520,20 +3520,20 @@ class Game:
                         
                 # OBN test 
                 elif self.obn_test:
-                    self.talking("Well while you're still here", True, RED)
-                    self.talking("You need a mark for OBN too", True, RED)
+                    self.talking("Well while you're still here...", True, RED)
+                    self.talking("You need a mark for OBN too.", True, RED)
                     
                     # Easy cop out if you found a referat
-                    if not self.referat:
+                    if "referat" in self.inv.keys():
                         self.talking("Is that a referat in your hand?", True, RED)
                         self.talking("What is it about?", True, RED)
-                        self.talking("Uhh")
+                        self.talking("Uhh...")
                         self.talking("Oh, it's about the OSN!")
                         self.talking("And I made it myself!")
-                        self.talking("Well, that makes my job easier", True, RED)
-                        self.talking("I'll just take it", True, RED)
+                        self.talking("Well, that makes my job easier.", True, RED)
+                        self.talking("I'll just take it.", True, RED)
                         self.talking("And give you a mark.", True, RED)
-                        self.inv.pop["referat"]
+                        self.inv.pop("referat")
                         self.grades["OBN"] = 1
                         self.obn_test = False
                         

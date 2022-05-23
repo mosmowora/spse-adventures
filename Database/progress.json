@@ -5,7 +5,10 @@
             "locker key": "img/locker key.png",
             "changing_room key": "img/changing_room key.png",
             "bananok": "img/bananok.png",
-            "amper key": "img/amper key.png"
+            "amper key": "img/amper key.png",
+            "ultra_teleporter": "img/ultra_teleporter.png",
+            "retake": "img/retake.png",
+            "vujcheek fender": "img/vujcheek fender.png"
         },
         "endings": [],
         "quests": {
@@ -24,10 +27,10 @@
             "program": true,
             "phone": true,
             "suplovanie": true,
-            "anj_test": true,
+            "anj_test": false,
             "mat_test": false,
-            "sjl_test": true,
-            "obn_test": true,
+            "sjl_test": false,
+            "obn_test": false,
             "referat": true,
             "window": true,
             "GUL_quest": false,
@@ -51,7 +54,7 @@
             "without_light": 0,
             "caught": 0
         },
-        "number_bananok": 999,
+        "number_bananok": 554,
         "bananky_in_trash": {
             "ground floor": {
                 "2113": 2,
@@ -518,20 +521,18 @@
             }
         },
         "amper_stuff": [
-            "level teleporter",
-            "referat",
-            "map",
-            "retake",
-            "vujcheek fender"
+            "retake"
         ],
         "level": 2,
-        "room_number": "217",
+        "room_number": "208",
         "grades": {
             "MAT": 1,
             "AEN": 1,
-            "ANJ": 1,
             "ICD": 1,
-            "OSY": 1
+            "OSY": 1,
+            "SJL": 1,
+            "ANJ": 1,
+            "OBN": 1
         },
         "settings": {
             "music": false,
