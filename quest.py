@@ -1,3 +1,4 @@
+# Imports
 import pygame
 from config import *
 from sprites import *
@@ -666,7 +667,6 @@ class Quest:
         assignment: List[str] = ["10x - 1 = 15 - 6x".upper(), "9x - 8 = 11x - 10".upper(), "7 + x/3 = 8 + x/4".upper(), "x/2 + x/3 = 5".upper(), "x - 2/3 = 5x/7 + 1/2".upper(), "2x - x/2 + 4 = x + x/3".upper(), "5x - 9 - 4/15 = (2x - 1)/3".upper(), "-1 - (3x - x)/4 = (2x - 5)/6".upper(), "(-17/19)x + 51 = 0".upper(), "|x - 7| = 0".upper()]
         assignment_answers: List[str] = ["1", "1", "12", "6", "49/12", "-24", "3/5", "-1/5", "57", "7"]
         
-        # print(assignment_answers) # for maths quest debugging
         answer: List[str] = []
         answer_rect = pygame.Rect(155, 215, 302, 67)
         answer_text: str = ""
@@ -1816,3 +1816,4 @@ class Quest:
         # After buying a thing
         self.game.draw(); self.game.update()
         self.game.talking("Come again.", True, BLUE)
+

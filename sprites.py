@@ -25,6 +25,7 @@ class Spritesheet:
         sprite.set_colorkey(BLACK)
         return sprite
 
+
 class Player(pygame.sprite.Sprite):
     """
     Class for player
@@ -316,6 +317,7 @@ class Player(pygame.sprite.Sprite):
             elif self.facing == "left": self.rect.x = x + TILE_SIZE
             elif self.facing == "right": self.rect.x = x - TILE_SIZE
             self.player_sitting = False
+
 
 class Npc(pygame.sprite.Sprite):
     """
@@ -674,6 +676,7 @@ class Npc(pygame.sprite.Sprite):
                 self.animation_loop += 0.1
                 if self.animation_loop >= 3: self.animation_loop = 1
 
+
 class Block(pygame.sprite.Sprite):
     """
     Class for Block
@@ -784,10 +787,14 @@ class Block(pygame.sprite.Sprite):
         elif type == "7": self.image = self.game.terrain_spritesheet.get_sprite(376, 70, self.width, self.height)
         elif type == "8": self.image = self.game.terrain_spritesheet.get_sprite(409, 70, self.width, self.height)
         elif type == "ď": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
+        elif type == "Ú": self.image = self.game.terrain_spritesheet.get_sprite(409, 104, self.width, self.height)
+        elif type == "Ů": self.image = self.game.terrain_spritesheet.get_sprite(376, 104, self.width, self.height)
+        elif type == "˙": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
 
 class Blockade(pygame.sprite.Sprite):
     """
@@ -818,6 +825,7 @@ class Blockade(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
 
 class Ground(pygame.sprite.Sprite):
     """
@@ -896,6 +904,7 @@ class Banana(pygame.sprite.Sprite):
             else: self.game.inv["bananok"] = "img/bananok.png"; self.game.number_bananok += 1
             self.game.bananky_on_ground[self.floors[self.game.rooms.index(self.game.in_room)]][str(int(self.x / TILE_SIZE)) + str(int(self.y / TILE_SIZE))] = False
 
+
 class Interact(pygame.sprite.Sprite):
     """
     Class for intracting
@@ -972,7 +981,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
-                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(i, j)
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
 
                     # Bookshelf
                     elif self.interactive[hits[0]] in ("O" + str(i) + str(j), "o" + str(i) + str(j), "ó" + str(i) + str(j), "Ó" + str(i) + str(j)): self.game.interacted = ["Bookshelf", i, j]
@@ -1003,6 +1012,7 @@ class Interact(pygame.sprite.Sprite):
 
                     # Ladder
                     elif self.interactive[hits[0]] == "ď" + str(i) + str(j): self.game.interacted = ["Ladder", i, j]
+
 
 class Button:
     """
@@ -1047,3 +1057,4 @@ class Button:
         """ 
         
         return True if self.rect.collidepoint(pos) and pressed[0] else False
+

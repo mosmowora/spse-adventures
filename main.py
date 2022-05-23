@@ -1,4 +1,4 @@
-# Import
+# Imports
 import pygame, random as r, getpass
 from leaderboard import Leaderboard
 from quest import Quest
@@ -777,6 +777,9 @@ class Game:
                 elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
                 elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
                 elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
+                elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
+                elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
+                elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
                 elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                 elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                 elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
@@ -1166,8 +1169,7 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
-            
-                  
+                         
     def inventory_item_info(self, img: str):
         """
         Player talks about item in inventory
@@ -2011,7 +2013,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png", "img/unlucky.png"]
         all_endings = tuple(endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)

@@ -1,3 +1,4 @@
+# Imports
 from dataclasses import dataclass
 from typing import List
 import json
@@ -17,13 +18,6 @@ class SaveProgress():
     grades: dict[str, int]
     settings: dict[str, bool | int] = None
     file_dest: str = "Database/progress.json"
-    
-    #   ↑     ↑       ↑        ↑          ↑
-    # def __init__(self, name: str, inventory: List[str], quests: List[str], file_dest: str = "Database/progress.json"):
-    #     self.name = name
-    #     self.inventory = inventory
-    #     self.quests = quests
-    #     self.file_dest = file_dest
     
     @staticmethod
     def load_data(name: str):
@@ -66,3 +60,4 @@ class SaveProgress():
     
     @staticmethod
     def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)
+

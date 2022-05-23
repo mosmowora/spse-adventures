@@ -1,3 +1,4 @@
+# Imports
 import json, pygame
 import math
 from typing import Any
@@ -37,7 +38,7 @@ class Leaderboard:
         name_ending.sort(reverse=True)
         
         while leaderboarding:
-            # print(page_number)
+            
             # Events
             for event in pygame.event.get():
                 
@@ -88,7 +89,6 @@ class Leaderboard:
                         endings = self.game.font.render("Endings: " + str(name_ending[player][0]), True, BLACK)
                         self.game.screen.blit(player_name, (WIN_WIDTH // 2 - 160, (player - 6) * row.get_height() + 23))
                         self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, (player - 6) * row.get_height() + 23))
-                        print((0, player * row.get_height()))
                 else:
                     for player in range(6):
                         self.game.screen.blit(row, (0, player * row.get_height()))
@@ -166,6 +166,8 @@ class Leaderboard:
                         self.game.screen.blit(endings, (WIN_WIDTH // 2 + 60, player * row.get_height() + 23))
                         
             else: page_number = max_page_number
+
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+
