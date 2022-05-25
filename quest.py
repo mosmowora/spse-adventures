@@ -1211,7 +1211,7 @@ class Quest:
             # Grade button
             elif grade_button.is_pressed(mouse_pos, mouse_pressed): 
                 bashing = False
-                if text_bash == "!#/bin/bash": return 1
+                if text_bash == "#!/bin/bash": return 1
                 else: return 3
 
 

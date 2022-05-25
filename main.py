@@ -1,4 +1,5 @@
 # Imports
+import sys
 import pygame, random as r, getpass
 from leaderboard import Leaderboard
 from quest import Quest
@@ -66,7 +67,7 @@ class Game:
         self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
         self.wow_iphone.set_volume(0.5)
         self.theme = pygame.mixer.Sound("sounds/theme.mp3")
-        self.theme.set_volume(0.008)
+        self.theme.set_volume(0.25)
         self.kacurovanie = pygame.mixer.Sound("sounds/kacurovanie.mp3")
         self.kacurovanie.set_volume(0.05)
         self.tsv_theme = pygame.mixer.Sound("sounds/bench.mp3")
@@ -1071,7 +1072,7 @@ class Game:
 
             # Close button
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
                     elif event.key == pygame.K_s: self.settings()
@@ -1089,7 +1090,7 @@ class Game:
             if return_button.is_pressed(mouse_pos, mouse_pressed): break
 
             # Save & Quit button was pressed
-            if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game(); quit()
+            if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game(); sys.exit()
 
             # BG
             self.screen.blit(bg, (0, 0))
@@ -2013,7 +2014,7 @@ class Game:
         if self.music_on: pygame.mixer.Sound.stop(self.theme)
 
         # Ending
-        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png", "img/unlucky.png", "img/unofficial_ending.png"]
+        endings = ["img/lost.png", "img/you_never_learn.png", "img/window_fail.png", "img/early.png", "img/canon_ending.gif", "img/lucky.png", "img/unlucky.png", "img/unofficial_ending.png", "img/you_tried.png"]
         all_endings = tuple(self.endings)
 
         # True ak ending je jeden z konecny (lost in school e.g.) hra zacina uplne odznova, ak False tak hrac ide na startovacie miesto (caught by cleaning lady e.g.)
@@ -2058,7 +2059,7 @@ class Game:
 
             # Close button
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -2075,7 +2076,7 @@ class Game:
             elif iamdone_button.is_pressed(mouse_pos, mouse_pressed): 
                 if img not in all_endings: self.endings.append(img[4:-4]) # Appends the name of the ending intead of the actual image
                 if end: self.reseting_game_values()
-                self.save_game(); quit()
+                self.save_game(); sys.exit()
             
             # Displaying background, text, button
             self.screen.blit(self.game_over_background, (0, 0))
@@ -2139,7 +2140,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
 
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -2200,7 +2201,7 @@ class Game:
             for event in pygame.event.get():
       
                 # Quit
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
         
                 # Click
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -2240,7 +2241,7 @@ class Game:
                                     for event in pygame.event.get():
 
                                         # Close button
-                                        if event.type == pygame.QUIT: quit()
+                                        if event.type == pygame.QUIT: sys.exit()
 
                                         # Keyboard
                                         elif event.type == pygame.KEYDOWN:
@@ -2354,7 +2355,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
                 
                 # Keyboard
                 elif event.type == pygame.KEYDOWN:
@@ -2685,7 +2686,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
                 
 
             # Background
@@ -2693,7 +2694,7 @@ class Game:
 
             # Exit button
             self.screen.blit(exit_button.image, exit_button.rect)
-            if exit_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append("canon_ending") if "canon_ending" not in self.endings else None; self.save_game(); quit()
+            if exit_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append("canon_ending") if "canon_ending" not in self.endings else None; self.save_game(); sys.exit()
 
             # Main menu button
             self.screen.blit(main_menu_button.image, main_menu_button.rect)
@@ -3237,7 +3238,7 @@ class Game:
                 for event in pygame.event.get():
 
                     # Close button
-                    if event.type == pygame.QUIT: print("You ruined the whole thing"); quit()
+                    if event.type == pygame.QUIT: print("You ruined the whole thing"); sys.exit()
 
                     # Keyboard
                     elif event.type == pygame.KEYDOWN:
@@ -3786,7 +3787,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
 
                 # Clicking
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -3992,7 +3993,7 @@ class Game:
             for event in pygame.event.get():
 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
 
                 # Esc
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: looking = False
@@ -4396,4 +4397,4 @@ class Game:
 # Main program
 g = Game()
 g.intro_screen().new("new").main()
-pygame.quit()
+pygame.sys.exit()
