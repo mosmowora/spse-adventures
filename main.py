@@ -1,5 +1,6 @@
 # Imports
 import sys
+from types import NoneType
 import pygame, random as r, getpass
 from leaderboard import Leaderboard
 from quest import Quest
@@ -692,11 +693,9 @@ class Game:
         for i, row in enumerate(self.in_room):
             for j, column in enumerate(row):
                 Ground(self, j, i)
-                if column == "_": Blockade(self, j, i, "_") # Grass
-                elif column == "?": Blockade(self, j, i, "?") # Black
-                elif column == "!": Block(self, j, i, "!") # No entry ground
+                if column in ("_", "?"): Blockade(self, j, i, column) # Grass or Black
                 elif column == "P": self.player = Player(self, j, i) # Player
-                elif column == "W": Block(self, j, i, "W") # Basic wall
+                elif column in ("!", "W"): Block(self, j, i, column) # No entry ground
                 elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
                 elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
                 elif column == "Ľ": self.interactive[Block(self, j, i, "Ľ")] = "Ľ" + str(i) + str(j) # Locker
@@ -3027,7 +3026,7 @@ class Game:
         elif self.player.facing == "up" and self.interacted[2] == 16 and self.interacted[1] == 31: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Hall -> 201
-        elif self.player.facing == "up" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("201 - Goated place", "201"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("201 - II.SB", "201"); self.center_player_after_doors()
 
         # 201 -> Hall
         elif self.player.facing == "down" and self.interacted[2] == 41 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
@@ -3073,12 +3072,6 @@ class Game:
             
         # 210 -> Hall
         elif self.player.facing == "down" and self.interacted[2] == 128 and self.interacted[1] == 25: self.door_info("Hall", "Hall"); self.center_player_after_doors()
-
-        # Hall -> 211
-        elif self.player.facing == "up" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("211 - Coming soon", "211")
-
-        # 211 -> Hall
-        elif self.player.facing == "down" and self.interacted[2] == 138 and self.interacted[1] == 25: self.door_info("Hall", "Hall")
 
         # Hall -> 212
         elif self.player.facing == "up" and self.interacted[2] == 157 and self.interacted[1] == 25: self.door_info("212 - IV.A", "212"); self.center_player_after_doors()
@@ -3406,7 +3399,9 @@ class Game:
                 if "ANJ" not in list(self.grades.keys()):
                     self.talking(f"{self.player_name} I've got the test you didn't attend", True)
                     anj_values = self.quest.anglictina()
+                    print(type(anj_values))
                     if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
+                    elif isinstance(anj_values, NoneType): self.talking("Come back later", True); return
                     self.draw(); self.update()
 
                     # Grade talk
@@ -3562,14 +3557,15 @@ class Game:
                     self.talking("I wasn't planning to give you a test today", True, YELLOW)
                     self.talking("But while you're here", True, YELLOW)
                     self.talking("I think I should.", True, YELLOW)
-                    self.grades["OSY"] = self.quest.bash()
+                    osy_test = self.quest.bash()
+                    if isinstance(osy_test, int): self.osy = not self.osy; self.grades["OSY"] = osy_test; self.talking("You can't leave without a mark", True, YELLOW)
+                    else: self.talking("I'm not sure if I can help you with that", True, YELLOW); return
                     self.draw(); self.update()
-                    self.osy = not self.osy 
+                    
 
                     # After grade talk 
                     if self.grades["OSY"] == 1: self.talking("Good linux knowledge, that's a 1 for you.", True, YELLOW)
                     elif self.grades["OSY"] == 3: self.talking("You have a lot to learn, but I'll give you a 3.", True, YELLOW)
-                    elif self.grades["OSY"] == 5: self.talking("No second chances here.", True, YELLOW)
 
                 # When quest completed
                 else: self.talking("Hi, leave me alone i need to", True, YELLOW); self.talking("install Linux on this machine", True, YELLOW)
@@ -3583,7 +3579,9 @@ class Game:
                     self.talking("you missed the last lesson", True, BLUE)
                     self.talking("I have a test for you", True, BLUE)
                     self.talking("you have to take it or else you'll recieve an a.", True, BLUE)
-                    self.grades["IOT"] = self.quest.iotest()
+                    iot_test = self.quest.iotest()
+                    if isinstance(iot_test, int): self.grades["IOT"] = iot_test
+                    else: self.talking("I need you to do this test later", True, BLUE); return
                     self.draw(); self.update()
                     self.iot = not self.iot
 
@@ -3612,8 +3610,9 @@ class Game:
                     self.talking("Well you're not him, nevermind", True, WHITE)
                     self.talking("You still haven't done previous exam", True, WHITE)
                     self.talking("You can use my PC", True, WHITE)
-                    self.grades["ICD"] = self.quest.icdl()
-                    self.icdl = False
+                    icdl_test = self.quest.icdl()
+                    if isinstance(icdl_test, int): self.icdl = False; self.grades["ICD"] = icdl_test; self.talking(f"I'll give you a {self.grades['ICD']} for effort", True, WHITE)
+                    else: self.talking("I need you to do this test later", True, WHITE); return
 
                 # After test
                 else: self.talking("Uh, let me be.", True, WHITE); self.talking("I have... Uh", True, WHITE); self.talking("Important work to do...", True, WHITE)
@@ -3695,6 +3694,8 @@ class Game:
         if self.locker_stuff["crocs"] and self.caught >= 3: self.game_over("img/you_never_learn.png")
         elif self.locker_stuff["crocs"] and self.caught < 3: 
             self.caught += 1
+            self.saved_room_data = "017"
+            self.in_room = self.rooms[GROUND_FLOOR]
             self.game_over("img/caught.png")
                
     def locker(self):
@@ -4366,7 +4367,7 @@ class Game:
         PeePeePooPoo time
         """
 
-        self.talking(f"{self.player_name} has PeePeePooPoo time now.")
+        self.talking(f"Wash your hands afterwards {self.player_name}")
 
     def found_guy(self):
         """

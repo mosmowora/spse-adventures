@@ -550,15 +550,20 @@
         "inventory": {
             "locker key": "img/locker key.png",
             "changing_room key": "img/changing_room key.png",
-            "phone": "img/Iphone_small.png"
+            "phone": "img/Iphone_small.png",
+            "amper key": "img/amper key.png",
+            "bananok": "img/bananok.png",
+            "referat": "img/referat.png",
+            "ultra_teleporter": "img/ultra_teleporter.png",
+            "vujcheek fender": "img/vujcheek fender.png"
         },
         "endings": [],
         "quests": {
             "key_in_trash": false,
             "locked_locker": false,
             "locked_changing_room": false,
-            "amper_locked": true,
-            "amper_key_in_trash": true,
+            "amper_locked": false,
+            "amper_key_in_trash": false,
             "number_kokosky": 0,
             "kokosky_in_locker": true,
             "kokosky_in_bookshelf": true,
@@ -581,9 +586,9 @@
             "router": true,
             "sooner": true,
             "resistor": true,
-            "osy": true,
+            "osy": false,
             "iot": true,
-            "icdl": true,
+            "icdl": false,
             "haram_test": true,
             "lost_guy": true,
             "saint": true,
@@ -594,9 +599,9 @@
                 "key": false
             },
             "without_light": 1,
-            "caught": 1
+            "caught": 3
         },
-        "number_bananok": 0,
+        "number_bananok": 614,
         "bananky_in_trash": {
             "ground floor": {
                 "2113": 2,
@@ -618,7 +623,7 @@
                 "8023": 2,
                 "11323": 3,
                 "11523": 2,
-                "16724": 4,
+                "16724": 0,
                 "10231": 2,
                 "138": 2,
                 "7038": 5,
@@ -732,9 +737,9 @@
                 "13011": true,
                 "13111": true,
                 "13211": true,
-                "15711": true,
-                "15811": true,
-                "15911": true,
+                "15711": false,
+                "15811": false,
+                "15911": false,
                 "7612": true,
                 "7712": true,
                 "7812": true,
@@ -747,9 +752,9 @@
                 "13012": true,
                 "13112": true,
                 "13212": true,
-                "15712": true,
-                "15812": true,
-                "15912": true,
+                "15712": false,
+                "15812": false,
+                "15912": false,
                 "18915": true,
                 "19015": true,
                 "19115": true,
@@ -1063,20 +1068,27 @@
             }
         },
         "amper_stuff": [
-            "level teleporter",
-            "referat",
-            "map",
-            "retake",
-            "vujcheek fender"
+            "retake"
         ],
-        "level": 4,
-        "room_number": "402",
+        "level": 2,
+        "room_number": "Hall",
         "grades": {
-            "TSV": 1,
-            "PRO": 2
+            "MAT": 4,
+            "AEN": 3,
+            "ICD": 3,
+            "OSY": 3,
+            "SJL": 5,
+            "ANJ": 2,
+            "OBN": 5,
+            "SIE": 1,
+            "IOT": 3,
+            "DSY": 1,
+            "TSV": 3,
+            "DEJ": 1,
+            "PRO": 4
         },
         "settings": {
-            "music": true,
+            "music": false,
             "talking_speed": 90
         }
     },

@@ -1339,7 +1339,7 @@ class Quest:
                 if pygame.KEYDOWN == event.type:
 
                     # Escape
-                    if event.key == pygame.K_ESCAPE: ioting = False; return 5
+                    if event.key == pygame.K_ESCAPE: ioting = False; return None
 
                     # Enter
                     if event.key == pygame.K_RETURN: ioting = False
