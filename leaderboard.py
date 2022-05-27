@@ -1,5 +1,5 @@
 # Imports
-import json, pygame
+import json, pygame, sys
 import math
 from typing import Any
 from config import *
@@ -43,7 +43,7 @@ class Leaderboard:
             for event in pygame.event.get():
                 
                 # Close button
-                if event.type == pygame.QUIT: quit()
+                if event.type == pygame.QUIT: sys.exit()
                 
                 # Keyboard
                 if event.type == pygame.KEYDOWN:
