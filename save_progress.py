@@ -1,7 +1,7 @@
 # Imports
 from dataclasses import dataclass
 from typing import List
-import json
+import json, firedatabase
 
 @dataclass
 class SaveProgress():
@@ -51,9 +51,12 @@ class SaveProgress():
             if write_data["name"] == loaded_data[i]["name"]: 
                 loaded_data[i] = write_data
                 has_profile = True
+                firedatabase.update_data(write_data, write_data["name"])
 
         # No profile for u big man
-        if not has_profile: loaded_data.append(write_data)
+        if not has_profile: 
+            loaded_data.append(write_data)
+            firedatabase.push_data(loaded_data, loaded_data[loaded_data.index(write_data)]['name'])
 
         # Writing to file 
         with open(self.file_dest, "w") as destination_file: json.dump(loaded_data, destination_file, indent=4)
