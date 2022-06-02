@@ -22,8 +22,23 @@ def push_data(data: list, id_key: str):
     db.child(id_key).set(data[-1])
   
 
-def update_data(data: list, id_key: str):
+def update_data(data, id_key: str):
     '''
     Updates the data on the server
     '''
     db.child(id_key).update(data)
+    
+    
+def retrieve_data(name=""):
+    '''
+    Retrieves the data from the server
+    '''
+    users = db.get()
+    if users.each() is not None:
+        if name != "":
+            for user in users.each():
+                if user.val()["name"] == name: return user.val()
+        
+        else: return [user.val() for user in users.each()]
+    
+    return []

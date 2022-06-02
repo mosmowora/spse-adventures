@@ -22,22 +22,20 @@ class SaveProgress():
     @staticmethod
     def load_data(name: str):
         """
-        Loads data for player if he has profile
+        Loads data for player if he has profile on OUR server
         """
     
         # Data from file
-        loaded_data: List = json.load(open(SaveProgress.file_dest))
-
-        for i in range(len(loaded_data)):
-            if loaded_data[i]["name"] == name: return loaded_data[i]
+        loaded_data = firedatabase.retrieve_data(name)
+        return None if len(loaded_data) == 0 else loaded_data 
               
     def save(self):
         """
-        Saves/rewrites data to file
+        Saves/rewrites data to server
         """
 
         # Data from file
-        loaded_data: List = json.load(open(SaveProgress.file_dest))
+        loaded_data: list = firedatabase.retrieve_data()
 
         # New data
         write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
@@ -56,10 +54,7 @@ class SaveProgress():
         # No profile for u big man
         if not has_profile: 
             loaded_data.append(write_data)
-            firedatabase.push_data(loaded_data, loaded_data[loaded_data.index(write_data)]['name'])
-
-        # Writing to file 
-        with open(self.file_dest, "w") as destination_file: json.dump(loaded_data, destination_file, indent=4)
+            firedatabase.push_data(loaded_data, write_data['name'])
     
     @staticmethod
     def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)

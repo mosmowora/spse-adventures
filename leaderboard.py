@@ -3,6 +3,7 @@ import json, pygame, sys
 import math
 from typing import Any
 from config import *
+from save_progress import SaveProgress
 
 class Leaderboard:
    
@@ -12,7 +13,6 @@ class Leaderboard:
         """
         
         self.game = game
-        self.player_info: str = "Database/progress.json"
         
     def show_leaderboard(self):
         """
@@ -29,12 +29,17 @@ class Leaderboard:
         second_medal = pygame.image.load("img/second_medal.png")
         third_medal = pygame.image.load("img/third_medal.png")
         
-        players: int = len(json.load(open(self.player_info)))
+        db = SaveProgress.load_data("")
+
+        players: int = len(db)
         max_page_number = math.ceil(players / 6)
-        player_names: dict[str, Any] = json.load(open(self.player_info))
+        player_names = db
         
         name_ending: list[tuple] = []
-        for player in range(players): name_ending.append((len(player_names[player]['endings']), player_names[player]['name']))
+
+        for player in range(players): 
+            if 'endings' not in player_names[player].keys(): player_names[player]['endings'] = []
+            name_ending.append((len(player_names[player]['endings']), player_names[player]['name']))
         name_ending.sort(reverse=True)
         
         while leaderboarding:

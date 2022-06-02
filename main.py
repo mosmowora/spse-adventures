@@ -824,12 +824,12 @@ class Game:
             self.saved_room_data = data['room_number']
 
             # Inventory
-            self.inv = data["inventory"]
+            self.inv = {} if "inventory" not in data.keys() else data["inventory"]
 
             # Variables for endings
             self.without_light = data["quests"]["without_light"]
             self.caught = data["quests"]["caught"]
-            self.endings = data["endings"]
+            self.endings = [] if "endings" not in data.keys() else data["endings"]
 
             # Variables for finding items/doing stuff
             self.key_in_trash = data["quests"]["key_in_trash"]
@@ -876,7 +876,7 @@ class Game:
             self.amper_stuff = data["amper_stuff"]
 
             # Grades
-            self.grades = data['grades']
+            self.grades = {} if "grades" not in data.keys() else data["grades"]
 
             # Saved settings
             self.music_on = data["settings"]["music"]
