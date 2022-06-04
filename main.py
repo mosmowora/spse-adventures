@@ -814,7 +814,7 @@ class Game:
         self.bananky = pygame.sprite.LayeredUpdates()
 
         # Loads data
-        data = SaveProgress.load_data(self.player_name)
+        data: list | dict = SaveProgress.load_data(self.player_name)
         
         # Has profile
         if data is not None and t == "new" and self.continue_game:
@@ -846,7 +846,7 @@ class Game:
             self.vtipnicek = data["quests"]["vtipnicek"]
             self.dumbbell_lifted = data["quests"]["dumbbells"]
             self.program_test = data["quests"]["program"]
-            self.suplovanie = data["quests"]['suplovanie']
+            self.suplovanie = data["quests"]['suplovanie'] if 'suplovanie' in data['quests'].keys() else False
             self.phone_in_trash = data["quests"]["phone"]
             self.anj_test = data["quests"]["anj_test"]
             self.mat_test = data["quests"]["mat_test"]
