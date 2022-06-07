@@ -3399,15 +3399,15 @@ class Game:
                 if "ANJ" not in list(self.grades.keys()):
                     self.talking(f"{self.player_name} I've got the test you didn't attend", True)
                     anj_values = self.quest.anglictina()
-                    print(type(anj_values))
                     if isinstance(anj_values, tuple): self.grades["ANJ"], self.anj_test = anj_values[0], anj_values[1]
-                    elif isinstance(anj_values, NoneType): self.talking("Come back later", True); return
+                    elif isinstance(anj_values, NoneType | bool): self.talking("Come back later", True); return
                     self.draw(); self.update()
 
                     # Grade talk
-                    if self.grades["ANJ"] in (1, 2): self.talking("You got " + str(self.grades["ANJ"]) + ". I am proud of you.", True)
-                    elif self.grades["ANJ"] == 3: self.talking("You got " + str(self.grades["ANJ"]) + ". Not great, not terrible.", True)
-                    elif self.grades["ANJ"] in (4, 5): self.talking("You got " + str(self.grades["ANJ"]) + ". You need to practice more.", True)
+                    anj_grade = self.grades["ANJ"]
+                    if anj_grade in (1, 2): self.talking("You got " + str(anj_grade) + ". I am proud of you.", True)
+                    elif anj_grade == 3: self.talking("You got " + str(anj_grade) + ". Not great, not terrible.", True)
+                    elif anj_grade in (4, 5): self.talking("You got " + str(anj_grade) + ". You need to practice more.", True)
 
                 # Already took the test
                 else: self.talking("Will you come to my kruzok?", True) # pls someone translate this  
