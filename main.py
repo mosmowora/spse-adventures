@@ -23,12 +23,19 @@ class Game:
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        '''Main game screen'''
         self.clock = pygame.time.Clock()
+        '''FPS shenanigans'''
         self.game_running = True
+        '''Ye, it's running alright'''
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
+        '''BIIG FOOONT'''
         self.font = pygame.font.Font("Roboto.ttf", 22)
+        '''just a normal font'''
         self.settings_font = pygame.font.Font("Caveat.ttf", 45)
-        self.lrob_font = pygame.font.Font("Roboto.ttf", 13) # also OSY font
+        '''Another font, but now usable for settings'''
+        self.lrob_font = pygame.font.Font("Roboto.ttf", 13) 
+        '''And there was also an OSY font'''
 
         # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -44,18 +51,28 @@ class Game:
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
-        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement] # Rooms where player can go
-        self.in_room: List[str] = self.rooms[GROUND_FLOOR] # Floor where player is rn (starting point) that's ground floor for those who don't know
-        self.saved_room_data: str = "017" # Room where player is rn (starting point) that's Satna for those who don't know
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement] 
+        '''Rooms where player can go'''
+        self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
+        '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
+        self.saved_room_data: str = "017" 
+        '''Room where player is rn (starting point) that's Satna for those who don't know'''
         self.quest = Quest(self)
+        '''More complex quests'''
         self.grades: dict[str, int] = {}
+        '''Player's grades'''
         self.endings: List[str] = []
+        '''Endings that player has already achieved'''
         self.camera = Camera(self)
+        '''Camera for the game'''
         self.leaderboarding = Leaderboard(self)
+        '''Yes, good name for a specific yet easy to use variable, used only once'''
         
         # Settings
         self.music_on: bool = True
+        '''Music on/off'''
         self.talking_speed_number: int = 90
+        '''Talking speed for the game'''
         self.reseting_game_values()
 
         # Player name
