@@ -3629,7 +3629,7 @@ class Game:
                     self.talking("You can use my PC", True, WHITE)
                     icdl_test = self.quest.icdl()
                     if isinstance(icdl_test, int): self.icdl = False; self.grades["ICD"] = icdl_test; self.talking(f"I'll give you a {self.grades['ICD']} for effort", True, WHITE)
-                    else: self.talking("I need you to do this test later", True, WHITE); return
+                    else: self.talking("I need you to do this test later", True, WHITE)
 
                 # After test
                 else: self.talking("Uh, let me be.", True, WHITE); self.talking("I have... Uh", True, WHITE); self.talking("Important work to do...", True, WHITE)
@@ -4415,4 +4415,4 @@ class Game:
 # Main program
 g = Game()
 g.intro_screen().new("new").main()
-pygame.sys.exit()
+sys.exit()
