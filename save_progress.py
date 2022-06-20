@@ -6,6 +6,7 @@ import json, firedatabase
 @dataclass
 class SaveProgress():
     name: str
+    credentials: tuple[str, str]
     inventory: dict[str]
     endings: List[str] 
     quests: List[str]
@@ -38,7 +39,7 @@ class SaveProgress():
         loaded_data: list = firedatabase.retrieve_data()
 
         # New data
-        write_data = {"name": self.name, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
+        write_data = {"name": self.name, 'credentials': self.credentials, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "grades": self.grades, "settings": self.settings}
 
         has_profile = False
 

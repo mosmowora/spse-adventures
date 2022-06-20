@@ -1,6 +1,7 @@
 # Imports
 import sys
 from types import NoneType
+import webbrowser
 import pygame, random as r, getpass
 from leaderboard import Leaderboard
 from quest import Quest
@@ -60,6 +61,8 @@ class Game:
 
         # Player name
         self.player_name: str = ""
+        self._email: str = ""
+        self._password: str = ""
 
         # Npc list
         self.npc = []
@@ -1987,6 +1990,7 @@ class Game:
         
         # Saving
         self.database = SaveProgress(self.player_name, 
+                                    (self._email, self._password),
                                     self.inv,
                                     self.endings,
                                     self.quests,
@@ -2169,6 +2173,80 @@ class Game:
 
         return self
     
+    def verifying_user(self, player_name: str):
+        
+        # Main verifying data
+        data = SaveProgress.load_data(player_name)
+        bg = pygame.image.load('img/login_background.png')
+        verifying: bool = True
+        active: bool = False
+        active_pass: bool = False
+        
+        # Drawings for inputs etc.
+        color = BLACK
+        color_pass = BLACK
+        email_info = pygame.Rect(210, 140, 210, 40)
+        password_info = pygame.Rect(210, 230, 210, 40)
+        text = self.font.render("Continue on the site", True, BLACK)
+        text_rect = text.get_rect(x=220, y=350)
+        emaill = self.font.render("E-mail", True, WHITE)
+        email_rect = text.get_rect(x=220, y=110)
+        password = self.font.render("Password", True, WHITE)
+        password_rect = text.get_rect(x=220, y=200)
+        
+        if 'credentials' not in data.keys(): 
+            data['credentials'] = ("", "")
+            # ↓ TESTING PURPOSES ONLY ↓
+            print(data['credentials'])
+        
+        if data['credentials'][0] == "" and data['credentials'][1] == "":
+            # webbrowser.open('https://aeternix-forum.herokuapp.com/register/')
+            
+            while verifying:
+
+                for event in pygame.event.get():
+        
+                    # Quit
+                    if event.type == pygame.QUIT: sys.exit()
+            
+                    # Click
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if email_info.collidepoint(event.pos): active = True
+                        else: active = False
+                        if password_info.collidepoint(event.pos): active_pass = True
+                        else: active_pass = False
+                    
+                        
+                    elif event.type == pygame.KEYDOWN:
+                        if active: 
+                            color = GRAY
+                            self._email += event.unicode
+                        else: color = BLACK
+                        if active_pass: 
+                            color_pass = GRAY
+                            self._password += event.unicode
+                        else: color_pass = BLACK
+                        
+                        # Check for backspace
+                        if event.key == pygame.K_BACKSPACE and active: self._email = self._email[:-2]; print(self._email)
+                        if event.key == pygame.K_BACKSPACE and active_pass: self._password = self._password[:-2]; print(self._password)
+                        
+                    
+                self.screen.blit(bg, (0, 0))
+                pygame.draw.rect(self.screen, color, email_info)
+                pygame.draw.rect(self.screen, color_pass, password_info)
+                self.screen.blit(text, text_rect)
+                self.screen.blit(emaill, email_rect)
+                self.screen.blit(password, password_rect)
+                email_render = self.font.render(self._email, True, WHITE)
+                password_render = self.font.render(self._password, True, WHITE)
+
+                self.screen.blit(email_render, (email_rect.x + 5, email_rect.y + 35))
+                self.screen.blit(password_render, (password_rect.x + 5, password_rect.y + 35))
+                self.clock.tick(FPS)
+                pygame.display.update()
+            
+    
     def start(self, intro: bool):
         """
         Starting the game
@@ -2256,6 +2334,7 @@ class Game:
                                     # Continue
                                     elif con_button.is_pressed(mouse_pos, mouse_pressed):
                                         picking_name = deciding = intro = False
+                                        self.verifying_user(self.player_name)
                                         self.continue_game = True
                                     
                                     # Buttons
