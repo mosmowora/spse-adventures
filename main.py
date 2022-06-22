@@ -1,5 +1,6 @@
 # Imports
 import sys
+from tkinter import messagebox
 from types import NoneType
 import webbrowser
 import pygame, random as r, getpass, requests
@@ -25,10 +26,10 @@ class Game:
         pygame.init()
         
         # Game version
-        web = requests.get('https://github.com/mosmowora/spse-adventures/blob/main/version_info.txt')
-        soup = bs(web.text, 'html.parser').find('td', attrs={'id': 'LC1'}).text
+        web = requests.get('https://aeternix-forum.herokuapp.com/version/')
+        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split(" ")[-1]
         self.__LOCAL_VERSION__ = float(open('version_info.txt', 'r').read())
-        self.__REMOTE_VERSION__ = float(soup)
+        self.__REMOTE_VERSION__ = float(soup) if not isinstance(soup, NoneType) else self.__LOCAL_VERSION__
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -126,7 +127,15 @@ class Game:
         self.g_leave = False
         self.player_follow = False
         
-    def _new_version(self): return True if self.__LOCAL_VERSION__ < self.__REMOTE_VERSION__ else False
+        self.show_update()
+        
+    def __new_version(self): return True if self.__LOCAL_VERSION__ < self.__REMOTE_VERSION__ else False
+    
+    def show_update(self): 
+        if self.__new_version() and messagebox.askyesno("New update", "Update the game?"): 
+            webbrowser.open('https://aeternix-forum.herokuapp.com/version/')
+            sys.exit()
+        else: sys.exit()
 
     def set_level_camera(self, level: List[str]):
         """
