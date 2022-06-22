@@ -6,7 +6,7 @@ import json, firedatabase
 @dataclass
 class SaveProgress():
     name: str
-    credentials: tuple[str, str]
+    credentials: str
     inventory: dict[str]
     endings: List[str] 
     quests: List[str]
