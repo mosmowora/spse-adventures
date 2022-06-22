@@ -25,10 +25,10 @@ class Game:
         pygame.init()
         
         # Game version
-        __local_version__: float = float(open('version_info.txt', 'r').read())
-        web = requests.get()
-        soup = bs()
-        # __remote_version__: float = 
+        web = requests.get('https://github.com/mosmowora/spse-adventures/blob/main/version_info.txt')
+        soup = bs(web.text, 'html.parser').find('td', attrs={'id': 'LC1'}).text
+        self.__LOCAL_VERSION__ = float(open('version_info.txt', 'r').read())
+        self.__REMOTE_VERSION__ = float(soup)
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -125,6 +125,8 @@ class Game:
         self.g_move = False
         self.g_leave = False
         self.player_follow = False
+        
+    def _new_version(self): return True if self.__LOCAL_VERSION__ < self.__REMOTE_VERSION__ else False
 
     def set_level_camera(self, level: List[str]):
         """
