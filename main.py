@@ -1,4 +1,5 @@
 # Imports
+import base64
 import sys
 from tkinter import messagebox
 from types import NoneType
@@ -26,10 +27,10 @@ class Game:
         pygame.init()
         
         # Game version
-        web = requests.get('https://aeternix-forum.herokuapp.com/version/')
-        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split(" ")[-1]
+        web = requests.get('https://aeternix-forum.herokuapp.com/releases/')
+        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split("v")[-1]
         self.__LOCAL_VERSION__ = float(open('version_info.txt', 'r').read())
-        self.__REMOTE_VERSION__ = float(soup) if not isinstance(soup, NoneType) else self.__LOCAL_VERSION__
+        self.__REMOTE_VERSION__ = float(soup)
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -85,9 +86,10 @@ class Game:
         '''Talking speed for the game'''
         self.reseting_game_values()
 
-        # Player name
+        # Player name and password
         self.player_name: str = ""
         self._password: str = ""
+        self.main_password: str = open('tfa.txt', 'r').read()
 
         # Npc list
         self.npc = []
@@ -132,10 +134,24 @@ class Game:
     def __new_version(self): return True if self.__LOCAL_VERSION__ < self.__REMOTE_VERSION__ else False
     
     def show_update(self): 
-        if self.__new_version() and messagebox.askyesno("New update", "Update the game?"): 
-            webbrowser.open('https://aeternix-forum.herokuapp.com/version/')
-            sys.exit()
-        else: sys.exit()
+        if self.__new_version():
+            if messagebox.askyesno("New update", "Update the game?"):
+                webbrowser.open('https://aeternix-forum.herokuapp.com/releases/')
+                sys.exit()
+            else: sys.exit()
+        
+    def encode_password(self, password: str): 
+        password = base64.b85encode(password.encode('utf-8')).decode('utf-8')
+        return password
+    
+    def decode_password(self, password: str):
+        try:
+            password = base64.b85decode(password.encode('utf-8')).decode('utf-8')
+            return password
+        except UnicodeDecodeError:
+            password = self.encode_password(password)
+            password = base64.b85decode(password.encode('utf-8')).decode('utf-8')
+            return password
 
     def set_level_camera(self, level: List[str]):
         """
@@ -2024,9 +2040,11 @@ class Game:
                         "caught": self.caught
                         }
         
+        # Refreshing the password to it's original state for further encodings
+        self._password = self.decode_password(self._password)
         # Saving
         self.database = SaveProgress(self.player_name, 
-                                    self._password,
+                                    self.encode_password(self._password),
                                     self.inv,
                                     self.endings,
                                     self.quests,
@@ -2283,15 +2301,15 @@ class Game:
                 self.clock.tick(FPS)
                 pygame.display.update()
         elif data['credentials'] != "":
-            
-            secret = data['credentials']
+            # encoded password -> WpH<5Z+K&P
+            secret: str = self.decode_password(data['credentials'])
             
             while verifying:
                 for event in pygame.event.get():
-                        # Quit
+                    # Quit
                     if event.type == pygame.QUIT: sys.exit()
                 
-                        # Click
+                    # Click
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if password_info.collidepoint(event.pos): active_pass = True
                         else: active_pass = False
@@ -2318,6 +2336,7 @@ class Game:
                         elif not active_pass: color_pass = BLACK
 
                         elif len(self._password) == 0: active_pass = False
+                        print(self._password)
                                 
                 dots = ""
                 for _ in range(len(self._password)): dots += "*"

@@ -18,7 +18,6 @@ class SaveProgress():
     room_number: str
     grades: dict[str, int]
     settings: dict[str, bool | int] = None
-    file_dest: str = "Database/progress.json"
     
     @staticmethod
     def load_data(name: str):
@@ -56,7 +55,3 @@ class SaveProgress():
         if not has_profile: 
             loaded_data.append(write_data)
             firedatabase.push_data(loaded_data, write_data['name'])
-    
-    @staticmethod
-    def print_database(): return json.dumps(json.loads(open(SaveProgress.file_dest).read()), indent=4)
-
