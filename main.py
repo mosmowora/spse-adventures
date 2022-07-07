@@ -28,9 +28,9 @@ class Game:
         
         # Game version
         web = requests.get('https://aeternix-forum.herokuapp.com/releases/')
-        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split("v")[-1]
+        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split("v")[-1] if web.status_code != 503 else None
         self.__LOCAL_VERSION__ = float(open('version_info.txt', 'r').read())
-        self.__REMOTE_VERSION__ = float(soup)
+        self.__REMOTE_VERSION__ = float(soup) if soup is not None else self.__LOCAL_VERSION__
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -62,8 +62,10 @@ class Game:
         pygame.display.set_icon(icon)
         pygame.display.set_caption('SPŠE ADVENTURE - REVENGEANCE')
 
-        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement] 
+        self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
+        self.lyz_rooms: List[List[str]] = [lyz_outside, "lyz_ground", "lyz_first", "lyz_second"]
+        '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
         self.saved_room_data: str = "017" 
@@ -89,7 +91,6 @@ class Game:
         # Player name and password
         self.player_name: str = ""
         self._password: str = ""
-        self.main_password: str = open('tfa.txt', 'r').read()
 
         # Npc list
         self.npc = []
@@ -841,6 +842,9 @@ class Game:
                 elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
                 elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
                 elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
+                elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(j) + str(i)
+                elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(j) + str(i)
+                elif column == "`": self.interactive[Block(self, j, i, "`")] = "`" + str(j) + str(i); print('CREATED!') # Snow
 
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
@@ -848,6 +852,7 @@ class Game:
             elif level == second_floor: self.camera.set_second_camera()
             elif level == third_floor: self.camera.set_third_camera()
             elif level == fourth_floor: self.camera.set_fourth_camera()
+            elif level == lyz_outside: self.camera.set_lyz_outside()
     
     def new(self, t: str):
         """
@@ -1111,6 +1116,45 @@ class Game:
         self.clock.tick(FPS) # How often does the game update
         pygame.display.update()
 
+    def show_dlcs(self):
+        
+        lyziarak_cover = pygame.image.load("img/lyziarak_dlc_cover.png")
+        lyziarak_rect: pygame.Rect = pygame.Rect(WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 - 145, 180, 280)
+        lyz_dlc_title = self.font.render("Lyziarsky DLC", True, WHITE)
+        lyz_dlc_title_rect = lyz_dlc_title.get_rect(x=lyziarak_rect.left + 25, y=lyziarak_rect.bottom + 10)
+        previewing: bool = True
+        
+        while previewing:
+            if self.music_on: pygame.mixer.Sound.stop(self.theme)
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            # Close button
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos):
+                    previewing = False
+                    self.create_tile_map()
+                    self.set_level_camera(self.lyz_rooms[OUTSIDE])
+                    print(self.lyz_rooms[OUTSIDE] == lyz_outside)
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: break
+            
+            
+            if lyziarak_rect.collidepoint(mouse_pos): 
+                bg = pygame.image.load("img/lyziarak_chata.png")
+            else: bg = pygame.image.load("img/exiting.png")
+            
+            # BG
+            self.screen.blit(bg, (0, 0))
+            self.screen.blit(lyziarak_cover, (WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 - 140))
+            self.screen.blit(lyz_dlc_title, lyz_dlc_title_rect)
+            pygame.draw.rect(self.screen, BLACK, lyziarak_rect, 5, 6)
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+
     def exiting(self):
         """
         After player presses Close button
@@ -1121,7 +1165,9 @@ class Game:
         return_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Return", fontsize=32)
         settings_button = Button(WIN_WIDTH // 2 + 5, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Settings", fontsize=32)
         sq_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 5, 310, 40, fg=WHITE, bg=BLACK, content="Save & Quit", fontsize=32)
+        dlc_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 50, 310, 40, fg=WHITE, bg=BLACK, content="Available DLCs", fontsize=32)
         exit_pause: bool = False
+        
         while True:
 
             # Close button
@@ -1145,7 +1191,9 @@ class Game:
 
             # Save & Quit button was pressed
             if sq_button.is_pressed(mouse_pos, mouse_pressed): self.save_game(); sys.exit()
-
+            
+            # Show all DLCs
+            if dlc_button.is_pressed(mouse_pos, mouse_pressed): self.show_dlcs()
             # BG
             self.screen.blit(bg, (0, 0))
 
@@ -1153,6 +1201,7 @@ class Game:
             self.screen.blit(return_button.image, return_button.rect)
             self.screen.blit(settings_button.image, settings_button.rect)
             self.screen.blit(sq_button.image, sq_button.rect)
+            self.screen.blit(dlc_button.image, dlc_button.rect)
 
             # Updates
             self.clock.tick(FPS)
@@ -2041,7 +2090,11 @@ class Game:
                         }
         
         # Refreshing the password to it's original state for further encodings
-        self._password = self.decode_password(self._password)
+        if self._password == "": self._password = open('tfa.txt', 'r').read()
+        
+        # If the password is already encoded -> decode it first
+        elif self._password != open('tfa.txt', 'r').read(): self._password = self.decode_password(self._password)
+        
         # Saving
         self.database = SaveProgress(self.player_name, 
                                     self.encode_password(self._password),
@@ -2227,7 +2280,7 @@ class Game:
 
         return self
     
-    def verifying_user(self, player_name: str):
+    def verifying_user(self, player_name: str) -> str:
         
         # Main verifying data
         data = SaveProgress.load_data(player_name)
@@ -2272,7 +2325,7 @@ class Game:
                             # Add authentication
                             if self._password == secret:
                                 verifying = False
-                                return
+                                return self._password
                             else: wrong = True
                         elif event.key == pygame.K_BACKSPACE and active_pass and len(self._password) > 0: self._password = self._password[:-1]
                         
@@ -2322,7 +2375,7 @@ class Game:
                             # Add authentication
                             if self._password == secret:
                                 verifying = False
-                                return
+                                return self._password
                             else: wrong = True
                         elif event.key == pygame.K_BACKSPACE and active_pass and len(self._password) > 0: self._password = self._password[:-1]
                         
@@ -2336,8 +2389,7 @@ class Game:
                         elif not active_pass: color_pass = BLACK
 
                         elif len(self._password) == 0: active_pass = False
-                        print(self._password)
-                                
+
                 dots = ""
                 for _ in range(len(self._password)): dots += "*"
                                 
@@ -2438,13 +2490,13 @@ class Game:
                                     if new_button.is_pressed(mouse_pos, mouse_pressed):
                                         picking_name = deciding = intro = False
                                         self.continue_game = False
-                                        self.verifying_user(self.player_name)
+                                        self._password = self.verifying_user(self.player_name)
                                         
                                     # Continue
                                     if con_button.is_pressed(mouse_pos, mouse_pressed):
                                         picking_name = deciding = intro = False
                                         self.continue_game = True
-                                        self.verifying_user(self.player_name)
+                                        # self._password = self.verifying_user(self.player_name)
                                     
                                     # Buttons
                                     self.screen.blit(new_button.image, new_button.rect)
