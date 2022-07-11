@@ -99,7 +99,7 @@ class Player(pygame.sprite.Sprite):
 
         # Moving
         if self.game.player_follow:
-            if self.go_left < 470: 
+            if self.go_left < 470:
                 self.facing = "left"
                 self.movement()
             elif self.go_down < 40:
@@ -792,7 +792,6 @@ class Block(pygame.sprite.Sprite):
         elif type == "˙": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
         elif type == "ś": self.image = self.game.terrain_spritesheet.get_sprite(500, 2, self.width, self.height)
         elif type == "š": self.image = self.game.terrain_spritesheet.get_sprite(500, 36, self.width, self.height)
-        elif type == "`": self.image = self.game.terrain_spritesheet.get_sprite(534, 36, self.width, self.height)
         
 
         self.rect = self.image.get_rect()
@@ -854,7 +853,7 @@ class Ground(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
-        self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height)
+        self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height) if self.game.in_room != lyz_outside else self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
         
         self.rect = self.image.get_rect()
         self.rect.x = self.x

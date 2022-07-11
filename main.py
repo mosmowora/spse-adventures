@@ -64,7 +64,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, "lyz_ground", "lyz_first", "lyz_second"]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, "lyz_ground", "lyz_first", "lyz_second", 'lyz_diner']
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -91,6 +91,7 @@ class Game:
         # Player name and password
         self.player_name: str = ""
         self._password: str = ""
+        self.bought: bool = False
 
         # Npc list
         self.npc = []
@@ -844,7 +845,6 @@ class Game:
                 elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
                 elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(j) + str(i)
                 elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(j) + str(i)
-                elif column == "`": self.interactive[Block(self, j, i, "`")] = "`" + str(j) + str(i); print('CREATED!') # Snow
 
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
@@ -852,7 +852,7 @@ class Game:
             elif level == second_floor: self.camera.set_second_camera()
             elif level == third_floor: self.camera.set_third_camera()
             elif level == fourth_floor: self.camera.set_fourth_camera()
-            elif level == lyz_outside: self.camera.set_lyz_outside()
+            elif level == lyz_outside: self.camera.set_lyz_outside(); print('lyz created')
     
     def new(self, t: str):
         """
@@ -1130,27 +1130,35 @@ class Game:
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
             mouse_pressed = pygame.mouse.get_pressed()
+            pressed: bool = False
             
             # Close button
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos):
+                if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and self.bought:
                     previewing = False
+                    self.in_room = self.lyz_rooms[OUTSIDE]
                     self.create_tile_map()
-                    self.set_level_camera(self.lyz_rooms[OUTSIDE])
-                    print(self.lyz_rooms[OUTSIDE] == lyz_outside)
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: break
+                    self.camera.set_lyz_outside()
+                elif event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and not self.bought: pressed = True
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: previewing = False; break
             
             
-            if lyziarak_rect.collidepoint(mouse_pos): 
-                bg = pygame.image.load("img/lyziarak_chata.png")
+            if lyziarak_rect.collidepoint(mouse_pos): bg = pygame.image.load("img/lyziarak_chata.png")
             else: bg = pygame.image.load("img/exiting.png")
             
             # BG
             self.screen.blit(bg, (0, 0))
             self.screen.blit(lyziarak_cover, (WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 - 140))
             self.screen.blit(lyz_dlc_title, lyz_dlc_title_rect)
+            if pressed:
+                for _ in range(self.talking_speed_number):
+                    self.screen.blit(self.font.render("Not yet bought", True, RED), (lyz_dlc_title_rect.centerx - 75, 50))
+                    pygame.draw.rect(self.screen, BLACK, lyziarak_rect, 5, 6)
+                    self.clock.tick(FPS)
+                    pygame.display.update()
             pygame.draw.rect(self.screen, BLACK, lyziarak_rect, 5, 6)
+
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -2105,8 +2113,9 @@ class Game:
                                     self.bananky_in_trash,
                                     self.bananky_on_ground,
                                     self.amper_stuff,
-                                    self.rooms.index(self.in_room),
+                                    self.rooms.index(self.in_room) if self.in_room in self.rooms else self.lyz_rooms.index(self.in_room),
                                     self.saved_room_data,
+                                    self.bought,
                                     self.grades,
                                     {
                                         "music": self.music_on,
