@@ -835,7 +835,7 @@ class Ground(pygame.sprite.Sprite):
     Class for ground
     """
 
-    def __init__(self, game, x: int, y: int):
+    def __init__(self, game, x: int, y: int, dirt: bool = False):
         """
         Initialization
         """
@@ -853,7 +853,11 @@ class Ground(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
-        self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height) if self.game.in_room != lyz_outside else self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
+        if self.game.in_room != lyz_outside:
+            self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height) 
+        elif self.game.in_room == lyz_outside:
+            if not dirt: self.image =  self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
+            elif dirt: self.image   =  self.game.terrain_spritesheet.get_sprite(534, 36, self.width, self.height)
         
         self.rect = self.image.get_rect()
         self.rect.x = self.x

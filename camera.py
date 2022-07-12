@@ -477,4 +477,9 @@ class Camera:
             sprite.rect.x += 3 * TILE_SIZE
             sprite.rect.y -= 165 * TILE_SIZE
 
-    def set_lyz_outside(self): pass
+    def set_lyz_camera(self):
+        match self.game.saved_room_data:
+            case 'diner':
+                for sprite in self.game.all_sprites:
+                    sprite.rect.y -= 5 * TILE_SIZE
+                    sprite.rect.x -= 17 * TILE_SIZE
