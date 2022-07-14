@@ -82,17 +82,20 @@ class Game:
         self.leaderboarding = Leaderboard(self)
         '''Yes, good name for a specific yet easy to use variable, used only once'''
         
+        # Player name and password
+        self.player_name: str = ""
+        self._password: str = ""
+        self.bought: bool = True
+        self.lyz_saved_data: str = ""
+        self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+        self.lyz_created: bool = False
+        
         # Settings
         self.music_on: bool = True
         '''Music on/off'''
         self.talking_speed_number: int = 90
         '''Talking speed for the game'''
         self.reseting_game_values()
-
-        # Player name and password
-        self.player_name: str = ""
-        self._password: str = ""
-        self.bought: bool = True
 
         # Npc list
         self.npc = []
@@ -210,9 +213,12 @@ class Game:
         # Room and floor
         self.saved_room_data = "017"
         self.in_room = self.rooms[GROUND_FLOOR]
+        self.lyz_saved_data = ''
+        self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+        self.lyz_created = False
 
         # Objects you can interact with
-        self.interacted: List[str, int] = ["", "", "", "", ""]
+        self.interacted: List[str] = ["", "", "", "", ""]
         self.interactive = {}
 
         # Inventory
@@ -747,107 +753,204 @@ class Game:
         for sprite in self.all_sprites: sprite.kill()
 
         # Creating sprites
-        for i, row in enumerate(self.in_room):
-            for j, column in enumerate(row):
-                Ground(self, j, i)
-                if column == '´': Ground(self, j, i, dirt=True)
-                if column in ("_", "?"): Blockade(self, j, i, column) # Grass or Black
-                elif column == "P": self.player = Player(self, j, i) # Player
-                elif column in ("!", "W"): Block(self, j, i, column) # No entry ground
-                elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
-                elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
-                elif column == "Ľ": self.interactive[Block(self, j, i, "Ľ")] = "Ľ" + str(i) + str(j) # Locker
-                elif column == "ľ": self.interactive[Block(self, j, i, "ľ")] = "ľ" + str(i) + str(j) # Locker
-                elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
-                elif column == "Z": self.interactive[Block(self, j, i, "Z")] = "Z" + str(i) + str(j) # Stairs
-                elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
-                elif column == "z": self.interactive[Block(self, j, i, "z")] = "z" + str(i) + str(j) # Stairs down
-                elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
-                elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
-                elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench (vertical)
-                elif column == "h": self.interactive[Block(self, j, i, "h")] = "h" + str(i) + str(j) # Bench (horizontal)
-                elif column == "y": self.interactive[Block(self, j, i, "y")] = "y" + str(i) + str(j) # Benchpress
-                elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
-                elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk + chair (vertical) left
-                elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
-                elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
-                elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
-                elif column == "ä": self.interactive[Block(self, j, i, "ä")] = "ä" + str(i) + str(j) # Desk + chair + baterries (vertical) right
-                elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
-                elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Desk + chair + PC (vertical) right
-                elif column == "a": self.interactive[Block(self, j, i, "a")] = "a" + str(i) + str(j) # Desk + chair + PC (vertical) left
-                elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
-                elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
-                elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Desk + chair (horizontal) up
-                elif column == "m": self.interactive[Block(self, j, i, "m")] = "m" + str(i) + str(j) # Desk no chair (horizontal) up
-                elif column == "i": self.interactive[Block(self, j, i, "i")] = "i" + str(i) + str(j) # Desk + chair (horizontal) down
-                elif column == "n": self.interactive[Block(self, j, i, "n")] = "n" + str(i) + str(j) # Desk no chair (horizontal) down
-                elif column == "q": self.interactive[Block(self, j, i, "q")] = "q" + str(i) + str(j) # Desk + chair + PC (horizontal) up
-                elif column == "Q": self.interactive[Block(self, j, i, "Q")] = "Q" + str(i) + str(j) # Desk + chair + PC (horizontal) down
-                elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
-                elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
-                elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
-                elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
-                elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
-                elif column == "Ř": self.interactive[Block(self, j, i, "Ř")] = "Ř" + str(i) + str(j) # Rails ground_floor
-                elif column == "Ŕ": self.interactive[Block(self, j, i, "Ŕ")] = "Ŕ" + str(i) + str(j) # Rails second_floor
-                elif column == "ŕ": self.interactive[Block(self, j, i, "ŕ")] = "ŕ" + str(i) + str(j) # Rails second_floor
-                elif column == "ř": self.interactive[Block(self, j, i, "ř")] = "ř" + str(i) + str(j) # Rails ground_floor
-                elif column == "/": self.interactive[Block(self, j, i, "/")] = "/" + str(i) + str(j) # Rails fourth_floor
-                elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
-                elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
-                elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
-                elif column == "O": self.interactive[Block(self, j, i, "O")] = "O" + str(i) + str(j) # Bookshelf
-                elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
-                elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
-                elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
-                elif column == "]": self.interactive[Block(self, j, i, "]")] = "]" + str(i) + str(j) # Whiteboard -> (that way)
-                elif column == "[": self.interactive[Block(self, j, i, "[")] = "[" + str(i) + str(j) # Whiteboard <- (that way)
-                elif column == "-": self.interactive[Block(self, j, i, "-")] = "-" + str(i) + str(j) # Whiteboard ^ (that way)
-                elif column == "=": self.interactive[Block(self, j, i, "=")] = "=" + str(i) + str(j) # Whiteboard V (that way)
-                elif column == "}": self.interactive[Block(self, j, i, "}")] = "}" + str(i) + str(j) # Blackboard -> (that way)
-                elif column == "{": self.interactive[Block(self, j, i, "{")] = "{" + str(i) + str(j) # Blackboard <- (that way)
-                elif column == "^": self.interactive[Block(self, j, i, "^")] = "^" + str(i) + str(j) # Blackboard ^ (that way)
-                elif column == "V": self.interactive[Block(self, j, i, "V")] = "V" + str(i) + str(j) # Blackboard V (that way)
-                elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
-                elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
-                elif column == "E": self.interactive[Block(self, j, i, "E")] = "E" + str(i) + str(j) # Router
-                elif column == "ý": self.interactive[Block(self, j, i, "ý")] = "ý" + str(i) + str(j) # ý as in Yellow Taburetka
-                elif column == "ž": self.interactive[Block(self, j, i, "ž")] = "ž" + str(i) + str(j) # ž as in Green (želena) Taburetka
-                elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
-                elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
-                elif column == "$": self.interactive[Block(self, j, i, "$")] = "$" + str(i) + str(j) # Corner desk
-                elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # dč as in Red (červena) Taburetka
-                elif column == "@": self.interactive[Block(self, j, i, "@")] = "@" + str(i) + str(j) # Up facing green chair
-                elif column == "#": self.interactive[Block(self, j, i, "#")] = "#" + str(i) + str(j) # Right facing green chair
-                elif column == "*": self.interactive[Block(self, j, i, "*")] = "*" + str(i) + str(j) # Left facing green chair
-                elif column == "~": self.interactive[Block(self, j, i, "~")] = "~" + str(i) + str(j) # Coffee machine
-                elif column == "&": self.interactive[Block(self, j, i, "&")] = "&" + str(i) + str(j) # Gym machine
-                elif column == "0": self.interactive[Block(self, j, i, "0")] = "0" + str(i) + str(j) # Basketball hoop (R)
-                elif column == "ô": self.interactive[Block(self, j, i, "ô")] = "ô" + str(i) + str(j) # Basketball hoop (L)
-                elif column == "ˇ": self.interactive[Block(self, j, i, "ˇ")] = "ˇ" + str(i) + str(j) # Dumbell rack
-                elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
-                elif column == "A": self.interactive[Block(self, j, i, "A")] = "A" + str(i) + str(j) # Pult in Amper
-                elif column == "3": self.interactive[Block(self, j, i, "3")] = "3" + str(i) + str(j) # Pong ping
-                elif column == "4": self.interactive[Block(self, j, i, "4")] = "4" + str(i) + str(j) # Pong ping
-                elif column == "5": self.interactive[Block(self, j, i, "5")] = "5" + str(i) + str(j) # Pong ping
-                elif column == "6": self.interactive[Block(self, j, i, "6")] = "6" + str(i) + str(j) # Pong ping
-                elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
-                elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
-                elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
-                elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
-                elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
-                elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
-                elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
-                elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
-                elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
-                elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
-                elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
-                elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
-                elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
-                elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(j) + str(i)
-                elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(j) + str(i)
+        if self.lyz_created:
+            for i, row in enumerate(self.lyz_in_room):
+                for j, column in enumerate(row):
+                    Ground(self, j, i, dirt=False)
+                    if column == '´': Ground(self, j, i, dirt=True)
+                    elif column == "P": self.player = Player(self, j, i) # Player
+                    elif column in ("!", "W"): Block(self, j, i, column) # No entry ground
+                    elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
+                    elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
+                    elif column == "Ľ": self.interactive[Block(self, j, i, "Ľ")] = "Ľ" + str(i) + str(j) # Locker
+                    elif column == "ľ": self.interactive[Block(self, j, i, "ľ")] = "ľ" + str(i) + str(j) # Locker
+                    elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
+                    elif column == "Z": self.interactive[Block(self, j, i, "Z")] = "Z" + str(i) + str(j) # Stairs
+                    elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
+                    elif column == "z": self.interactive[Block(self, j, i, "z")] = "z" + str(i) + str(j) # Stairs down
+                    elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
+                    elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
+                    elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench (vertical)
+                    elif column == "h": self.interactive[Block(self, j, i, "h")] = "h" + str(i) + str(j) # Bench (horizontal)
+                    elif column == "y": self.interactive[Block(self, j, i, "y")] = "y" + str(i) + str(j) # Benchpress
+                    elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
+                    elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk + chair (vertical) left
+                    elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
+                    elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
+                    elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
+                    elif column == "ä": self.interactive[Block(self, j, i, "ä")] = "ä" + str(i) + str(j) # Desk + chair + baterries (vertical) right
+                    elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
+                    elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Desk + chair + PC (vertical) right
+                    elif column == "a": self.interactive[Block(self, j, i, "a")] = "a" + str(i) + str(j) # Desk + chair + PC (vertical) left
+                    elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
+                    elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
+                    elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Desk + chair (horizontal) up
+                    elif column == "m": self.interactive[Block(self, j, i, "m")] = "m" + str(i) + str(j) # Desk no chair (horizontal) up
+                    elif column == "i": self.interactive[Block(self, j, i, "i")] = "i" + str(i) + str(j) # Desk + chair (horizontal) down
+                    elif column == "n": self.interactive[Block(self, j, i, "n")] = "n" + str(i) + str(j) # Desk no chair (horizontal) down
+                    elif column == "q": self.interactive[Block(self, j, i, "q")] = "q" + str(i) + str(j) # Desk + chair + PC (horizontal) up
+                    elif column == "Q": self.interactive[Block(self, j, i, "Q")] = "Q" + str(i) + str(j) # Desk + chair + PC (horizontal) down
+                    elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
+                    elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
+                    elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
+                    elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
+                    elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
+                    elif column == "Ř": self.interactive[Block(self, j, i, "Ř")] = "Ř" + str(i) + str(j) # Rails ground_floor
+                    elif column == "Ŕ": self.interactive[Block(self, j, i, "Ŕ")] = "Ŕ" + str(i) + str(j) # Rails second_floor
+                    elif column == "ŕ": self.interactive[Block(self, j, i, "ŕ")] = "ŕ" + str(i) + str(j) # Rails second_floor
+                    elif column == "ř": self.interactive[Block(self, j, i, "ř")] = "ř" + str(i) + str(j) # Rails ground_floor
+                    elif column == "/": self.interactive[Block(self, j, i, "/")] = "/" + str(i) + str(j) # Rails fourth_floor
+                    elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
+                    elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
+                    elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
+                    elif column == "O": self.interactive[Block(self, j, i, "O")] = "O" + str(i) + str(j) # Bookshelf
+                    elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
+                    elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
+                    elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
+                    elif column == "]": self.interactive[Block(self, j, i, "]")] = "]" + str(i) + str(j) # Whiteboard -> (that way)
+                    elif column == "[": self.interactive[Block(self, j, i, "[")] = "[" + str(i) + str(j) # Whiteboard <- (that way)
+                    elif column == "-": self.interactive[Block(self, j, i, "-")] = "-" + str(i) + str(j) # Whiteboard ^ (that way)
+                    elif column == "=": self.interactive[Block(self, j, i, "=")] = "=" + str(i) + str(j) # Whiteboard V (that way)
+                    elif column == "}": self.interactive[Block(self, j, i, "}")] = "}" + str(i) + str(j) # Blackboard -> (that way)
+                    elif column == "{": self.interactive[Block(self, j, i, "{")] = "{" + str(i) + str(j) # Blackboard <- (that way)
+                    elif column == "^": self.interactive[Block(self, j, i, "^")] = "^" + str(i) + str(j) # Blackboard ^ (that way)
+                    elif column == "V": self.interactive[Block(self, j, i, "V")] = "V" + str(i) + str(j) # Blackboard V (that way)
+                    elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
+                    elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
+                    elif column == "E": self.interactive[Block(self, j, i, "E")] = "E" + str(i) + str(j) # Router
+                    elif column == "ý": self.interactive[Block(self, j, i, "ý")] = "ý" + str(i) + str(j) # ý as in Yellow Taburetka
+                    elif column == "ž": self.interactive[Block(self, j, i, "ž")] = "ž" + str(i) + str(j) # ž as in Green (želena) Taburetka
+                    elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
+                    elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
+                    elif column == "$": self.interactive[Block(self, j, i, "$")] = "$" + str(i) + str(j) # Corner desk
+                    elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # dč as in Red (červena) Taburetka
+                    elif column == "@": self.interactive[Block(self, j, i, "@")] = "@" + str(i) + str(j) # Up facing green chair
+                    elif column == "#": self.interactive[Block(self, j, i, "#")] = "#" + str(i) + str(j) # Right facing green chair
+                    elif column == "*": self.interactive[Block(self, j, i, "*")] = "*" + str(i) + str(j) # Left facing green chair
+                    elif column == "~": self.interactive[Block(self, j, i, "~")] = "~" + str(i) + str(j) # Coffee machine
+                    elif column == "&": self.interactive[Block(self, j, i, "&")] = "&" + str(i) + str(j) # Gym machine
+                    elif column == "0": self.interactive[Block(self, j, i, "0")] = "0" + str(i) + str(j) # Basketball hoop (R)
+                    elif column == "ô": self.interactive[Block(self, j, i, "ô")] = "ô" + str(i) + str(j) # Basketball hoop (L)
+                    elif column == "ˇ": self.interactive[Block(self, j, i, "ˇ")] = "ˇ" + str(i) + str(j) # Dumbell rack
+                    elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
+                    elif column == "A": self.interactive[Block(self, j, i, "A")] = "A" + str(i) + str(j) # Pult in Amper
+                    elif column == "3": self.interactive[Block(self, j, i, "3")] = "3" + str(i) + str(j) # Pong ping
+                    elif column == "4": self.interactive[Block(self, j, i, "4")] = "4" + str(i) + str(j) # Pong ping
+                    elif column == "5": self.interactive[Block(self, j, i, "5")] = "5" + str(i) + str(j) # Pong ping
+                    elif column == "6": self.interactive[Block(self, j, i, "6")] = "6" + str(i) + str(j) # Pong ping
+                    elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
+                    elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
+                    elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
+                    elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
+                    elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
+                    elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
+                    elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(i) + str(j) # Wood
+                    elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(i) + str(j) # Wood ^ 2
+                    elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
+                    elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
+                    elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
+                    elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
+                    elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
+        else:
+            for i, row in enumerate(self.in_room):
+                for j, column in enumerate(row):
+                    Ground(self, j, i)
+                    if column in ("_", "?"): Blockade(self, j, i, column) # Grass or Black
+                    elif column == "P": self.player = Player(self, j, i) # Player
+                    elif column in ("!", "W"): Block(self, j, i, column) # No entry ground
+                    elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
+                    elif column == "L": self.interactive[Block(self, j, i, "L")] = "L" + str(i) + str(j) # Locker
+                    elif column == "Ľ": self.interactive[Block(self, j, i, "Ľ")] = "Ľ" + str(i) + str(j) # Locker
+                    elif column == "ľ": self.interactive[Block(self, j, i, "ľ")] = "ľ" + str(i) + str(j) # Locker
+                    elif column == "S": self.interactive[Block(self, j, i, "S")] = "S" + str(i) + str(j) # Stairs
+                    elif column == "Z": self.interactive[Block(self, j, i, "Z")] = "Z" + str(i) + str(j) # Stairs
+                    elif column == "s": self.interactive[Block(self, j, i, "s")] = "s" + str(i) + str(j) # Stairs down
+                    elif column == "z": self.interactive[Block(self, j, i, "z")] = "z" + str(i) + str(j) # Stairs down
+                    elif column == "D": self.interactive[Block(self, j, i, "D")] = "D" + str(i) + str(j) # Door
+                    elif column == "G": self.interactive[Block(self, j, i, "G")] = "G" + str(i) + str(j) # Glass door
+                    elif column == "B": self.interactive[Block(self, j, i, "B")] = "B" + str(i) + str(j) # Bench (vertical)
+                    elif column == "h": self.interactive[Block(self, j, i, "h")] = "h" + str(i) + str(j) # Bench (horizontal)
+                    elif column == "y": self.interactive[Block(self, j, i, "y")] = "y" + str(i) + str(j) # Benchpress
+                    elif column == "Y": self.interactive[Block(self, j, i, "Y")] = "Y" + str(i) + str(j) # Benchpress with dumbbells
+                    elif column == "l": self.interactive[Block(self, j, i, "l")] = "l" + str(i) + str(j) # Desk + chair (vertical) left
+                    elif column == "k": self.interactive[Block(self, j, i, "k")] = "k" + str(i) + str(j) # Desk no chair (vertical) left
+                    elif column == "é": self.interactive[Block(self, j, i, "é")] = "é" + str(i) + str(j) # Desk special (vertical)
+                    elif column == "u": self.interactive[Block(self, j, i, "u")] = "u" + str(i) + str(j) # Desk + chair (vertical) right
+                    elif column == "ä": self.interactive[Block(self, j, i, "ä")] = "ä" + str(i) + str(j) # Desk + chair + baterries (vertical) right
+                    elif column == "e": self.interactive[Block(self, j, i, "e")] = "e" + str(i) + str(j) # Desk no chair (vertical) right
+                    elif column == "g": self.interactive[Block(self, j, i, "g")] = "g" + str(i) + str(j) # Desk + chair + PC (vertical) right
+                    elif column == "a": self.interactive[Block(self, j, i, "a")] = "a" + str(i) + str(j) # Desk + chair + PC (vertical) left
+                    elif column == "U": self.interactive[Block(self, j, i, "U")] = "U" + str(i) + str(j) # LCUJ Desk
+                    elif column == "J": self.interactive[Block(self, j, i, "J")] = "J" + str(i) + str(j) # LCUJ Desk
+                    elif column == "j": self.interactive[Block(self, j, i, "j")] = "j" + str(i) + str(j) # Desk + chair (horizontal) up
+                    elif column == "m": self.interactive[Block(self, j, i, "m")] = "m" + str(i) + str(j) # Desk no chair (horizontal) up
+                    elif column == "i": self.interactive[Block(self, j, i, "i")] = "i" + str(i) + str(j) # Desk + chair (horizontal) down
+                    elif column == "n": self.interactive[Block(self, j, i, "n")] = "n" + str(i) + str(j) # Desk no chair (horizontal) down
+                    elif column == "q": self.interactive[Block(self, j, i, "q")] = "q" + str(i) + str(j) # Desk + chair + PC (horizontal) up
+                    elif column == "Q": self.interactive[Block(self, j, i, "Q")] = "Q" + str(i) + str(j) # Desk + chair + PC (horizontal) down
+                    elif column == "t": self.interactive[Block(self, j, i, "t")] = "t" + str(i) + str(j) # Trashcan
+                    elif column == "T": self.interactive[Block(self, j, i, "T")] = "T" + str(i) + str(j) # Toilet
+                    elif column == "Ť": self.interactive[Block(self, j, i, "Ť")] = "Ť" + str(i) + str(j) # Toilet
+                    elif column == "R": self.interactive[Block(self, j, i, "R")] = "R" + str(i) + str(j) # Rails
+                    elif column == "r": self.interactive[Block(self, j, i, "r")] = "r" + str(i) + str(j) # Rails
+                    elif column == "Ř": self.interactive[Block(self, j, i, "Ř")] = "Ř" + str(i) + str(j) # Rails ground_floor
+                    elif column == "Ŕ": self.interactive[Block(self, j, i, "Ŕ")] = "Ŕ" + str(i) + str(j) # Rails second_floor
+                    elif column == "ŕ": self.interactive[Block(self, j, i, "ŕ")] = "ŕ" + str(i) + str(j) # Rails second_floor
+                    elif column == "ř": self.interactive[Block(self, j, i, "ř")] = "ř" + str(i) + str(j) # Rails ground_floor
+                    elif column == "/": self.interactive[Block(self, j, i, "/")] = "/" + str(i) + str(j) # Rails fourth_floor
+                    elif column == "|": self.interactive[Block(self, j, i, "|")] = "|" + str(i) + str(j) # Rails fourth_floor
+                    elif column == "b": self.interactive[Block(self, j, i, "b")] = "b" + str(i) + str(j) # Basement
+                    elif column == "d": self.interactive[Block(self, j, i, "d")] = "d" + str(i) + str(j) # Basement
+                    elif column == "O": self.interactive[Block(self, j, i, "O")] = "O" + str(i) + str(j) # Bookshelf
+                    elif column == "o": self.interactive[Block(self, j, i, "o")] = "o" + str(i) + str(j) # Bookshelf
+                    elif column == "ó": self.interactive[Block(self, j, i, "ó")] = "ó" + str(i) + str(j) # Bookshelf
+                    elif column == "Ó": self.interactive[Block(self, j, i, "Ó")] = "Ó" + str(i) + str(j) # Bookshelf
+                    elif column == "]": self.interactive[Block(self, j, i, "]")] = "]" + str(i) + str(j) # Whiteboard -> (that way)
+                    elif column == "[": self.interactive[Block(self, j, i, "[")] = "[" + str(i) + str(j) # Whiteboard <- (that way)
+                    elif column == "-": self.interactive[Block(self, j, i, "-")] = "-" + str(i) + str(j) # Whiteboard ^ (that way)
+                    elif column == "=": self.interactive[Block(self, j, i, "=")] = "=" + str(i) + str(j) # Whiteboard V (that way)
+                    elif column == "}": self.interactive[Block(self, j, i, "}")] = "}" + str(i) + str(j) # Blackboard -> (that way)
+                    elif column == "{": self.interactive[Block(self, j, i, "{")] = "{" + str(i) + str(j) # Blackboard <- (that way)
+                    elif column == "^": self.interactive[Block(self, j, i, "^")] = "^" + str(i) + str(j) # Blackboard ^ (that way)
+                    elif column == "V": self.interactive[Block(self, j, i, "V")] = "V" + str(i) + str(j) # Blackboard V (that way)
+                    elif column == "x": self.interactive[Block(self, j, i, "x")] = "x" + str(i) + str(j) # Double Vertical Whiteboard
+                    elif column == "X": self.interactive[Block(self, j, i, "X")] = "X" + str(i) + str(j) # Double Horizontal Whiteboard
+                    elif column == "E": self.interactive[Block(self, j, i, "E")] = "E" + str(i) + str(j) # Router
+                    elif column == "ý": self.interactive[Block(self, j, i, "ý")] = "ý" + str(i) + str(j) # ý as in Yellow Taburetka
+                    elif column == "ž": self.interactive[Block(self, j, i, "ž")] = "ž" + str(i) + str(j) # ž as in Green (želena) Taburetka
+                    elif column == "ň": self.interactive[Block(self, j, i, "ň")] = "ň" + str(i) + str(j) # ň as in Brown (hňeda) Taburetka
+                    elif column == "ú": self.interactive[Block(self, j, i, "ú")] = "ú" + str(i) + str(j) # ú as in Blúe Taburetka
+                    elif column == "$": self.interactive[Block(self, j, i, "$")] = "$" + str(i) + str(j) # Corner desk
+                    elif column == "č": self.interactive[Block(self, j, i, "č")] = "č" + str(i) + str(j) # dč as in Red (červena) Taburetka
+                    elif column == "@": self.interactive[Block(self, j, i, "@")] = "@" + str(i) + str(j) # Up facing green chair
+                    elif column == "#": self.interactive[Block(self, j, i, "#")] = "#" + str(i) + str(j) # Right facing green chair
+                    elif column == "*": self.interactive[Block(self, j, i, "*")] = "*" + str(i) + str(j) # Left facing green chair
+                    elif column == "~": self.interactive[Block(self, j, i, "~")] = "~" + str(i) + str(j) # Coffee machine
+                    elif column == "&": self.interactive[Block(self, j, i, "&")] = "&" + str(i) + str(j) # Gym machine
+                    elif column == "0": self.interactive[Block(self, j, i, "0")] = "0" + str(i) + str(j) # Basketball hoop (R)
+                    elif column == "ô": self.interactive[Block(self, j, i, "ô")] = "ô" + str(i) + str(j) # Basketball hoop (L)
+                    elif column == "ˇ": self.interactive[Block(self, j, i, "ˇ")] = "ˇ" + str(i) + str(j) # Dumbell rack
+                    elif column == "Ž": self.interactive[Block(self, j, i, "Ž")] = "Ž" + str(i) + str(j) # Rebrina (idk in english)
+                    elif column == "A": self.interactive[Block(self, j, i, "A")] = "A" + str(i) + str(j) # Pult in Amper
+                    elif column == "3": self.interactive[Block(self, j, i, "3")] = "3" + str(i) + str(j) # Pong ping
+                    elif column == "4": self.interactive[Block(self, j, i, "4")] = "4" + str(i) + str(j) # Pong ping
+                    elif column == "5": self.interactive[Block(self, j, i, "5")] = "5" + str(i) + str(j) # Pong ping
+                    elif column == "6": self.interactive[Block(self, j, i, "6")] = "6" + str(i) + str(j) # Pong ping
+                    elif column == "7": self.interactive[Block(self, j, i, "7")] = "7" + str(i) + str(j) # Pong ping
+                    elif column == "8": self.interactive[Block(self, j, i, "8")] = "8" + str(i) + str(j) # Pong ping
+                    elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
+                    elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
+                    elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
+                    elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
+                    elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
+                    elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
+                    elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
+                    elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
+                    elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
+                    elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
+                    elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
 
+                
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
             elif level == first_floor: self.camera.set_first_camera()
@@ -883,8 +986,10 @@ class Game:
             self.bought = data['DLC bought']
 
             # Level
-            self.in_room = self.rooms[data["level"]] if self.rooms[data["level"]] not in ('diner', 'outside') else self.lyz_rooms[data["level"]]
+            self.in_room = self.rooms[data["level"]]
             self.saved_room_data = data['room_number']
+            self.lyz_in_room = self.lyz_rooms[data['lyz_room_level']]
+            self.lyz_saved_data = data['lyz_room_number']
 
             # Inventory
             self.inv = {} if "inventory" not in data.keys() else data["inventory"]
@@ -1133,7 +1238,6 @@ class Game:
             
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
-            mouse_pressed = pygame.mouse.get_pressed()
             pressed: bool = False
             
             # Close button
@@ -1141,7 +1245,8 @@ class Game:
                 if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and self.bought:
                     previewing = False
-                    self.in_room = self.lyz_rooms[OUTSIDE]
+                    self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+                    self.lyz_created = True
                     self.create_tile_map()
                     self.camera.set_lyz_camera()
                 elif event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and not self.bought: pressed = True
@@ -2117,8 +2222,10 @@ class Game:
                                     self.bananky_in_trash,
                                     self.bananky_on_ground,
                                     self.amper_stuff,
-                                    self.rooms.index(self.in_room) if self.in_room in self.rooms else self.lyz_rooms.index(self.in_room),
+                                    self.rooms.index(self.in_room),
                                     self.saved_room_data,
+                                    self.lyz_saved_data,
+                                    self.lyz_rooms.index(self.lyz_in_room),
                                     self.bought,
                                     self.grades,
                                     {
@@ -2716,7 +2823,8 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner'): self.saved_room_data = room_number
+        else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
         """
@@ -2954,14 +3062,14 @@ class Game:
             pygame.display.update()
             
     def lyz_doors(self):
-        if self.in_room == self.lyz_rooms[OUTSIDE]:
+        if self.lyz_in_room == self.lyz_rooms[OUTSIDE]:
             if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:
-                self.in_room = self.lyz_rooms[LYZ_DINER]
+                self.lyz_in_room = self.lyz_rooms[LYZ_DINER]
                 self.door_info("Eat 'n games", 'diner')
                 self.create_tile_map()
                 self.camera.set_lyz_camera()
             elif self.player.facing == 'right' and self.interacted[1] in (11, 12) and self.interacted[2] == 27:
-                self.in_room = self.lyz_rooms[OUTSIDE]
+                self.lyz_in_room = self.lyz_rooms[OUTSIDE]
                 self.door_info("Brrr... it's cold", 'outside')
                 self.create_tile_map()
                 self.camera.set_lyz_camera()
@@ -2969,7 +3077,7 @@ class Game:
             elif self.player.facing == 'down' and self.interacted[1] == 27 and self.interacted[2] in (57, 58):  self.info("I shouldn't go there")
             elif self.player.facing == 'right' and self.interacted[1] in (49, 50) and self.interacted[2] == 50: self.info("Not my lodge")
             elif self.player.facing == 'down' and self.interacted[1] == 51 and self.interacted[2] in (12, 13):
-                self.in_room = self.lyz_rooms[LYZ_GROUND]
+                self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
                 self.create_tile_map()
             
         
@@ -4156,7 +4264,6 @@ class Game:
         """
         Unlocking/going through door
         """
-
         # Ground floor
         if self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
 
@@ -4176,7 +4283,7 @@ class Game:
         elif self.in_room == self.rooms[ENDING_HALLWAY]: self.ending_hallway_doors()
         
         # Lyziarsky doors (with creating tile map)
-        elif any(self.in_room for self.in_room in self.lyz_rooms): self.lyz_doors()
+        elif self.lyz_in_room in self.lyz_rooms: self.lyz_doors()
 
         # Lost guy
         elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45 and self.lost_guy: self.quest.guy_lost_in_school()

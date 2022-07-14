@@ -853,9 +853,9 @@ class Ground(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
-        if self.game.in_room != lyz_outside:
+        if not self.game.lyz_created:
             self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height) 
-        elif self.game.in_room == lyz_outside:
+        elif self.game.lyz_created:
             if not dirt: self.image =  self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
             elif dirt: self.image   =  self.game.terrain_spritesheet.get_sprite(534, 36, self.width, self.height)
         
@@ -965,7 +965,7 @@ class Interact(pygame.sprite.Sprite):
                     if self.interactive[hits[0]] in ("T" + str(i) + str(j), "Ť" + str(i) + str(j)): self.game.interacted = ["Toilet", i ,j]
 
                     # Door
-                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]
+                    elif self.interactive[hits[0]] in ("D" + str(i) + str(j), "G" + str(i) + str(j)): self.game.interacted = ["Door", i, j, hits[0].rect.left, hits[0].rect.top]; print(j, i)
 
                     # Locker
                     elif self.interactive[hits[0]] in ("L" + str(i) + str(j), "Ľ" + str(i) + str(j), "ľ" + str(i) + str(j)): self.game.interacted = ["Locker", i, j]
