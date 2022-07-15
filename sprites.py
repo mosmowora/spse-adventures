@@ -52,7 +52,7 @@ class Player(pygame.sprite.Sprite):
         self.facing = "down"
         self.animation_loop = 1
 
-        self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
+        self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
 
         self.player_sitting = False
 
@@ -65,6 +65,10 @@ class Player(pygame.sprite.Sprite):
             self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)
+        ] if not self.game.lyz_created else [
+            self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 33, 0, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 66, 0, self.width, self.height)
         ]
 
         # Up animations
@@ -72,6 +76,10 @@ class Player(pygame.sprite.Sprite):
             self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)
+        ] if not self.game.lyz_created else [
+            self.game.character_spritesheet.get_sprite(141, 35, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 33, 35, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 66, 35, self.width, self.height)
         ]
 
         # Left animations
@@ -79,6 +87,10 @@ class Player(pygame.sprite.Sprite):
             self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)
+        ] if not self.game.lyz_created else [
+            self.game.character_spritesheet.get_sprite(141, 99, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 32, 99, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 65, 99, self.width, self.height)
         ]
 
         # Right animations
@@ -86,6 +98,10 @@ class Player(pygame.sprite.Sprite):
             self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
+        ] if not self.game.lyz_created else [
+            self.game.character_spritesheet.get_sprite(141, 66, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 32, 66, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(141 + 65, 66, self.width, self.height)
         ]
 
         # Lost guy
@@ -135,13 +151,6 @@ class Player(pygame.sprite.Sprite):
         else: 
             self.x_change = 0
             self.y_change = 0
-            
-    def get_facing(self):
-        """
-        Returns the facing of the player
-        """
-
-        return self.facing
 
     def movement(self):
         """
@@ -268,7 +277,7 @@ class Player(pygame.sprite.Sprite):
         # Down
         if self.facing == "down":
             if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height)
+                self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
             else:
                 self.image = self.facing_down[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -277,7 +286,7 @@ class Player(pygame.sprite.Sprite):
         # Up
         elif self.facing == "up":
             if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height)
+                self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 35, self.width, self.height)
             else:
                 self.image = self.facing_up[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -286,7 +295,7 @@ class Player(pygame.sprite.Sprite):
         # Left
         elif self.facing == "left":
             if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height)
+                self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 99, self.width, self.height)
             else:
                 self.image = self.facing_left[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -295,7 +304,7 @@ class Player(pygame.sprite.Sprite):
         # Right
         elif self.facing == "right":
             if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height)
+                self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 66, self.width, self.height)
             else:
                 self.image = self.facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -688,7 +697,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -792,6 +801,9 @@ class Block(pygame.sprite.Sprite):
         elif type == "˙": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
         elif type == "ś": self.image = self.game.terrain_spritesheet.get_sprite(500, 2, self.width, self.height)
         elif type == "š": self.image = self.game.terrain_spritesheet.get_sprite(500, 36, self.width, self.height)
+        elif type == "▬": self.image = self.game.terrain_spritesheet.get_sprite(568, 2, self.width, self.height)
+        elif type == "∟": self.image = self.game.terrain_spritesheet.get_sprite(500, 70, self.width, self.height)
+        elif type == "↔": self.image = self.game.terrain_spritesheet.get_sprite(534, 70, self.width, self.height)
         
 
         self.rect = self.image.get_rect()
@@ -835,7 +847,7 @@ class Ground(pygame.sprite.Sprite):
     Class for ground
     """
 
-    def __init__(self, game, x: int, y: int, dirt: bool = False):
+    def __init__(self, game, x: int, y: int, /, dirt: bool = False, snow: bool = False, carpet: bool = False):
         """
         Initialization
         """
@@ -856,8 +868,12 @@ class Ground(pygame.sprite.Sprite):
         if not self.game.lyz_created:
             self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height) 
         elif self.game.lyz_created:
-            if not dirt: self.image =  self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
+            if not dirt:
+                if snow: self.image =  self.game.terrain_spritesheet.get_sprite(534, 2, self.width, self.height)
+                elif carpet: self.image = self.game.terrain_spritesheet.get_sprite(568, 36, self.width, self.height)
+                else: self.image = self.game.terrain_spritesheet.get_sprite(2, 2, self.width, self.height)
             elif dirt: self.image   =  self.game.terrain_spritesheet.get_sprite(534, 36, self.width, self.height)
+             
         
         self.rect = self.image.get_rect()
         self.rect.x = self.x

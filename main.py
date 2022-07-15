@@ -65,7 +65,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, "lyz_ground", "lyz_first", "lyz_second", lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, "lyz_first", "lyz_second", lyz_diner]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -85,10 +85,16 @@ class Game:
         # Player name and password
         self.player_name: str = ""
         self._password: str = ""
+        
+        # Lyziarksy DLC variables
         self.bought: bool = True
+        '''Player has bought the DLC'''
         self.lyz_saved_data: str = ""
+        '''Just in case you get lost on Lyziarsky'''
         self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+        '''Where are you hiding???'''
         self.lyz_created: bool = False
+        '''Are we there yet?'''
         
         # Settings
         self.music_on: bool = True
@@ -756,8 +762,9 @@ class Game:
         if self.lyz_created:
             for i, row in enumerate(self.lyz_in_room):
                 for j, column in enumerate(row):
-                    Ground(self, j, i, dirt=False)
+                    Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second') else Ground(self, j, i)
                     if column == '´': Ground(self, j, i, dirt=True)
+                    if column == "↨": Ground(self, j, i, carpet=True)
                     elif column == "P": self.player = Player(self, j, i) # Player
                     elif column in ("!", "W"): Block(self, j, i, column) # No entry ground
                     elif column == "w": self.interactive[Block(self, j, i, "w")] = "w" + str(i) + str(j) # Window
@@ -846,6 +853,9 @@ class Game:
                     elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
                     elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(i) + str(j) # Wood
                     elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(i) + str(j) # Wood ^ 2
+                    elif column == "▬": self.interactive[Block(self, j, i, "▬")] = "▬" + str(i) + str(j) # Shoe rack
+                    elif column == "∟": self.interactive[Block(self, j, i, "∟")] = "∟" + str(i) + str(j) # Stairs
+                    elif column == "↔": self.interactive[Block(self, j, i, "↔")] = "↔" + str(i) + str(j) # More stairs
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                     elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
@@ -1245,7 +1255,6 @@ class Game:
                 if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and self.bought:
                     previewing = False
-                    self.lyz_in_room = self.lyz_rooms[OUTSIDE]
                     self.lyz_created = True
                     self.create_tile_map()
                     self.camera.set_lyz_camera()
@@ -2616,7 +2625,7 @@ class Game:
                                     if con_button.is_pressed(mouse_pos, mouse_pressed):
                                         picking_name = deciding = intro = False
                                         self.continue_game = True
-                                        # self._password = self.verifying_user(self.player_name)
+                                        self._password = self.verifying_user(self.player_name)
                                     
                                     # Buttons
                                     self.screen.blit(new_button.image, new_button.rect)
@@ -2823,7 +2832,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        if room_number not in ('outside', 'diner'): self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner', 'ground'): self.saved_room_data = room_number
         else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
@@ -3062,24 +3071,33 @@ class Game:
             pygame.display.update()
             
     def lyz_doors(self):
-        if self.lyz_in_room == self.lyz_rooms[OUTSIDE]:
-            if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:
-                self.lyz_in_room = self.lyz_rooms[LYZ_DINER]
-                self.door_info("Eat 'n games", 'diner')
-                self.create_tile_map()
-                self.camera.set_lyz_camera()
-            elif self.player.facing == 'right' and self.interacted[1] in (11, 12) and self.interacted[2] == 27:
-                self.lyz_in_room = self.lyz_rooms[OUTSIDE]
-                self.door_info("Brrr... it's cold", 'outside')
-                self.create_tile_map()
-                self.camera.set_lyz_camera()
-            
-            elif self.player.facing == 'down' and self.interacted[1] == 27 and self.interacted[2] in (57, 58):  self.info("I shouldn't go there")
-            elif self.player.facing == 'right' and self.interacted[1] in (49, 50) and self.interacted[2] == 50: self.info("Not my lodge")
-            elif self.player.facing == 'down' and self.interacted[1] == 51 and self.interacted[2] in (12, 13):
-                self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
-                self.create_tile_map()
-            
+        if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:
+            self.lyz_in_room = self.lyz_rooms[LYZ_DINER]
+            self.door_info("Eat 'n games", 'diner')
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
+        elif self.player.facing == 'right' and self.interacted[1] in (1, 11, 12) and self.interacted[2] in (27, 127):
+            self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+            self.door_info("Brrr... it's cold", 'outside')
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
+        
+        elif self.player.facing == 'down' and self.interacted[1] == 27 and self.interacted[2] in (57, 58):  self.info("I shouldn't go there")
+        elif self.player.facing == 'right' and self.interacted[1] in (49, 50) and self.interacted[2] == 50: self.info("Not my lodge")
+        elif self.player.facing == 'down' and self.interacted[1] == 5 and self.interacted[2] in (112, 113):
+            self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
+            self.door_info('Finally somewhere warm', 'ground')
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
+        elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] in (4, 5):
+            self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+            self.door_info("Brrr... it's cold", 'outside')
+            self.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.y -= 44 * TILE_SIZE
+                sprite.rect.x -= 3 * TILE_SIZE
+            self.player.rect.y += 44 * TILE_SIZE
+            self.player.rect.x += 4 * TILE_SIZE
         
     def ground_floor_doors(self):
         """
@@ -4264,8 +4282,11 @@ class Game:
         """
         Unlocking/going through door
         """
+        # Lyziarsky doors (with creating tile map)
+        if self.lyz_in_room in self.lyz_rooms: self.lyz_doors()
+
         # Ground floor
-        if self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
+        elif self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
 
         # First floor
         elif self.in_room == self.rooms[FIRST_FLOOR]: self.first_floor_doors()
@@ -4282,9 +4303,6 @@ class Game:
         # Ending hall
         elif self.in_room == self.rooms[ENDING_HALLWAY]: self.ending_hallway_doors()
         
-        # Lyziarsky doors (with creating tile map)
-        elif self.lyz_in_room in self.lyz_rooms: self.lyz_doors()
-
         # Lost guy
         elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45 and self.lost_guy: self.quest.guy_lost_in_school()
         
