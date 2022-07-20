@@ -65,7 +65,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, "lyz_first", "lyz_second", lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_diner]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -210,7 +210,7 @@ class Game:
         elif level == self.rooms[BASEMENT_FLOOR]:
             for sprite in self.all_sprites: sprite.rect.x -= 34 * TILE_SIZE
             self.player.rect.x -= 45 * TILE_SIZE
-            
+        
     def reseting_game_values(self):
         """
         When player wants to restart
@@ -858,8 +858,6 @@ class Game:
                     elif column == "↔": self.interactive[Block(self, j, i, "↔")] = "↔" + str(i) + str(j) # More stairs
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
-                    elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
-                    elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
         else:
             for i, row in enumerate(self.in_room):
@@ -959,7 +957,6 @@ class Game:
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
                     elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
                     elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
-
                 
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
@@ -2625,7 +2622,7 @@ class Game:
                                     if con_button.is_pressed(mouse_pos, mouse_pressed):
                                         picking_name = deciding = intro = False
                                         self.continue_game = True
-                                        self._password = self.verifying_user(self.player_name)
+                                        # self._password = self.verifying_user(self.player_name)
                                     
                                     # Buttons
                                     self.screen.blit(new_button.image, new_button.rect)
@@ -3071,24 +3068,31 @@ class Game:
             pygame.display.update()
             
     def lyz_doors(self):
+        # Outside -> Diner
         if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:
             self.lyz_in_room = self.lyz_rooms[LYZ_DINER]
             self.door_info("Eat 'n games", 'diner')
             self.create_tile_map()
             self.camera.set_lyz_camera()
+
+        # Diner -> Outside
         elif self.player.facing == 'right' and self.interacted[1] in (1, 11, 12) and self.interacted[2] in (27, 127):
             self.lyz_in_room = self.lyz_rooms[OUTSIDE]
             self.door_info("Brrr... it's cold", 'outside')
             self.create_tile_map()
             self.camera.set_lyz_camera()
         
+        # Nevermind
         elif self.player.facing == 'down' and self.interacted[1] == 27 and self.interacted[2] in (57, 58):  self.info("I shouldn't go there")
-        elif self.player.facing == 'right' and self.interacted[1] in (49, 50) and self.interacted[2] == 50: self.info("Not my lodge")
+
+        # Into the lodge!!!
         elif self.player.facing == 'down' and self.interacted[1] == 5 and self.interacted[2] in (112, 113):
             self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
             self.door_info('Finally somewhere warm', 'ground')
             self.create_tile_map()
             self.camera.set_lyz_camera()
+        
+        # Outside
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] in (4, 5):
             self.lyz_in_room = self.lyz_rooms[OUTSIDE]
             self.door_info("Brrr... it's cold", 'outside')
@@ -3098,6 +3102,40 @@ class Game:
                 sprite.rect.x -= 3 * TILE_SIZE
             self.player.rect.y += 44 * TILE_SIZE
             self.player.rect.x += 4 * TILE_SIZE
+        
+        # indoor doors
+        # Classmates
+        elif self.player.facing == 'left' and self.interacted[1] == 8 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
+            self.talking("What do you want?", True, BLUE)
+            self.talking("Go to YOUR room.", True, BLUE)
+        
+        # Kitchen
+        elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
+            self.talking("Hmmm... a kitchen, but I didn't bring any food.")
+        
+        # Classmates
+        elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground:
+            self.talking("Bring us food and you can play FIFA with us.", True, BLUE)
+        
+        elif self.player.facing == 'left' and self.interacted[1] == 4 and self.interacted[2] == 0 and self.lyz_in_room == lyz_first:
+            self.talking("Not my room.")
+        
+        elif self.player.facing == 'left' and self.interacted[1] == 11 and self.interacted[2] == 0 and self.lyz_in_room == lyz_first:
+            self.talking("This is not my room.")
+        
+        elif self.player.facing == 'down' and self.interacted[1] == 14 and self.interacted[2] == 2 and self.lyz_in_room == lyz_first:
+            self.talking("Time to get cozy.")
+            # TODO: Complete this function
+            # self.unlock_lyz_door()
+
+        elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
+            self.talking("Anything can happen, but not me going here.")
+            
+        elif self.player.facing == 'right' and self.interacted[1] == 5 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
+            self.talking("Samko lives here.")
+            
+        elif self.player.facing == 'down' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
+            self.info("We're getting into untapped territory.")
         
     def ground_floor_doors(self):
         """
@@ -4600,167 +4638,210 @@ class Game:
         self.interacted[2] = x coordinates\n
         self.interacted[1] = y coordinates
         """
+        
+        if self.lyz_created:
+            if self.interacted[0] == "Stairs_up":
+                
+                # Ground -> First floor
+                if self.interacted[1] == 14 and self.interacted[2] in (5, 6) and self.lyz_in_room == lyz_ground:
+                    self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+                    self.create_tile_map()
+                    for sprite in self.all_sprites:
+                        sprite.rect.y += 4 * TILE_SIZE
+                        sprite.rect.x += TILE_SIZE
+                    self.door_info("First floor", "first")
+                
+                # First floor -> Second floor
+                elif self.interacted[1] == 2 and self.interacted[2] in (1, 2, 3) and self.lyz_in_room == lyz_first:
+                    self.lyz_in_room = self.lyz_rooms[LYZ_SECOND]
+                    self.create_tile_map()
+                    for sprite in self.all_sprites:
+                        sprite.rect.y += 3 * TILE_SIZE
+                        sprite.rect.x += 2 * TILE_SIZE
+                    self.door_info("Second floor", "second")
+            
+            elif self.interacted[0] == "Stairs_down":
+                
+                # First floor -> Ground
+                if self.interacted[1] == 2 and self.interacted[2] in (6, 7, 8) and self.lyz_in_room == lyz_first:
+                    self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
+                    self.create_tile_map()
+                    for sprite in self.all_sprites:
+                        sprite.rect.y -= 7 * TILE_SIZE
+                        sprite.rect.x += 3 * TILE_SIZE
+                    self.player.rect.y += 12 * TILE_SIZE
+                    self.door_info("Ground floor", "ground")
+                
+                # Second floor -> First floor
+                elif self.interacted[1] == 2 and self.interacted[2] in (6, 7, 8) and self.lyz_in_room == lyz_second:
+                    self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+                    self.create_tile_map()
+                    for sprite in self.all_sprites:
+                        sprite.rect.y += 4 * TILE_SIZE
+                        sprite.rect.x += TILE_SIZE
+                    self.door_info("First floor", "first")
+                
+        else:
+            # Basement
+            if self.interacted[0] == "Stairs_up" and self.in_room == basement:
 
-        # Basement
-        if self.interacted[0] == "Stairs_up" and self.in_room == basement:
+                # From right
+                if self.interacted[1] in (5, 6) and self.interacted[2] == 89:
+                    self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
+                    self.create_tile_map()
+                    for sprite in self.all_sprites: 
+                        sprite.rect.x -= 185 * TILE_SIZE
+                        sprite.rect.y -= 10 * TILE_SIZE
+                    self.player.rect.x += 25 * TILE_SIZE
+                    self.player.rect.y += 10 * TILE_SIZE
 
-            # From right
-            if self.interacted[1] in (5, 6) and self.interacted[2] == 89:
+                # From left
+                if self.interacted[1] in (9, 10) and self.interacted[2] == 0:
+                    self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
+                    self.create_tile_map()
+                    for sprite in self.all_sprites: 
+                        sprite.rect.x -= 107 * TILE_SIZE
+                        sprite.rect.y -= 20 * TILE_SIZE
+                    self.player.rect.x -= 52 * TILE_SIZE
+                    self.player.rect.y += 20 * TILE_SIZE
+
+            # Ground floor -> 1st floor
+            elif self.interacted[0] == "Stairs_up" and self.in_room == ground_floor:
+                self.in_room = self.rooms[FIRST_FLOOR] # First floor
+                self.create_tile_map()
+
+                # Right stairs
+                if self.interacted[1] in (16, 17, 18, 19) and self.interacted[2] == 184:
+                    for sprite in self.all_sprites: 
+                        sprite.rect.x -= 171 * TILE_SIZE
+                        sprite.rect.y -= 17 * TILE_SIZE
+                
+                # Left stairs
+                elif self.interacted[1] == 13 and self.interacted[2] in (45, 46, 47, 48, 49, 50, 51):
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 47 * TILE_SIZE
+                        sprite.rect.y -= 17 * TILE_SIZE
+                    self.player.rect.x -= 124 * TILE_SIZE
+                    self.player.rect.y += 2 * TILE_SIZE
+                
+                self.door_info("First floor", "Hall")
+                    
+            # 1st floor -> Ground floor
+            elif self.interacted[0] == "Stairs_down" and self.in_room == first_floor:
                 self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
                 self.create_tile_map()
-                for sprite in self.all_sprites: 
-                    sprite.rect.x -= 185 * TILE_SIZE
-                    sprite.rect.y -= 10 * TILE_SIZE
-                self.player.rect.x += 25 * TILE_SIZE
-                self.player.rect.y += 10 * TILE_SIZE
 
-            # From left
-            if self.interacted[1] in (9, 10) and self.interacted[2] == 0:
-                self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
+                # Right stairs
+                if self.interacted[1] in (21, 22, 23, 24) and self.interacted[2] == 181:
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 174 * TILE_SIZE
+                        sprite.rect.y -= 11 * TILE_SIZE
+                    self.player.rect.x += 15 * TILE_SIZE
+                    self.player.rect.y += 11 * TILE_SIZE
+
+                # Left stairs
+                elif self.interacted[1] == 24 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 39 * TILE_SIZE
+                        sprite.rect.y -= 7 * TILE_SIZE
+                    self.player.rect.x -= 120 * TILE_SIZE
+                    self.player.rect.y += 8 * TILE_SIZE
+                    
+                self.door_info("Ground floor", "Hall")
+            
+            # First floor -> Second floor
+            elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
+                self.in_room = self.rooms[SECOND_FLOOR] # Second floor
                 self.create_tile_map()
-                for sprite in self.all_sprites: 
-                    sprite.rect.x -= 107 * TILE_SIZE
-                    sprite.rect.y -= 20 * TILE_SIZE
-                self.player.rect.x -= 52 * TILE_SIZE
-                self.player.rect.y += 20 * TILE_SIZE
-
-        # Ground floor -> 1st floor
-        elif self.interacted[0] == "Stairs_up" and self.in_room == ground_floor:
-            self.in_room = self.rooms[FIRST_FLOOR] # First floor
-            self.create_tile_map()
-
-            # Right stairs
-            if self.interacted[1] in (16, 17, 18, 19) and self.interacted[2] == 184:
-                for sprite in self.all_sprites: 
-                    sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 17 * TILE_SIZE
-            
-            # Left stairs
-            elif self.interacted[1] == 13 and self.interacted[2] in (45, 46, 47, 48, 49, 50, 51):
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 47 * TILE_SIZE
-                    sprite.rect.y -= 17 * TILE_SIZE
-                self.player.rect.x -= 124 * TILE_SIZE
-                self.player.rect.y += 2 * TILE_SIZE
-            
-            self.door_info("First floor", "Hall")
                 
-        # 1st floor -> Ground floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room == first_floor:
-            self.in_room = self.rooms[GROUND_FLOOR] # Ground floor
-            self.create_tile_map()
-
-            # Right stairs
-            if self.interacted[1] in (21, 22, 23, 24) and self.interacted[2] == 181:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 174 * TILE_SIZE
-                    sprite.rect.y -= 11 * TILE_SIZE
-                self.player.rect.x += 15 * TILE_SIZE
-                self.player.rect.y += 11 * TILE_SIZE
-
-            # Left stairs
-            elif self.interacted[1] == 24 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 39 * TILE_SIZE
-                    sprite.rect.y -= 7 * TILE_SIZE
-                self.player.rect.x -= 120 * TILE_SIZE
-                self.player.rect.y += 8 * TILE_SIZE
+                # Right stairs
+                if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 171 * TILE_SIZE
+                        sprite.rect.y -= 18 * TILE_SIZE
                 
-            self.door_info("Ground floor", "Hall")
-        
-        # First floor -> Second floor
-        elif self.interacted[0] == "Stairs_up" and self.in_room == first_floor:
-            self.in_room = self.rooms[SECOND_FLOOR] # Second floor
-            self.create_tile_map()
-            
-            # Right stairs
-            if self.interacted[1] in (26, 27, 28, 29) and self.interacted[2] == 181: 
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 18 * TILE_SIZE
-            
-            # Left stairs
-            elif self.interacted[2] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[1] == 24:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 47 * TILE_SIZE
-                    sprite.rect.y -= 19 * TILE_SIZE
-                self.player.rect.x -= 124 * TILE_SIZE
-                self.player.rect.y += 2 * TILE_SIZE
-            
-            self.door_info("Second floor", "Hall")
+                # Left stairs
+                elif self.interacted[2] in (45, 46, 47, 48, 49, 50, 51) and self.interacted[1] == 24:
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 47 * TILE_SIZE
+                        sprite.rect.y -= 19 * TILE_SIZE
+                    self.player.rect.x -= 124 * TILE_SIZE
+                    self.player.rect.y += 2 * TILE_SIZE
                 
-        # Second floor -> First floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
-            self.in_room = self.rooms[FIRST_FLOOR] # First floor
-            self.create_tile_map()
-
-            # Right stairs
-            if self.interacted[1] in (22, 23, 24, 25) and self.interacted[2] == 181:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 19 * TILE_SIZE
-                self.player.rect.y += 4 * TILE_SIZE
-
-            # Left stairs
-            elif self.interacted[1] == 25 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 39 * TILE_SIZE
-                    sprite.rect.y -= 19 * TILE_SIZE
-                self.player.rect.x -= 132 * TILE_SIZE
-                self.player.rect.y += 2 * TILE_SIZE
-                
-            self.door_info("First floor", "Hall")
-        
-        # Second floor -> Third floor
-        elif self.interacted[0] == "Stairs_up" and self.in_room == second_floor:
-            self.in_room = self.rooms[THIRD_FLOOR]
-            self.create_tile_map()
-            
-            if self.interacted[1] in (27, 28, 29, 30) and self.interacted[2] == 181: 
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 62 * TILE_SIZE
-                    sprite.rect.y -= 4 * TILE_SIZE
-
-            self.door_info("Third floor", "Hall")
-            
-        # Third floor -> Second floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room == third_floor:
-            self.in_room = self.rooms[SECOND_FLOOR]
-            self.create_tile_map()
-            
-            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 171 * TILE_SIZE
-                    sprite.rect.y -= 20 * TILE_SIZE
-                self.player.rect.y += 4 * TILE_SIZE
+                self.door_info("Second floor", "Hall")
                     
-            self.door_info("Second floor", "Hall")
-            
-        # Fourth floor -> Third floor
-        elif self.interacted[0] == "Stairs_down" and self.in_room == fourth_floor:
-            self.in_room = self.rooms[THIRD_FLOOR]
-            self.create_tile_map()
-            
-            if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 62 * TILE_SIZE
-                    sprite.rect.y -= 7 * TILE_SIZE
-                self.player.rect.y += 4 * TILE_SIZE
-                    
-            self.door_info("Third floor", "Hall")
-            
-        # Third floor -> Fourth floor
-        elif self.interacted[0] == "Stairs_up" and self.in_room == third_floor:
-            self.in_room = self.rooms[FOURTH_FLOOR]
-            self.create_tile_map()
-            
-            if self.interacted[1] in (13, 14, 15, 16) and self.interacted[2] == 72: 
-                for sprite in self.all_sprites:
-                    sprite.rect.x -= 62 * TILE_SIZE
-                    sprite.rect.y -= 4 * TILE_SIZE
+            # Second floor -> First floor
+            elif self.interacted[0] == "Stairs_down" and self.in_room == second_floor:
+                self.in_room = self.rooms[FIRST_FLOOR] # First floor
+                self.create_tile_map()
 
-            self.door_info("Fourth floor", "Hall")
+                # Right stairs
+                if self.interacted[1] in (22, 23, 24, 25) and self.interacted[2] == 181:
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 171 * TILE_SIZE
+                        sprite.rect.y -= 19 * TILE_SIZE
+                    self.player.rect.y += 4 * TILE_SIZE
+
+                # Left stairs
+                elif self.interacted[1] == 25 and self.interacted[2] in (53, 54, 55, 56, 57, 58, 59):
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 39 * TILE_SIZE
+                        sprite.rect.y -= 19 * TILE_SIZE
+                    self.player.rect.x -= 132 * TILE_SIZE
+                    self.player.rect.y += 2 * TILE_SIZE
+                    
+                self.door_info("First floor", "Hall")
+            
+            # Second floor -> Third floor
+            elif self.interacted[0] == "Stairs_up" and self.in_room == second_floor:
+                self.in_room = self.rooms[THIRD_FLOOR]
+                self.create_tile_map()
                 
+                if self.interacted[1] in (27, 28, 29, 30) and self.interacted[2] == 181: 
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 62 * TILE_SIZE
+                        sprite.rect.y -= 4 * TILE_SIZE
+
+                self.door_info("Third floor", "Hall")
+                
+            # Third floor -> Second floor
+            elif self.interacted[0] == "Stairs_down" and self.in_room == third_floor:
+                self.in_room = self.rooms[SECOND_FLOOR]
+                self.create_tile_map()
+                
+                if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 171 * TILE_SIZE
+                        sprite.rect.y -= 20 * TILE_SIZE
+                    self.player.rect.y += 4 * TILE_SIZE
+                        
+                self.door_info("Second floor", "Hall")
+                
+            # Fourth floor -> Third floor
+            elif self.interacted[0] == "Stairs_down" and self.in_room == fourth_floor:
+                self.in_room = self.rooms[THIRD_FLOOR]
+                self.create_tile_map()
+                
+                if self.interacted[1] in (8, 9, 10, 11) and self.interacted[2] == 72:
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 62 * TILE_SIZE
+                        sprite.rect.y -= 7 * TILE_SIZE
+                    self.player.rect.y += 4 * TILE_SIZE
+                        
+                self.door_info("Third floor", "Hall")
+                
+            # Third floor -> Fourth floor
+            elif self.interacted[0] == "Stairs_up" and self.in_room == third_floor:
+                self.in_room = self.rooms[FOURTH_FLOOR]
+                self.create_tile_map()
+                
+                if self.interacted[1] in (13, 14, 15, 16) and self.interacted[2] == 72: 
+                    for sprite in self.all_sprites:
+                        sprite.rect.x -= 62 * TILE_SIZE
+                        sprite.rect.y -= 4 * TILE_SIZE
+
+                self.door_info("Fourth floor", "Hall")
+
     def toilet(self):
         """
         PeePeePooPoo time
@@ -4779,7 +4860,7 @@ class Game:
         self.player_follow = False
         self.in_room = self.rooms[GROUND_FLOOR]
         self.create_tile_map()
-        for sprite in self.all_sprites: 
+        for sprite in self.all_sprites:
             sprite.rect.x -= 107 * TILE_SIZE
             sprite.rect.y -= 20 * TILE_SIZE
         self.player.rect.x -= 52 * TILE_SIZE
