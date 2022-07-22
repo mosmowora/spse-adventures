@@ -95,6 +95,7 @@ class Game:
         '''Where are you hiding???'''
         self.lyz_created: bool = False
         '''Are we there yet?'''
+        self.lyz_day = 1
         
         # Settings
         self.music_on: bool = True
@@ -1337,6 +1338,7 @@ class Game:
 
         open_inventory = True
         inventory_coords: dict[str, pygame.Rect] = {}
+        smart_watch = pygame.image.load('img/smart_watch.png')
         
         # Screen of the game
         bg = pygame.image.load("img/screen.png")
@@ -1349,29 +1351,32 @@ class Game:
         max_items = 7
 
         while open_inventory:
-
             # Background
             self.screen.blit(bg, (0, 0))
 
-            # Inv items
-            n = 0
-            m = 0
-            for i in self.inv:
-                if n >= min_items:
-                    fg_rect = fg.get_rect(x=10 + 85 * m, y=10)
-                    img = pygame.image.load(self.inv[i])
-                    rect = img.get_rect(x=10 + 85 * m, y=10)
+            if self.lyz_created: 
+                if self.smart_watch_logic(smart_watch): open_inventory = False
 
-                    # Display items
-                    self.screen.blit(fg, fg_rect)
-                    self.screen.blit(img, rect)
-                    
-                    # Inventory coords for items
-                    inventory_coords[self.inv[i]] = rect
+            else:
+                # Inv items
+                n = 0
+                m = 0
+                for i in self.inv:
+                    if n >= min_items:
+                        fg_rect = fg.get_rect(x=10 + 85 * m, y=10)
+                        img = pygame.image.load(self.inv[i])
+                        rect = img.get_rect(x=10 + 85 * m, y=10)
 
-                    m += 1
-                n += 1
-                if n == max_items: break
+                        # Display items
+                        self.screen.blit(fg, fg_rect)
+                        self.screen.blit(img, rect)
+                        
+                        # Inventory coords for items
+                        inventory_coords[self.inv[i]] = rect
+
+                        m += 1
+                    n += 1
+                    if n == max_items: break
 
             # Events
             for event in pygame.event.get():
@@ -1675,6 +1680,25 @@ class Game:
             self.screen.blit(three.image, three.rect)
             self.screen.blit(four.image, four.rect)
             
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
+    def smart_watch_logic(self, smart_watch_img: pygame.Surface):
+        watching: bool = True
+
+        while watching:
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button
+                if event.type == pygame.QUIT: self.exiting()
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE: watching = False; return True
+            
+            self.screen.blit(smart_watch_img, smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 200, y= WIN_HEIGHT // 2 - 200))
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
