@@ -798,7 +798,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "ď": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
         elif type == "Ú": self.image = self.game.terrain_spritesheet.get_sprite(409, 104, self.width, self.height)
         elif type == "Ů": self.image = self.game.terrain_spritesheet.get_sprite(376, 104, self.width, self.height)
-        elif type == "˙": self.image = self.game.terrain_spritesheet.get_sprite(2, 240, self.width, self.height)
+        elif type == "▼": self.image = self.game.terrain_spritesheet.get_sprite(409, 138, self.width, self.height)
         elif type == "ś": self.image = self.game.terrain_spritesheet.get_sprite(500, 2, self.width, self.height)
         elif type == "š": self.image = self.game.terrain_spritesheet.get_sprite(500, 36, self.width, self.height)
         elif type == "▬": self.image = self.game.terrain_spritesheet.get_sprite(568, 2, self.width, self.height)

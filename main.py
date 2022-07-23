@@ -1,6 +1,5 @@
 # Imports
 import base64
-from pickle import FALSE
 import sys
 from tkinter import messagebox
 from types import NoneType
@@ -11,6 +10,7 @@ from quest import Quest
 from save_progress import SaveProgress
 from camera import Camera
 from bs4 import BeautifulSoup as bs
+from time import gmtime, strftime
 
 from sprites import *; from config import *
 
@@ -851,7 +851,7 @@ class Game:
                     elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
                     elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
                     elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
-                    elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
+                    elif column == "▼": self.interactive[Block(self, j, i, "▼")] = "▼" + str(i) + str(j) # Sink
                     elif column == "š": self.interactive[Block(self, j, i, "š")] = "š" + str(i) + str(j) # Wood
                     elif column == "ś": self.interactive[Block(self, j, i, "ś")] = "ś" + str(i) + str(j) # Wood ^ 2
                     elif column == "▬": self.interactive[Block(self, j, i, "▬")] = "▬" + str(i) + str(j) # Shoe rack
@@ -950,7 +950,7 @@ class Game:
                     elif column == "ď": self.interactive[Block(self, j, i, "ď")] = "ď" + str(i) + str(j) # Laďďer
                     elif column == "Ú": self.interactive[Block(self, j, i, "Ú")] = "Ú" + str(i) + str(j) # Sink
                     elif column == "Ů": self.interactive[Block(self, j, i, "Ů")] = "Ů" + str(i) + str(j) # Sink
-                    elif column == "˙": self.interactive[Block(self, j, i, "˙")] = "˙" + str(i) + str(j) # Sink
+                    elif column == "▼": self.interactive[Block(self, j, i, "▼")] = "▼" + str(i) + str(j) # Sink
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                     elif column == "9": self.npc.append(Npc(self, j, i, "9"))  # NPC VUJ
@@ -1339,9 +1339,6 @@ class Game:
         open_inventory = True
         inventory_coords: dict[str, pygame.Rect] = {}
         smart_watch = pygame.image.load('img/smart_watch.png')
-        
-        # Screen of the game
-        bg = pygame.image.load("img/screen.png")
 
         # Inventory
         fg = pygame.image.load("img/inv_fg.png")
@@ -1351,8 +1348,7 @@ class Game:
         max_items = 7
 
         while open_inventory:
-            # Background
-            self.screen.blit(bg, (0, 0))
+            
 
             if self.lyz_created: 
                 if self.smart_watch_logic(smart_watch): open_inventory = False
@@ -1685,9 +1681,21 @@ class Game:
             pygame.display.update()
             
     def smart_watch_logic(self, smart_watch_img: pygame.Surface):
+        # Screen of the game
+        bg = pygame.image.load("img/screen.png")
         watching: bool = True
-
+        x: int = 0
+        smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
+        watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
+        watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
+        unlock_img = pygame.image.load("img/unlock_watch.png")
+        unlock_img_rect = unlock_img.get_rect(x=WIN_WIDTH // 2 - 430, y=WIN_HEIGHT // 2 - 30)
+        
         while watching:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
             
             # Events
             for event in pygame.event.get():
@@ -1696,9 +1704,36 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
                 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE: watching = False; return True
+                    if event.key in (pygame.K_ESCAPE, pygame.K_i):
+                        # Moving the watch / animation for it
+                        while smart_watch_rect.x >= WIN_WIDTH // 2 - 580:
+                            smart_watch_rect.x -= x * 2
+                            watch_time_rect.x -= x * 2
+                            unlock_img_rect.x -= x * 2
+                            x -= 0.25
+                            # Background
+                            self.screen.blit(bg, (0, 0))
+                            self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
+                            self.screen.blit(watch_time.convert_alpha(), watch_time_rect)
+                            if unlock_img is not None: self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
+                        watching = False; return True
+                        
+                if unlock_img_rect.collidepoint(mouse_pos) and mouse_pressed[0]:
+                    unlock_img = None
             
-            self.screen.blit(smart_watch_img, smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 200, y= WIN_HEIGHT // 2 - 200))
+            # Moving the watch / animation for it
+            if smart_watch_rect.x <= WIN_WIDTH // 2 - 400: 
+                smart_watch_rect.x += x * 2
+                watch_time_rect.x += x * 2
+                unlock_img_rect.x += x * 2
+                x += 1
+            
+            # Background
+            self.screen.blit(bg, (0, 0))
+            self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
+            self.screen.blit(watch_time, watch_time_rect)
+            if unlock_img is not None: self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
+
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -2853,7 +2888,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        if room_number not in ('outside', 'diner', 'ground'): self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner', 'ground', 'first', 'second'): self.saved_room_data = room_number
         else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
@@ -4348,7 +4383,7 @@ class Game:
         if self.lyz_in_room in self.lyz_rooms: self.lyz_doors()
 
         # Ground floor
-        elif self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
+        if self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
 
         # First floor
         elif self.in_room == self.rooms[FIRST_FLOOR]: self.first_floor_doors()
@@ -4367,7 +4402,6 @@ class Game:
         
         # Lost guy
         elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45 and self.lost_guy: self.quest.guy_lost_in_school()
-        
                
     def basement(self):
         """
