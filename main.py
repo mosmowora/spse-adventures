@@ -6,6 +6,7 @@ from types import NoneType
 import webbrowser
 import pygame, random as r, getpass, requests
 from leaderboard import Leaderboard
+from lyz import Lyziarsky
 from quest import Quest
 from save_progress import SaveProgress
 from camera import Camera
@@ -95,7 +96,7 @@ class Game:
         '''Where are you hiding???'''
         self.lyz_created: bool = False
         '''Are we there yet?'''
-        self.lyz_day = 1
+        self.lyz_day = Lyziarsky(self)
         
         # Settings
         self.music_on: bool = True
@@ -1688,14 +1689,10 @@ class Game:
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
         watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
-        unlock_img = pygame.image.load("img/unlock_watch.png")
-        unlock_img_rect = unlock_img.get_rect(x=WIN_WIDTH // 2 - 430, y=WIN_HEIGHT // 2 - 30)
+        unlock_img = pygame.image.load("img/card-hand.png")
+        unlock_img_rect = unlock_img.get_rect(x=WIN_WIDTH // 2 - 450, y=WIN_HEIGHT // 2 - 30)
         
         while watching:
-            
-            # Position and click of the mouse
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_pressed = pygame.mouse.get_pressed()
             
             # Events
             for event in pygame.event.get():
@@ -1715,11 +1712,8 @@ class Game:
                             self.screen.blit(bg, (0, 0))
                             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
                             self.screen.blit(watch_time.convert_alpha(), watch_time_rect)
-                            if unlock_img is not None: self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
+                            if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
                         watching = False; return True
-                        
-                if unlock_img_rect.collidepoint(mouse_pos) and mouse_pressed[0]:
-                    unlock_img = None
             
             # Moving the watch / animation for it
             if smart_watch_rect.x <= WIN_WIDTH // 2 - 400: 
@@ -1732,7 +1726,7 @@ class Game:
             self.screen.blit(bg, (0, 0))
             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
             self.screen.blit(watch_time, watch_time_rect)
-            if unlock_img is not None: self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
+            if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
 
             # Updates
             self.clock.tick(FPS)
@@ -3184,8 +3178,7 @@ class Game:
         
         elif self.player.facing == 'down' and self.interacted[1] == 14 and self.interacted[2] == 2 and self.lyz_in_room == lyz_first:
             self.talking("Time to get cozy.")
-            # TODO: Complete this function
-            # self.unlock_lyz_door()
+            self.lyz_day.unlock_room()
 
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             self.talking("Anything can happen, but not me going here.")
