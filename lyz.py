@@ -17,9 +17,9 @@ class Lyziarsky:
         '''
         
         unlocking = True
-        locker = pygame.image.load("img/reader.png")
+        locker = pygame.image.load("img/reader.png").convert_alpha()
         unlock_rect = pygame.Rect(191, 134, 52, 38)
-        hand_unlocking = pygame.image.load("img/unlocker_hand.png")
+        hand_unlocking = pygame.image.load("img/unlocker_hand.png").convert_alpha()
         
         while unlocking:
             
@@ -36,7 +36,7 @@ class Lyziarsky:
                 tmp = self.game.talking_speed_number
                 self.game.talking_speed_number = 120
                 self.game.talking("Wait a moment...", True, BRITISH_WHITE)
-                self.game.talking("Unlocked", True, BRITISH_WHITE)
+                self.game.door_info("Unlocked", "room")
                 unlocking = False
                 self.game.talking_speed_number = tmp
                 

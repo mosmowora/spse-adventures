@@ -11,7 +11,7 @@ from quest import Quest
 from save_progress import SaveProgress
 from camera import Camera
 from bs4 import BeautifulSoup as bs
-from time import gmtime, strftime
+from time import strftime
 
 from sprites import *; from config import *
 
@@ -22,7 +22,7 @@ class Game:
 
     def __init__(self):
         """
-        Initialization
+        Main game
         """
 
         # Pygame initialization
@@ -66,7 +66,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_diner]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -764,7 +764,7 @@ class Game:
         if self.lyz_created:
             for i, row in enumerate(self.lyz_in_room):
                 for j, column in enumerate(row):
-                    Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second') else Ground(self, j, i)
+                    Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room') else Ground(self, j, i)
                     if column == '´': Ground(self, j, i, dirt=True)
                     if column == "↨": Ground(self, j, i, carpet=True)
                     elif column == "P": self.player = Player(self, j, i) # Player
@@ -2882,7 +2882,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        if room_number not in ('outside', 'diner', 'ground', 'first', 'second'): self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner', 'ground', 'first', 'second', 'room'): self.saved_room_data = room_number
         else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
@@ -3179,6 +3179,20 @@ class Game:
         elif self.player.facing == 'down' and self.interacted[1] == 14 and self.interacted[2] == 2 and self.lyz_in_room == lyz_first:
             self.talking("Time to get cozy.")
             self.lyz_day.unlock_room()
+            self.lyz_in_room = self.lyz_rooms[LYZ_ROOM]
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
+        
+        elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_in_room == lyz_room:
+            self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
+            self.door_info("Bye guys", 'first')
+            for sprite in self.all_sprites:
+                sprite.rect.y -= 12 * TILE_SIZE
+                sprite.rect.x += 6 * TILE_SIZE
+            self.player.rect.y += 10 * TILE_SIZE
+            self.player.rect.x -= 5 * TILE_SIZE
 
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             self.talking("Anything can happen, but not me going here.")
