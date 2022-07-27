@@ -697,7 +697,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "["]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -804,6 +804,8 @@ class Block(pygame.sprite.Sprite):
         elif type == "▬": self.image = self.game.terrain_spritesheet.get_sprite(568, 2, self.width, self.height)
         elif type == "∟": self.image = self.game.terrain_spritesheet.get_sprite(500, 70, self.width, self.height)
         elif type == "↔": self.image = self.game.terrain_spritesheet.get_sprite(534, 70, self.width, self.height)
+        elif type == "◙": self.image = self.game.terrain_spritesheet.get_sprite(568, 70, self.width, self.height)
+        elif type == "♂": self.image = self.game.terrain_spritesheet.get_sprite(602, 2, self.width, self.height)
         
 
         self.rect = self.image.get_rect()
@@ -935,7 +937,7 @@ class Interact(pygame.sprite.Sprite):
 
     def __init__(self, game, x: int, y: int, inter: dict):
         """
-        Initialization
+        Interacting with game objects
         """
 
         # Dictionary
@@ -1036,6 +1038,7 @@ class Interact(pygame.sprite.Sprite):
                     # Ladder
                     elif self.interactive[hits[0]] == "ď" + str(i) + str(j): self.game.interacted = ["Ladder", i, j]
 
+                    elif self.interactive[hits[0]] == "[" + str(i) + str(j): self.game.interacted = ["Bag", i, j]
 
 class Button:
     """

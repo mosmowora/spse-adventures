@@ -235,6 +235,9 @@ class Game:
         # Variables for endings
         self.without_light: int = 0
         self.caught: int = 0
+        
+        # LYZ quests
+        self.vybalenie: bool = True
 
         # Quests variables
         self.__gul_counter: int = 0
@@ -858,6 +861,8 @@ class Game:
                     elif column == "▬": self.interactive[Block(self, j, i, "▬")] = "▬" + str(i) + str(j) # Shoe rack
                     elif column == "∟": self.interactive[Block(self, j, i, "∟")] = "∟" + str(i) + str(j) # Stairs
                     elif column == "↔": self.interactive[Block(self, j, i, "↔")] = "↔" + str(i) + str(j) # More stairs
+                    elif column == "♂": self.interactive[Block(self, j, i, "♂")] = "♂" + str(i) + str(j) # Desk for TV
+                    elif column == "◙": self.interactive[Block(self, j, i, "◙")] = "◙" + str(i) + str(j) # Desk with TV
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
@@ -1101,7 +1106,7 @@ class Game:
 
         # Events
         for event in pygame.event.get():
-
+            
             # Close button/Esc
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
 
@@ -1143,9 +1148,12 @@ class Game:
                     case "Battery": self.batteries()
                     case "Flashlight": self.flashlight()
                     case "Ladder": self.ladder()
+                    case "Bag": self.lyz_day.first.unpack_things()
 
-                # Reset
-                self.interacted = ["", "", ""]  
+                # Reset and multiple event entries fix
+                self.interacted = ["", "", ""]
+                pygame.event.clear(eventtype=[pygame.KEYDOWN,
+                                          pygame.KEYUP])
                 
     def flashlight(self):
         """
@@ -2262,7 +2270,8 @@ class Game:
                         "prayed": self.prayed,
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
-                        "caught": self.caught
+                        "caught": self.caught,
+                        "vybalenie": self.vybalenie
                         }
         
         # Refreshing the password to it's original state for further encodings
