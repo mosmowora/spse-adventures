@@ -9,8 +9,8 @@ class Lyziarsky:
         self.first = firstDay(self.game)
         self.day: int = 1
         
-    def new_day(self): self.day += 1 
-        
+    def __new_day(self): self.day += 1
+    
     def unlock_room(self):
         '''
         Getting inside own room
@@ -48,7 +48,9 @@ class Lyziarsky:
         
 class firstDay:
     
-    def __init__(self, game) -> None: self.game = game
+    def __init__(self, game) -> None: 
+        self.game = game
+        self.notes = {1: "Unpack your things next to your bed.", 2: "Take a nap and wait for evening.", 3: "Go get yourself a nice dinner."}
     
     def vybalit(self):
         '''

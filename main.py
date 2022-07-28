@@ -43,6 +43,8 @@ class Game:
         '''Ye, it's running alright'''
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
         '''BIIG FOOONT'''
+        self.bigger_font = pygame.font.Font("Caveat.ttf", 35)
+        '''BIGGERR FOOONT'''
         self.font = pygame.font.Font("Roboto.ttf", 22)
         '''just a normal font'''
         self.settings_font = pygame.font.Font("Caveat.ttf", 45)
@@ -238,6 +240,8 @@ class Game:
         
         # LYZ quests
         self.vybalenie: bool = True
+        self.nap: bool = True
+        self.first_dinner: bool = True
 
         # Quests variables
         self.__gul_counter: int = 0
@@ -1049,6 +1053,9 @@ class Game:
             self.lost_guy = data["quests"]["lost_guy"]
             self.not_saint = data["quests"]["saint"]
             self.prayed = data["quests"]["prayed"]
+            # self.vybalenie = data["quests"]["vybalenie"]
+            # self.nap = data["quests"]["nap"]
+            # self.first_dinner = data["quests"]["first_dinner"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -1113,7 +1120,11 @@ class Game:
             # Pressed I
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_i and len(self.inv) != 0: 
                 pygame.image.save(self.screen, "img/screen.png")
-                self.inventory() 
+                self.inventory()
+            
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n and self.lyz_created:
+                pygame.image.save(self.screen, "img/screen.png")
+                self.notes()
 
             # Pressed E
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
@@ -1336,6 +1347,37 @@ class Game:
             self.screen.blit(sq_button.image, sq_button.rect)
             self.screen.blit(dlc_button.image, dlc_button.rect)
 
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
+    def notes(self):
+        
+        '''
+        Opens notes for player to know what he has to do in a certain day
+        '''
+        
+        noting: bool = True
+        notes = pygame.image.load('img/notes.png')
+        
+        while noting:
+            # Close button
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_n: noting = not noting; break
+                
+            self.screen.blit(notes, (40, 20))
+            match self.lyz_day.day:
+                case 1:
+                    done_quests = [quest for quest in (self.vybalenie, self.nap, self.first_dinner) if not quest]
+                    first_notes = list(self.lyz_day.first.notes.values())
+                    quest_coords: list[list[tuple[int, int]]] = []
+                    for item in range(len(first_notes)):
+                        quest_coords.append((100, 130 + 60 * item))
+                        self.screen.blit(self.bigger_font.render(first_notes[item], True, BLACK), quest_coords[item])
+                    for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 450, quest_coords[quest][1] + 25), 3)
+            
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -1699,6 +1741,8 @@ class Game:
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
         unlock_img = pygame.image.load("img/card-hand.png")
         unlock_img_rect = unlock_img.get_rect(x=WIN_WIDTH // 2 - 450, y=WIN_HEIGHT // 2 - 30)
+        day_info = self.font.render('Day: ' + str(self.lyz_day.day), True, WHITE)
+        day_info_rect = day_info.get_rect(x=WIN_WIDTH // 2 - 415, y=WIN_HEIGHT // 2 + 50)
         
         while watching:
             
@@ -1715,25 +1759,29 @@ class Game:
                             smart_watch_rect.x -= x * 2
                             watch_time_rect.x -= x * 2
                             unlock_img_rect.x -= x * 2
+                            day_info_rect.x -= x * 2
                             x -= 0.25
                             # Background
                             self.screen.blit(bg, (0, 0))
                             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
                             self.screen.blit(watch_time.convert_alpha(), watch_time_rect)
+                            self.screen.blit(day_info, day_info_rect)
                             if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
                         watching = False; return True
             
             # Moving the watch / animation for it
-            if smart_watch_rect.x <= WIN_WIDTH // 2 - 400: 
+            if smart_watch_rect.x <= WIN_WIDTH // 2 - 400:
                 smart_watch_rect.x += x * 2
                 watch_time_rect.x += x * 2
                 unlock_img_rect.x += x * 2
+                day_info_rect.x += x * 2
                 x += 1
             
             # Background
             self.screen.blit(bg, (0, 0))
             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
             self.screen.blit(watch_time, watch_time_rect)
+            self.screen.blit(day_info, day_info_rect)
             if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
 
             # Updates
@@ -2271,7 +2319,9 @@ class Game:
                         "locker_stuff": self.locker_stuff, 
                         "without_light": self.without_light,
                         "caught": self.caught,
-                        "vybalenie": self.vybalenie
+                        "vybalenie": self.vybalenie,
+                        "nap": self.nap,
+                        "first_dinner": self.first_dinner
                         }
         
         # Refreshing the password to it's original state for further encodings
