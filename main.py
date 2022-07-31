@@ -769,7 +769,8 @@ class Game:
 
         # Creating sprites
         if self.lyz_created:
-            for i, row in enumerate(self.lyz_in_room):
+            tmp_room: List[str] = self.samko_placement() # Room with Samko
+            for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room') else Ground(self, j, i)
                     if column == '´': Ground(self, j, i, dirt=True)
@@ -868,8 +869,10 @@ class Game:
                     elif column == "♂": self.interactive[Block(self, j, i, "♂")] = "♂" + str(i) + str(j) # Desk for TV
                     elif column == "◙": self.interactive[Block(self, j, i, "◙")] = "◙" + str(i) + str(j) # Desk with TV
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
+                    elif column == ":": self.interactive[Npc(self, j, i, ":")] = ":" + str(i) + str(j) # Samko NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
+            self.talking_with_samko()
         else:
             for i, row in enumerate(self.in_room):
                 for j, column in enumerate(row):
@@ -967,7 +970,39 @@ class Game:
                     elif column == "C": self.npc.append(Npc(self, j, i, "C")) # Cleaner
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
                     elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
-                    elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) # Bananok 
+                    elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) 
+
+    def talking_with_samko(self):
+        samko_pos: list = []
+        try: samko_pos = list(list(self.interactive.values())[list(map(lambda x: x[0], self.interactive.values())).index(":")])[1:]
+        except ValueError: self.samko_placement()
+        finally:
+            if len(samko_pos) <= 3:
+                if str(self.interacted[1]) == samko_pos[0] and str(self.interacted[2]) == ''.join(samko_pos[1:]) or str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == samko_pos[-1]:
+                    self.talking("I dunno how I got here", True, BRITISH_WHITE)
+                    self.talking("Maybe a higher power?", True, BRITISH_WHITE)
+                    self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
+                    self.talking("So leave me alone", True, BRITISH_WHITE)
+            elif len(samko_pos) == 4:
+                if str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == ''.join(samko_pos[2:]):
+                    self.talking("I dunno how I got here", True, BRITISH_WHITE)
+                    self.talking("Maybe a higher power?", True, BRITISH_WHITE)
+                    self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
+                    self.talking("So leave me alone", True, BRITISH_WHITE)
+    
+    def samko_placement(self):
+        '''
+        Returns new room with Samko
+        '''
+        tmp_room: List[str] = self.lyz_in_room.copy()
+        row = r.randint(1, len(self.lyz_in_room) - 2)
+        samko_pos = tmp_room[row]
+        if "." in samko_pos:
+            private_idx = r.randint(0, len(samko_pos) // 2)
+            samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
+            tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
+        else: print(". : not found")
+        return tmp_room
                 
     def set_camera(self, level: List[str]):
             if level == ground_floor: self.camera.set_ground_camera()
@@ -1147,6 +1182,7 @@ class Game:
                     case "Basement": self.basement()
                     case "Toilet": self.toilet()
                     case "Teacher": self.talking_with_teachers()
+                    case "Samko": self.talking_with_samko()
                     case "Bookshelf": self.bookshelf()
                     case "Desk": self.desk()
                     case "Computer": self.quest.programming()
@@ -1160,6 +1196,7 @@ class Game:
                     case "Flashlight": self.flashlight()
                     case "Ladder": self.ladder()
                     case "Bag": self.lyz_day.first.unpack_things()
+                    case "Nap": self.lyz_day.first.go_sleep()
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -1739,8 +1776,6 @@ class Game:
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
         watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
-        unlock_img = pygame.image.load("img/card-hand.png")
-        unlock_img_rect = unlock_img.get_rect(x=WIN_WIDTH // 2 - 450, y=WIN_HEIGHT // 2 - 30)
         day_info = self.font.render('Day: ' + str(self.lyz_day.day), True, WHITE)
         day_info_rect = day_info.get_rect(x=WIN_WIDTH // 2 - 415, y=WIN_HEIGHT // 2 + 50)
         
@@ -1758,7 +1793,6 @@ class Game:
                         while smart_watch_rect.x >= WIN_WIDTH // 2 - 580:
                             smart_watch_rect.x -= x * 2
                             watch_time_rect.x -= x * 2
-                            unlock_img_rect.x -= x * 2
                             day_info_rect.x -= x * 2
                             x -= 0.25
                             # Background
@@ -1766,14 +1800,12 @@ class Game:
                             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
                             self.screen.blit(watch_time.convert_alpha(), watch_time_rect)
                             self.screen.blit(day_info, day_info_rect)
-                            if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
                         watching = False; return True
             
             # Moving the watch / animation for it
             if smart_watch_rect.x <= WIN_WIDTH // 2 - 400:
                 smart_watch_rect.x += x * 2
                 watch_time_rect.x += x * 2
-                unlock_img_rect.x += x * 2
                 day_info_rect.x += x * 2
                 x += 1
             
@@ -1782,7 +1814,6 @@ class Game:
             self.screen.blit(smart_watch_img.convert_alpha(), smart_watch_rect)
             self.screen.blit(watch_time, watch_time_rect)
             self.screen.blit(day_info, day_info_rect)
-            if self.lyz_day.day == 1 and self.lyz_day.first.vybalit(): self.screen.blit(unlock_img.convert_alpha(), unlock_img_rect)
 
             # Updates
             self.clock.tick(FPS)

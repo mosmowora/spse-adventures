@@ -375,6 +375,9 @@ class Npc(pygame.sprite.Sprite):
 
         # Cleaner - White
         if self.type == "C": self.color = colors[-1]
+        
+        # Samko on LYZ - Yellow
+        elif self.type == ":": self.color = colors[3]
 
         # Vujcheek - Blue
         elif self.type == "9": self.color = colors[5]
@@ -697,7 +700,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "["]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "^"]
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -1007,6 +1010,9 @@ class Interact(pygame.sprite.Sprite):
                     
                     # Teacher
                     elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
+                    
+                    # Samko
+                    elif self.interactive[hits[0]] == ":" + str(i) + str(j): self.game.interacted = ["Samko", i, j]
 
                     # Bookshelf
                     elif self.interactive[hits[0]] in ("O" + str(i) + str(j), "o" + str(i) + str(j), "ó" + str(i) + str(j), "Ó" + str(i) + str(j)): self.game.interacted = ["Bookshelf", i, j]
@@ -1038,7 +1044,10 @@ class Interact(pygame.sprite.Sprite):
                     # Ladder
                     elif self.interactive[hits[0]] == "ď" + str(i) + str(j): self.game.interacted = ["Ladder", i, j]
 
+                    # Unpacking things
                     elif self.interactive[hits[0]] == "[" + str(i) + str(j): self.game.interacted = ["Bag", i, j]
+                    # Napping
+                    elif self.interactive[hits[0]] == "^" + str(i) + str(j): self.game.interacted = ["Nap", i, j]
 
 class Button:
     """

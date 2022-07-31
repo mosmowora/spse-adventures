@@ -52,14 +52,9 @@ class firstDay:
         self.game = game
         self.notes = {1: "Unpack your things next to your bed.", 2: "Take a nap and wait for evening.", 3: "Go get yourself a nice dinner."}
     
-    def vybalit(self):
-        '''
-        If player is inside his lodge then he should unpack his things
-        ''' 
-        return True if self.game.lyz_in_room == self.game.lyz_rooms[LYZ_FIRST] else False
+    def open_bag(self): return True if self.game.interacted[1] in (4, 5, 6) and self.game.interacted[2] == 4 else False
     
-    def open_bag(self):
-        return True if self.game.interacted[1] in (4, 5, 6) and self.game.interacted[2] == 4 else False
+    def has_all(self): return True if all(x for x in (self.game.vybalenie, self.game.nap, self.game.first_dinner) if not x) else False
     
     def unpack_things(self):
         things_in_bag = [pygame.image.load('img/shirts.png'), pygame.image.load('img/ski_boots.png'), pygame.image.load('img/pants.png'), pygame.image.load('img/backpack.png'), pygame.image.load('img/stacked_towels.png')]
@@ -100,3 +95,26 @@ class firstDay:
                 # Updates
                 self.game.clock.tick(FPS)
                 pygame.display.update()
+
+    def go_sleep(self):
+        if self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and not self.game.vybalenie:
+            fade = pygame.Surface((640, 480))
+            fade.fill((0,0,0))
+            for alpha in range(0, 510):
+                fade.set_alpha(alpha)
+                self.game.screen.blit(fade, (0,0))
+                pygame.display.update()
+                pygame.time.delay(25)
+                if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap...", False, WHITE), (200, 190))
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button/Esc
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: return
+                
+            self.game.nap = False
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+            
