@@ -43,7 +43,7 @@ class Game:
         '''Ye, it's running alright'''
         self.big_font = pygame.font.Font("Caveat.ttf", 40)
         '''BIIG FOOONT'''
-        self.bigger_font = pygame.font.Font("Caveat.ttf", 35)
+        self.bigger_font = pygame.font.Font("Caveat.ttf", 32)
         '''BIGGERR FOOONT'''
         self.font = pygame.font.Font("Roboto.ttf", 22)
         '''just a normal font'''
@@ -977,18 +977,22 @@ class Game:
         try: samko_pos = list(list(self.interactive.values())[list(map(lambda x: x[0], self.interactive.values())).index(":")])[1:]
         except ValueError: self.samko_placement()
         finally:
-            if len(samko_pos) <= 3:
-                if str(self.interacted[1]) == samko_pos[0] and str(self.interacted[2]) == ''.join(samko_pos[1:]) or str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == samko_pos[-1]:
-                    self.talking("I dunno how I got here", True, BRITISH_WHITE)
-                    self.talking("Maybe a higher power?", True, BRITISH_WHITE)
-                    self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
-                    self.talking("So leave me alone", True, BRITISH_WHITE)
-            elif len(samko_pos) == 4:
-                if str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == ''.join(samko_pos[2:]):
-                    self.talking("I dunno how I got here", True, BRITISH_WHITE)
-                    self.talking("Maybe a higher power?", True, BRITISH_WHITE)
-                    self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
-                    self.talking("So leave me alone", True, BRITISH_WHITE)
+            try:
+                if len(samko_pos) <= 3:
+                    if str(self.interacted[1]) == samko_pos[0] and str(self.interacted[2]) == ''.join(samko_pos[1:]) or str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == samko_pos[-1]:
+                        self.talking("I dunno how I got here", True, BRITISH_WHITE)
+                        self.talking("Maybe a higher power?", True, BRITISH_WHITE)
+                        self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
+                        self.talking("So leave me alone", True, BRITISH_WHITE)
+                elif len(samko_pos) == 4:
+                    if str(self.interacted[1]) == ''.join(samko_pos[:2]) and str(self.interacted[2]) == ''.join(samko_pos[2:]):
+                        self.talking("I dunno how I got here", True, BRITISH_WHITE)
+                        self.talking("Maybe a higher power?", True, BRITISH_WHITE)
+                        self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
+                        self.talking("So leave me alone", True, BRITISH_WHITE)
+            except IndexError:
+                print("First variant "+samko_pos)
+                print("Second variant "+''.join(samko_pos[:2]), samko_pos[-1])
     
     def samko_placement(self):
         '''
@@ -1001,7 +1005,13 @@ class Game:
             private_idx = r.randint(0, len(samko_pos) // 2)
             samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
             tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
-        else: print(". : not found")
+        else: 
+            for x in range(len(tmp_room)):
+                if "." in tmp_room[x]: samko_pos = tmp_room[x]
+            
+            private_idx = r.randint(0, len(samko_pos) // 2)
+            samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
+            tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
         return tmp_room
                 
     def set_camera(self, level: List[str]):
@@ -1409,11 +1419,13 @@ class Game:
                 case 1:
                     done_quests = [quest for quest in (self.vybalenie, self.nap, self.first_dinner) if not quest]
                     first_notes = list(self.lyz_day.first.notes.values())
+                    first_note_order = list(self.lyz_day.first.notes.keys())
                     quest_coords: list[list[tuple[int, int]]] = []
                     for item in range(len(first_notes)):
-                        quest_coords.append((100, 130 + 60 * item))
+                        quest_coords.append((130, 130 + 60 * item))
                         self.screen.blit(self.bigger_font.render(first_notes[item], True, BLACK), quest_coords[item])
-                    for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 450, quest_coords[quest][1] + 25), 3)
+                        self.screen.blit(self.bigger_font.render(str(first_note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
+                    for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
             
             # Updates
             self.clock.tick(FPS)
@@ -1775,6 +1787,8 @@ class Game:
         x: int = 0
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
         watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
+        if len([x for x in (self.vybalenie, self.nap) if not x]) == 2: watch_time = self.settings_font.render("18:"+strftime("%R").split(":")[1], True, WHITE)
+
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
         day_info = self.font.render('Day: ' + str(self.lyz_day.day), True, WHITE)
         day_info_rect = day_info.get_rect(x=WIN_WIDTH // 2 - 415, y=WIN_HEIGHT // 2 + 50)
