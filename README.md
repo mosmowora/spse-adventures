@@ -19,7 +19,7 @@
 
 <hr style="background-color: lightgreen; border-radius: 3px">
 
-1. <r>[Download](https://spse-po.edupage.org) </r> the game
+1. <r>[Download](https://aeternix-forum.herokuapp.com/releases) </r> the game
 
 2. Make sure you have `Pygame` installed
     > if not use >> `pip install pygame` in your python terminal or command prompt
