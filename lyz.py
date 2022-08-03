@@ -4,12 +4,20 @@ from config import *
 
 class Lyziarsky:
     
-    def __init__(self, game) -> None:
+    def __init__(self, game, day: int) -> None:
         self.game = game
         self.first = firstDay(self.game)
-        self.day: int = 1
+        self.day: int = day
         
-    def __new_day(self): self.day += 1
+    def new_day(self):
+        print("new day")
+        match self.day:
+            case 1:
+                if self.first.go_sleep(end_day=True): self.day += 1; self.game.lyz_day_number += 1
+            case 2: ...
+            case 3: ...
+            case 4: ...
+            case 5: ...
     
     def unlock_room(self):
         '''
@@ -50,12 +58,10 @@ class firstDay:
     
     def __init__(self, game) -> None: 
         self.game = game
-        self.notes = {1: "Unpack your things next to your bed.", 2: "Take a nap and wait for evening.", 3: "Go get yourself a nice dinner."}
+        self.notes = {1: "Unpack your things next to your bed.", 2: "Take a nap and wait for evening.", 3: "Go visit friends on the top floor", 4: "Tomorrow is another day"}
     
     def open_bag(self): return True if self.game.interacted[1] in (4, 5, 6) and self.game.interacted[2] == 4 else False
-    
-    def has_all(self): return True if all(x for x in (self.game.vybalenie, self.game.nap, self.game.first_dinner) if not x) else False
-    
+        
     def unpack_things(self):
         things_in_bag = [pygame.image.load('img/shirts.png'), pygame.image.load('img/ski_boots.png'), pygame.image.load('img/pants.png'), pygame.image.load('img/backpack.png'), pygame.image.load('img/stacked_towels.png')]
         things_in_bag_rects = [things_in_bag[i].get_rect(x=(200 * i) // 2 + 180 if i < 3 else ((200 * i) // 2 + 200) - 250, y=230 - i * 20 if i < 3 else 350 - i * 20) for i in range(len(things_in_bag))]
@@ -96,16 +102,11 @@ class firstDay:
                 self.game.clock.tick(FPS)
                 pygame.display.update()
 
-    def go_sleep(self):
-        if self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and not self.game.vybalenie:
+    def go_sleep(self, end_day: bool = False):
+        if self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and not self.game.vybalenie and not end_day and self.game.nap:
             fade = pygame.Surface((640, 480))
             fade.fill((0,0,0))
-            for alpha in range(0, 510):
-                fade.set_alpha(alpha)
-                self.game.screen.blit(fade, (0,0))
-                pygame.display.update()
-                pygame.time.delay(25)
-                if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap...", False, WHITE), (200, 190))
+            self.__fade_transition(fade)
             
             # Events
             for event in pygame.event.get():
@@ -117,4 +118,21 @@ class firstDay:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
-            
+        
+        elif self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and end_day and not self.game.vybalenie and not self.game.nap and not self.game.friends:
+            fade = pygame.Surface((640, 480))
+            fade.fill((0,0,0))
+            self.__fade_transition(fade, True)
+            return True
+        
+    def __fade_transition(self, fade: pygame.Surface, end_day: bool = False):
+        for alpha in range(0, 510):
+            fade.set_alpha(alpha)
+            self.game.screen.blit(fade, (0,0))
+            pygame.display.update()
+            pygame.time.delay(25)
+            if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap..." if not end_day else "Tomorrow is another day", False, WHITE), (200, 190))
+    
+    def with_friends(self):
+        if self.game.lyz_saved_data == 'second': self.game.friends = False; return True
+        return False

@@ -98,7 +98,8 @@ class Game:
         '''Where are you hiding???'''
         self.lyz_created: bool = False
         '''Are we there yet?'''
-        self.lyz_day = Lyziarsky(self)
+        self.lyz_day_number: int = 1
+        self.lyz_day = Lyziarsky(self, self.lyz_day_number)
         
         # Settings
         self.music_on: bool = True
@@ -241,7 +242,8 @@ class Game:
         # LYZ quests
         self.vybalenie: bool = True
         self.nap: bool = True
-        self.first_dinner: bool = True
+        self.friends: bool = True
+        self.lyz_day_number: int = 1
 
         # Quests variables
         self.__gul_counter: int = 0
@@ -991,7 +993,7 @@ class Game:
                         self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
                         self.talking("So leave me alone", True, BRITISH_WHITE)
             except IndexError:
-                print("First variant "+samko_pos)
+                print("First variant "+ ''.join(samko_pos))
                 print("Second variant "+''.join(samko_pos[:2]), samko_pos[-1])
     
     def samko_placement(self):
@@ -999,7 +1001,7 @@ class Game:
         Returns new room with Samko
         '''
         tmp_room: List[str] = self.lyz_in_room.copy()
-        row = r.randint(1, len(self.lyz_in_room) - 2)
+        row = r.randint(1, len(self.lyz_in_room) - 3)
         samko_pos = tmp_room[row]
         if "." in samko_pos:
             private_idx = r.randint(0, len(samko_pos) // 2)
@@ -1007,7 +1009,9 @@ class Game:
             tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
         else: 
             for x in range(len(tmp_room)):
-                if "." in tmp_room[x]: samko_pos = tmp_room[x]
+                if "." in tmp_room[x]: 
+                    samko_pos, row = tmp_room[x], x
+                    break
             
             private_idx = r.randint(0, len(samko_pos) // 2)
             samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
@@ -1098,9 +1102,10 @@ class Game:
             self.lost_guy = data["quests"]["lost_guy"]
             self.not_saint = data["quests"]["saint"]
             self.prayed = data["quests"]["prayed"]
-            # self.vybalenie = data["quests"]["vybalenie"]
-            # self.nap = data["quests"]["nap"]
-            # self.first_dinner = data["quests"]["first_dinner"]
+            self.vybalenie = data["quests"]["vybalenie"]
+            self.nap = data["quests"]["nap"]
+            self.friends = data["quests"]["friends"]
+            self.lyz_day_number = data["quests"]["lyz_day"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -1206,7 +1211,10 @@ class Game:
                     case "Flashlight": self.flashlight()
                     case "Ladder": self.ladder()
                     case "Bag": self.lyz_day.first.unpack_things()
-                    case "Nap": self.lyz_day.first.go_sleep()
+                    case "Nap":
+                        print((self.nap, self.friends, self.vybalenie))
+                        if not self.nap and not self.friends and not self.vybalenie: self.lyz_day.new_day()
+                        else: self.lyz_day.first.go_sleep()
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -1415,21 +1423,24 @@ class Game:
                     if event.key == pygame.K_ESCAPE or event.key == pygame.K_n: noting = not noting; break
                 
             self.screen.blit(notes, (40, 20))
-            match self.lyz_day.day:
-                case 1:
-                    done_quests = [quest for quest in (self.vybalenie, self.nap, self.first_dinner) if not quest]
-                    first_notes = list(self.lyz_day.first.notes.values())
-                    first_note_order = list(self.lyz_day.first.notes.keys())
-                    quest_coords: list[list[tuple[int, int]]] = []
-                    for item in range(len(first_notes)):
-                        quest_coords.append((130, 130 + 60 * item))
-                        self.screen.blit(self.bigger_font.render(first_notes[item], True, BLACK), quest_coords[item])
-                        self.screen.blit(self.bigger_font.render(str(first_note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
-                    for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
+            self.display_notes()
             
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+
+    def display_notes(self):
+        match self.lyz_day_number:
+            case 1:
+                done_quests = [quest for quest in (self.vybalenie, self.nap, self.friends) if not quest]
+                first_notes = list(self.lyz_day.first.notes.values())
+                first_note_order = list(self.lyz_day.first.notes.keys())
+                quest_coords: list[list[tuple[int, int]]] = []
+                for item in range(len(first_notes)):
+                    quest_coords.append((130, 130 + 60 * item))
+                    self.screen.blit(self.bigger_font.render(first_notes[item], True, BLACK), quest_coords[item])
+                    self.screen.blit(self.bigger_font.render(str(first_note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
+                for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
 
     def inventory(self):
         """
@@ -1450,8 +1461,9 @@ class Game:
         while open_inventory:
             
 
-            if self.lyz_created: 
-                if self.smart_watch_logic(smart_watch): open_inventory = False
+            if self.lyz_created:
+                if self.lyz_day_number == 2: self.smart_watch_logic(smart_watch, '6'); open_inventory = False
+                elif self.smart_watch_logic(smart_watch): open_inventory = False
 
             else:
                 # Inv items
@@ -1780,17 +1792,19 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
             
-    def smart_watch_logic(self, smart_watch_img: pygame.Surface):
+    def smart_watch_logic(self, smart_watch_img: pygame.Surface, time: str = None):
         # Screen of the game
         bg = pygame.image.load("img/screen.png")
         watching: bool = True
         x: int = 0
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
         watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
-        if len([x for x in (self.vybalenie, self.nap) if not x]) == 2: watch_time = self.settings_font.render("18:"+strftime("%R").split(":")[1], True, WHITE)
+        if len([x for x in (self.vybalenie, self.nap) if not x]) == 2 and self.lyz_day_number == 1: watch_time = self.settings_font.render("18:"+strftime("%R").split(":")[1], True, WHITE)
+        elif time is not None: watch_time = self.settings_font.render(time+':'+strftime("%R").split(":")[1], True, WHITE)
+            
 
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
-        day_info = self.font.render('Day: ' + str(self.lyz_day.day), True, WHITE)
+        day_info = self.font.render('Day: ' + str(self.lyz_day_number), True, WHITE)
         day_info_rect = day_info.get_rect(x=WIN_WIDTH // 2 - 415, y=WIN_HEIGHT // 2 + 50)
         
         while watching:
@@ -2366,7 +2380,8 @@ class Game:
                         "caught": self.caught,
                         "vybalenie": self.vybalenie,
                         "nap": self.nap,
-                        "first_dinner": self.first_dinner
+                        "friends": self.friends,
+                        "lyz_day": self.lyz_day_number
                         }
         
         # Refreshing the password to it's original state for further encodings
@@ -3306,6 +3321,12 @@ class Game:
             
         elif self.player.facing == 'down' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
             self.info("We're getting into untapped territory.")
+            self.lyz_day.first.with_friends()
+            self.center_player_after_doors()
+            
+        elif self.player.facing == 'up' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
+            self.talking("Where next?")
+            self.center_player_after_doors()
         
     def ground_floor_doors(self):
         """
@@ -4847,7 +4868,8 @@ class Game:
                     self.create_tile_map()
                     for sprite in self.all_sprites:
                         sprite.rect.y += 4 * TILE_SIZE
-                        sprite.rect.x += TILE_SIZE
+                        sprite.rect.x += 6 * TILE_SIZE
+                    self.player.rect.x -= 5 * TILE_SIZE
                     self.door_info("First floor", "first")
                 
         else:
