@@ -98,9 +98,18 @@ class Game:
         '''Where are you hiding???'''
         self.lyz_created: bool = False
         '''Are we there yet?'''
+        # LYZ quests
+        self.vybalenie: bool = True
+        self.nap: bool = True
+        self.friends: bool = True
+        # 2nd day
+        self.ski_suit_on: bool = True
+        self.skied_two: bool = True
+        self.talked_with_teacher: bool = True
+        # 3rd day
+        # ...
         self.lyz_day_number: int = 1
         self.lyz_day = Lyziarsky(self, self.lyz_day_number)
-        
         # Settings
         self.music_on: bool = True
         '''Music on/off'''
@@ -243,6 +252,9 @@ class Game:
         self.vybalenie: bool = True
         self.nap: bool = True
         self.friends: bool = True
+        self.ski_suit_on: bool = True
+        self.skied_two: bool = True
+        self.talked_with_teacher: bool = True
         self.lyz_day_number: int = 1
 
         # Quests variables
@@ -1212,9 +1224,13 @@ class Game:
                     case "Ladder": self.ladder()
                     case "Bag": self.lyz_day.first.unpack_things()
                     case "Nap":
-                        print((self.nap, self.friends, self.vybalenie))
-                        if not self.nap and not self.friends and not self.vybalenie: self.lyz_day.new_day()
-                        else: self.lyz_day.first.go_sleep()
+                        match self.lyz_day_number: 
+                            case 1:
+                                if self.lyz_day.first._has_all(): self.lyz_day.new_day()
+                                else: self.lyz_day.first.go_sleep()
+                                # FIXME: might need fix for go_sleep() method
+                            case 2:
+                                if self.lyz_day.second._has_all(): self.lyz_day.new_day()
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -1430,17 +1446,33 @@ class Game:
             pygame.display.update()
 
     def display_notes(self):
+        done_quests = self.get_available_notes()
+        notes_for_day = []
+        note_order = []
+        notes_for_day, note_order = self.grab_notes()
+        quest_coords: list[list[tuple[int, int]]] = []
+        for item in range(len(notes_for_day)):
+            quest_coords.append((130, 130 + 60 * item))
+            self.screen.blit(self.bigger_font.render(notes_for_day[item], True, BLACK), quest_coords[item])
+            self.screen.blit(self.bigger_font.render(str(note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
+        for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
+
+    def get_available_notes(self):
+        match self.lyz_day_number:
+            case 1: return [x for x in (self.vybalenie, self.nap, self.friends) if not x]
+            case 2: return [x for x in (self.ski_suit_on, self.skied_two, self.talked_with_teacher) if not x]
+            case _: return []
+            
+    def grab_notes(self):
         match self.lyz_day_number:
             case 1:
-                done_quests = [quest for quest in (self.vybalenie, self.nap, self.friends) if not quest]
-                first_notes = list(self.lyz_day.first.notes.values())
-                first_note_order = list(self.lyz_day.first.notes.keys())
-                quest_coords: list[list[tuple[int, int]]] = []
-                for item in range(len(first_notes)):
-                    quest_coords.append((130, 130 + 60 * item))
-                    self.screen.blit(self.bigger_font.render(first_notes[item], True, BLACK), quest_coords[item])
-                    self.screen.blit(self.bigger_font.render(str(first_note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
-                for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
+                notes_for_day = list(self.lyz_day.first.notes.values())
+                note_order = list(self.lyz_day.first.notes.keys())
+            case 2:
+                notes_for_day = list(self.lyz_day.second.notes.values())
+                note_order = list(self.lyz_day.second.notes.keys())
+            case _: return None
+        return notes_for_day, note_order
 
     def inventory(self):
         """
@@ -2381,6 +2413,7 @@ class Game:
                         "vybalenie": self.vybalenie,
                         "nap": self.nap,
                         "friends": self.friends,
+                        "suit_on": self.ski_suit_on,
                         "lyz_day": self.lyz_day_number
                         }
         
@@ -3283,7 +3316,9 @@ class Game:
         
         # Kitchen
         elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
-            self.talking("Hmmm... a kitchen, but I didn't bring any food.")
+            if self.lyz_day_number % 2 != 0: self.talking("Hmmm... a kitchen, but I don't have keys to open it.") 
+            elif self.ski_suit_on: self.talking("Finally time to go ski"); self.lyz_day.second.grab_suit()
+            
         
         # Classmates
         elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground:

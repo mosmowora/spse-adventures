@@ -7,17 +7,12 @@ class Lyziarsky:
     def __init__(self, game, day: int) -> None:
         self.game = game
         self.first = firstDay(self.game)
+        self.second = secondDay(self.game)
         self.day: int = day
         
     def new_day(self):
-        print("new day")
-        match self.day:
-            case 1:
-                if self.first.go_sleep(end_day=True): self.day += 1; self.game.lyz_day_number += 1
-            case 2: ...
-            case 3: ...
-            case 4: ...
-            case 5: ...
+        print("day: {}".format(self.game.lyz_day_number))
+        if self.first.go_sleep(end_day=True): self.day += 1; self.game.lyz_day_number += 1
     
     def unlock_room(self):
         '''
@@ -122,17 +117,77 @@ class firstDay:
         elif self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and end_day and not self.game.vybalenie and not self.game.nap and not self.game.friends:
             fade = pygame.Surface((640, 480))
             fade.fill((0,0,0))
-            self.__fade_transition(fade, True)
+            self.__fade_transition(fade, True, "Tomorrow is another day")
             return True
-        
-    def __fade_transition(self, fade: pygame.Surface, end_day: bool = False):
+    
+    def _has_all(self): return True if not self.game.nap and not self.game.friends and not self.game.vybalenie else False
+    
+    def __fade_transition(self, fade: pygame.Surface, end_day: bool = False, text: str = ""):
         for alpha in range(0, 510):
             fade.set_alpha(alpha)
             self.game.screen.blit(fade, (0,0))
             pygame.display.update()
             pygame.time.delay(25)
-            if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap..." if not end_day else "Tomorrow is another day", False, WHITE), (200, 190))
+            if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap..." if not end_day else text, False, WHITE), (200, 190))
     
     def with_friends(self):
         if self.game.lyz_saved_data == 'second': self.game.friends = False; return True
         return False
+    
+class secondDay:
+    
+    def __init__(self, game) -> None: 
+        self.game = game
+        self.notes = {1: "Go to the kitchen for your skis.", 2: "Go straight to the ski slope.", 3: "Go meet up with a teacher in the diner.", 4: "Tomorrow is another day"}
+
+    def _has_all(self): return True if not self.game.ski_suit_on and not self.game.skied_two and not self.game.talked_with_teacher else False
+    
+    def grab_suit(self):
+        suiting = True
+        pygame.image.save(self.game.screen, "img/screen.png")
+        bg = pygame.image.load("img/screen.png")
+        ski_coat = pygame.image.load("img/ski_coat.png")
+        ski_coat_rect = ski_coat.get_rect(x=0, y=0)
+        ski_pants = pygame.image.load("img/ski_pants.png")
+        ski_pants_rect = ski_pants.get_rect(x=0, y=112)
+        ski_boots = pygame.image.load("img/ski_bots.png")
+        ski_boots_rect = ski_boots.get_rect(x=0, y=224)
+        person_silhoutte = pygame.image.load("img/silhouette.png")
+        person_silhoutte_rect = person_silhoutte.get_rect(x=320 - person_silhoutte.get_width() // 2, y=0)
+        can_move_boot = True
+        can_move_coat = True
+        can_move_pants = True
+        
+        while suiting:
+            
+            # Position of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+        
+            # Events
+            for event in pygame.event.get():
+
+                # Close button/Esc
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: return
+                
+                
+            if ski_coat_rect.center[0] in range(315, 325) and ski_coat_rect.center[1] in range(149, 169): can_move_coat = False
+            if ski_pants_rect.center[0] in range(319, 329) and ski_pants_rect.center[1] in range(246, 256): can_move_pants = False
+            if ski_boots_rect.center[0] in range(315, 325) and ski_boots_rect.center[1] in range(316, 326): can_move_boot = False
+
+            if mouse_pressed[0]:
+                if ski_boots_rect.collidepoint(mouse_pos) and can_move_boot: ski_boots_rect.center = mouse_pos
+                elif ski_coat_rect.collidepoint(mouse_pos) and can_move_coat: ski_coat_rect.center = mouse_pos
+                elif ski_pants_rect.collidepoint(mouse_pos) and can_move_pants: ski_pants_rect.center = mouse_pos
+                
+            if not can_move_boot and not can_move_coat and not can_move_pants: self.game.ski_suit_on = False; return
+            
+            self.game.screen.blit(bg, (0,0))
+            self.game.screen.blit(person_silhoutte, person_silhoutte_rect)
+            self.game.screen.blit(ski_boots, ski_boots_rect)
+            self.game.screen.blit(ski_pants, ski_pants_rect)
+            self.game.screen.blit(ski_coat, ski_coat_rect)
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+            
