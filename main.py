@@ -1,6 +1,7 @@
 # Imports
 import base64
 import sys
+from threading import Timer
 from tkinter import messagebox
 from types import NoneType
 import webbrowser
@@ -1012,6 +1013,7 @@ class Game:
         '''
         Returns new room with Samko
         '''
+        self.odd_days()
         tmp_room: List[str] = self.lyz_in_room.copy()
         row = r.randint(1, len(self.lyz_in_room) - 3)
         samko_pos = tmp_room[row]
@@ -1158,13 +1160,13 @@ class Game:
         """
 
         if not self.music_on: pygame.mixer.Sound.stop(self.theme)
-
         # Main game loop
         while self.playing:
             self.events()
             self.update()
             self.draw()
             self.craft()
+            if self.lyz_created: self.gotta_ski()
 
         return self
     
@@ -3272,6 +3274,17 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
             
+    def odd_days(self):
+        # When the day is odd
+        if self.lyz_day_number % 2 != 0:
+            self.lyz_rooms[OUTSIDE][42] = self.lyz_rooms[OUTSIDE][42][:81] + self.lyz_rooms[OUTSIDE][42][81 : 81+16].replace(".", "!") + self.lyz_rooms[OUTSIDE][42][81+16:]
+        else:
+            self.lyz_rooms[OUTSIDE][42] = self.lyz_rooms[OUTSIDE][42][:88] + self.lyz_rooms[OUTSIDE][42][88].replace(".", '♂') + self.lyz_rooms[OUTSIDE][42][88:]
+    
+    def gotta_ski(self):
+        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y == -1118 and self.lyz_saved_data == 'outside':
+            self.talking("This is why I've come here!")
+    
     def lyz_doors(self):
         # Outside -> Diner
         if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:
@@ -3319,7 +3332,6 @@ class Game:
             if self.lyz_day_number % 2 != 0: self.talking("Hmmm... a kitchen, but I don't have keys to open it.") 
             elif self.ski_suit_on: self.talking("Finally time to go ski"); self.lyz_day.second.grab_suit()
             
-        
         # Classmates
         elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground:
             self.talking("Bring us food and you can play FIFA with us.", True, BLUE)

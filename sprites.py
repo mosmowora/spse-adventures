@@ -327,7 +327,6 @@ class Player(pygame.sprite.Sprite):
             elif self.facing == "right": self.rect.x = x - TILE_SIZE
             self.player_sitting = False
 
-
 class Npc(pygame.sprite.Sprite):
     """
     Class for Npcs
