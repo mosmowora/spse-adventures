@@ -1,7 +1,6 @@
 # Imports
 import base64
 import sys
-from threading import Timer
 from tkinter import messagebox
 from types import NoneType
 import webbrowser
@@ -69,7 +68,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_ski_map, lyz_diner]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -784,7 +783,7 @@ class Game:
 
         # Creating sprites
         if self.lyz_created:
-            tmp_room: List[str] = self.samko_placement() # Room with Samko
+            tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room') else Ground(self, j, i)
@@ -883,11 +882,12 @@ class Game:
                     elif column == "↔": self.interactive[Block(self, j, i, "↔")] = "↔" + str(i) + str(j) # More stairs
                     elif column == "♂": self.interactive[Block(self, j, i, "♂")] = "♂" + str(i) + str(j) # Desk for TV
                     elif column == "◙": self.interactive[Block(self, j, i, "◙")] = "◙" + str(i) + str(j) # Desk with TV
+                    elif column == "♀": self.interactive[Block(self, j, i, "♀")] = "♀" + str(i) + str(j) # Flags for skiing
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == ":": self.interactive[Npc(self, j, i, ":")] = ":" + str(i) + str(j) # Samko NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
-            self.talking_with_samko()
+            if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP]: self.talking_with_samko()
         else:
             for i, row in enumerate(self.in_room):
                 for j, column in enumerate(row):
@@ -1013,7 +1013,6 @@ class Game:
         '''
         Returns new room with Samko
         '''
-        self.odd_days()
         tmp_room: List[str] = self.lyz_in_room.copy()
         row = r.randint(1, len(self.lyz_in_room) - 3)
         samko_pos = tmp_room[row]
@@ -3273,18 +3272,14 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
-            
-    def odd_days(self):
-        # When the day is odd
-        if self.lyz_day_number % 2 != 0:
-            self.lyz_rooms[OUTSIDE][42] = self.lyz_rooms[OUTSIDE][42][:81] + self.lyz_rooms[OUTSIDE][42][81 : 81+16].replace(".", "!") + self.lyz_rooms[OUTSIDE][42][81+16:]
-        else:
-            self.lyz_rooms[OUTSIDE][42] = self.lyz_rooms[OUTSIDE][42][:88] + self.lyz_rooms[OUTSIDE][42][88].replace(".", '♂') + self.lyz_rooms[OUTSIDE][42][88:]
     
     def gotta_ski(self):
-        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y == -1118 and self.lyz_saved_data == 'outside':
+        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y in range(-1200, -1118) and self.lyz_saved_data == 'outside':
             self.talking("This is why I've come here!")
-    
+            self.lyz_in_room = self.lyz_rooms[LYZ_SKI_MAP]
+            self.create_tile_map()
+        elif self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP]: self.player.movement(is_pressed=True)
+        
     def lyz_doors(self):
         # Outside -> Diner
         if self.player.facing == 'left' and self.interacted[1] in (6, 7) and self.interacted[2] == 7:

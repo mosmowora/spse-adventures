@@ -503,3 +503,4 @@ class Camera:
                 for sprite in self.game.all_sprites:
                     sprite.rect.y += 6 * TILE_SIZE
                     sprite.rect.x += TILE_SIZE
+                    

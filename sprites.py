@@ -152,17 +152,29 @@ class Player(pygame.sprite.Sprite):
             self.x_change = 0
             self.y_change = 0
 
-    def movement(self):
+    def movement(self, is_pressed: bool = False):
         """
         Movement for the player
         """
 
         keys = pygame.key.get_pressed()
+        if is_pressed:
+            for sprite in self.game.all_sprites: sprite.rect.y -= PLAYER_SPEED // 2
+            self.y_change += PLAYER_SPEED // 2
+            self.facing = "down"
         if keys[pygame.K_a]:
+            if is_pressed:
+                for sprite in self.game.all_sprites: sprite.rect.x += 3    
+                self.x_change -= 3
+                self.facing = "left"
             for sprite in self.game.all_sprites: sprite.rect.x += PLAYER_SPEED
             self.x_change -= PLAYER_SPEED
             self.facing = "left"
         elif keys[pygame.K_d]: 
+            if is_pressed:
+                for sprite in self.game.all_sprites: sprite.rect.x -= 3    
+                self.x_change += 3
+                self.facing = "right"
             for sprite in self.game.all_sprites: sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = "right"
@@ -243,9 +255,18 @@ class Player(pygame.sprite.Sprite):
         if direction == "x":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
-                
+                for item in hits:
+                    if item.type == "!" or item.type == "♀" and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
+                        self.game.lyz_in_room = self.game.lyz_rooms[OUTSIDE]
+                        self.game.create_tile_map()
+                        for sprite in self.game.all_sprites:
+                            sprite.rect.x -= 78 * TILE_SIZE
+                            sprite.rect.y -= 34 * TILE_SIZE
+                        self.game.player.rect.x += 78 * TILE_SIZE
+                        self.game.player.rect.y += 34 * TILE_SIZE
+
                 # Moving right
-                if self.x_change > 0: 
+                if self.x_change > 0:
                     for sprite in self.game.all_sprites: sprite.rect.x += PLAYER_SPEED
                     self.rect.x = hits[0].rect.left - self.rect.width
 
@@ -258,6 +279,15 @@ class Player(pygame.sprite.Sprite):
         elif direction == "y":
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
+                for item in hits:
+                    if item.type == "!" or item.type == "♀" and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
+                        self.game.lyz_in_room = self.game.lyz_rooms[OUTSIDE]
+                        self.game.create_tile_map()
+                        for sprite in self.game.all_sprites:
+                            sprite.rect.x -= 78 * TILE_SIZE
+                            sprite.rect.y -= 34 * TILE_SIZE
+                        self.game.player.rect.x += 78 * TILE_SIZE
+                        self.game.player.rect.y += 34 * TILE_SIZE
 
                 # Moving down
                 if self.y_change > 0:
@@ -702,6 +732,7 @@ class Block(pygame.sprite.Sprite):
         inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "^"]
 
         self.game = game
+        self.type = type
         self._layer = BLOCK_LAYER
         if type in inter: self.groups = self.game.all_sprites, self.game.blocks, self.game.interactible
         else: self.groups = self.game.all_sprites, self.game.blocks
@@ -808,6 +839,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "↔": self.image = self.game.terrain_spritesheet.get_sprite(534, 70, self.width, self.height)
         elif type == "◙": self.image = self.game.terrain_spritesheet.get_sprite(568, 70, self.width, self.height)
         elif type == "♂": self.image = self.game.terrain_spritesheet.get_sprite(602, 2, self.width, self.height)
+        elif type == "♀": self.image = self.game.terrain_spritesheet.get_sprite(602, 36, self.width, self.height)
         
 
         self.rect = self.image.get_rect()
