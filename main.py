@@ -51,6 +51,8 @@ class Game:
         '''Another font, but now usable for settings'''
         self.lrob_font = pygame.font.Font("Roboto.ttf", 13) 
         '''And there was also an OSY font'''
+        self.timer_font = pygame.font.Font("Roboto.ttf", 155)
+        '''Font for showing the timer for certain things'''
 
         # Spritesheets
         self.character_spritesheet = Spritesheet("img/character.png")
@@ -3278,6 +3280,13 @@ class Game:
             self.talking("This is why I've come here!")
             self.lyz_in_room = self.lyz_rooms[LYZ_SKI_MAP]
             self.create_tile_map()
+            for n in range(4):
+                self.screen.blit(self.timer_font.render(str(3 - n) if 3 - n != 0 else "GO!", True, BLACK), (260, 140) if 3 - n != 0 else (200, 140))
+                pygame.time.delay(500)
+                pygame.display.update()
+                self.update()
+                pygame.time.delay(500)
+                self.draw()
         elif self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP]: self.player.movement(is_pressed=True)
         
     def lyz_doors(self):
