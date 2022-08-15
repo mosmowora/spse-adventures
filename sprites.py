@@ -256,7 +256,7 @@ class Player(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
                 for item in hits:
-                    if item.type == "!" or item.type == "♀" and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
+                    if item.type in ("♀", "♪") and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
                         self.game.lyz_in_room = self.game.lyz_rooms[OUTSIDE]
                         self.game.create_tile_map()
                         for sprite in self.game.all_sprites:
@@ -280,7 +280,7 @@ class Player(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
             if hits:
                 for item in hits:
-                    if item.type == "!" or item.type == "♀" and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
+                    if item.type in ("♀", "♪") and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SKI_MAP]: 
                         self.game.lyz_in_room = self.game.lyz_rooms[OUTSIDE]
                         self.game.create_tile_map()
                         for sprite in self.game.all_sprites:
@@ -840,6 +840,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "◙": self.image = self.game.terrain_spritesheet.get_sprite(568, 70, self.width, self.height)
         elif type == "♂": self.image = self.game.terrain_spritesheet.get_sprite(602, 2, self.width, self.height)
         elif type == "♀": self.image = self.game.terrain_spritesheet.get_sprite(602, 36, self.width, self.height)
+        elif type == "♪": self.image = self.game.terrain_spritesheet.get_sprite(603, 70, self.width, self.height)
         
 
         self.rect = self.image.get_rect()

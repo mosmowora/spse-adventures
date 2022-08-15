@@ -885,6 +885,7 @@ class Game:
                     elif column == "♂": self.interactive[Block(self, j, i, "♂")] = "♂" + str(i) + str(j) # Desk for TV
                     elif column == "◙": self.interactive[Block(self, j, i, "◙")] = "◙" + str(i) + str(j) # Desk with TV
                     elif column == "♀": self.interactive[Block(self, j, i, "♀")] = "♀" + str(i) + str(j) # Flags for skiing
+                    elif column == "♪": self.interactive[Block(self, j, i, "♪")] = "♪" + str(i) + str(j) # Rocks
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == ":": self.interactive[Npc(self, j, i, ":")] = ":" + str(i) + str(j) # Samko NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka
@@ -1231,7 +1232,6 @@ class Game:
                             case 1:
                                 if self.lyz_day.first._has_all(): self.lyz_day.new_day()
                                 else: self.lyz_day.first.go_sleep()
-                                # FIXME: might need fix for go_sleep() method
                             case 2:
                                 if self.lyz_day.second._has_all(): self.lyz_day.new_day()
 
@@ -3276,7 +3276,12 @@ class Game:
             pygame.display.update()
     
     def gotta_ski(self):
-        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y in range(-1200, -1118) and self.lyz_saved_data == 'outside':
+        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y in range(-1200, -1118) and self.lyz_saved_data == 'outside' and self.skied_two:
+            if self.ski_suit_on:
+                for sprite in self.all_sprites: sprite.rect.y += 3 * TILE_SIZE
+                self.player.rect.y -= 3 * TILE_SIZE
+                self.talking("I don't have my ski suit on.")
+                return
             self.talking("This is why I've come here!")
             self.lyz_in_room = self.lyz_rooms[LYZ_SKI_MAP]
             self.create_tile_map()
@@ -3288,6 +3293,19 @@ class Game:
                 pygame.time.delay(500)
                 self.draw()
         elif self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP]: self.player.movement(is_pressed=True)
+        if self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP] and self.all_sprites.sprites()[0].rect.y in range(-1290, -1260):
+            self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+            self.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.x -= 78 * TILE_SIZE
+                sprite.rect.y -= 34 * TILE_SIZE
+            self.player.rect.x += 78 * TILE_SIZE
+            self.player.rect.y += 34 * TILE_SIZE
+            self.skied_two = False
+            self.screen.blit(self.timer_font.render("Done!", True, BLACK), (100, 65))
+            pygame.display.update()
+            self.clock.tick(FPS)
+            pygame.time.delay(1200)
         
     def lyz_doors(self):
         # Outside -> Diner
@@ -4361,6 +4379,15 @@ class Game:
                 elif not self.prayed:
                     self.talking("Why are you still here?", True, SILVER)
                     self.talking("I believe the Lord will forgive you.", True, SILVER)
+            if self.lyz_created and self.interacted[2] == 6 and self.interacted[1] == 11 and self.talked_with_teacher:
+                if self.ski_suit_on: self.talking("Go get yourself ready for the day.", True, BLUE)
+                elif self.skied_two: self.talking("I have to prepare certain things for this day.", True, BLUE); self.talking("You should go straight to the ski slope.", True, BLUE)
+                else:
+                    self.talking("I wanted to congratulate you for your performance on the slope.", True, BLUE)
+                    self.talking("So here is a reward.", True, BLUE)
+                    self.info("Your recieved a photo.", GREEN)
+                    self.talked_with_teacher = False
+                    # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
                 
     def shoes_on(self):
         """
