@@ -1013,8 +1013,7 @@ class Game:
                         self.talking("Just spawning all around the place made me dizzy", True, BRITISH_WHITE)
                         self.talking("So leave me alone", True, BRITISH_WHITE)
             except IndexError:
-                print("First variant "+ ''.join(samko_pos))
-                print("Second variant "+''.join(samko_pos[:2]), samko_pos[-1])
+                print("Coska wronk")
     
     def samko_placement(self):
         '''
@@ -1191,17 +1190,18 @@ class Game:
             # Close button/Esc
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
 
-            # Pressed I
-            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I'] and len(self.inv) != 0: 
+            # Pressed Inventory
+            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[1]] and len(self.inv) != 0: 
                 pygame.image.save(self.screen, "img/screen.png")
                 self.inventory()
             
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n and self.lyz_created:
+            # Pressed Notes
+            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[2]] and self.lyz_created:
                 pygame.image.save(self.screen, "img/screen.png")
                 self.notes()
 
-            # Pressed E
-            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults['E']:
+            # Pressed Interact
+            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[0]]:
 
                 # What was clicked
                 match self.player.facing:
@@ -1400,11 +1400,11 @@ class Game:
             
     def show_controls(self):
         viewing = True
-        contents = list(self.controls.defaults.keys())
         bg = pygame.Surface((640, 480))
+        contents = list(self.controls.defaults.keys())
         bg.fill((0, 0, 0, 20))
         while viewing:
-            # print(contents)
+            print(contents)
             e = Button(100, 150, 60, 60, fg=BLACK, bg=WHITE, content=contents[0], fontsize=32)
             i = Button(100, 220, 60, 60, fg=BLACK, bg=WHITE, content=contents[1], fontsize=32)
             n = Button(100, 290, 60, 60, fg=BLACK, bg=WHITE, content=contents[2], fontsize=32)
@@ -1419,25 +1419,37 @@ class Game:
                 elif event.type == pygame.QUIT: return
             
             
-            if e.is_pressed(mouse_pos, mouse_pressed): 
+            if e.is_pressed(mouse_pos, mouse_pressed):
                 new_key = self.update_key()
                 key_name = pygame.key.name(new_key).upper()
-                self.controls.set_key(key_name, new_key)
-                self.controls.defaults.pop(key_name)
+                self.controls.defaults.pop(list(self.controls.defaults.keys())[0])
+                tmp_dict = self.controls.defaults.copy()
+                self.controls.defaults = {key_name: new_key}
+                for k, v in tmp_dict.items(): self.controls.defaults[k] = v
                 contents[0] = key_name
                 e.content = key_name
+            
             elif i.is_pressed(mouse_pos, mouse_pressed): 
                 new_key = self.update_key()
                 key_name = pygame.key.name(new_key).upper()
-                self.controls.set_key(key_name, new_key)
+                self.controls.defaults.pop(list(self.controls.defaults.keys())[1])
+                tmp_dict = self.controls.defaults.copy()
+                helper_lst = [(k, v) for k, v in tmp_dict.items()]
+                self.controls.defaults.clear()
+                self.controls.defaults = {helper_lst[0][0]: helper_lst[0][1], key_name: new_key, helper_lst[1][0]: helper_lst[1][1]}
                 contents[1] = key_name
-                i.content = key_name
+                e.content = key_name
+            
             elif n.is_pressed(mouse_pos, mouse_pressed): 
                 new_key = self.update_key()
                 key_name = pygame.key.name(new_key).upper()
-                self.controls.set_key(key_name, new_key)
+                self.controls.defaults.pop(list(self.controls.defaults.keys())[2])
+                tmp_dict = self.controls.defaults.copy()
+                self.controls.defaults.clear()
+                for k, v in tmp_dict.items(): self.controls.defaults[k] = v
+                self.controls.defaults[key_name] = new_key
                 contents[2] = key_name
-                n.content = key_name
+                e.content = key_name
             
             self.screen.blit(bg, (0, 0))
             self.screen.blit(e.image, e.rect)
@@ -1471,7 +1483,7 @@ class Game:
                 if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
-                    elif event.key == self.controls.defaults['S']: self.settings()
+                    elif event.key == pygame.K_s: self.settings()
 
             if exit_pause: break
 
@@ -1521,7 +1533,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_n: noting = not noting; break
+                    if event.key == pygame.K_ESCAPE or event.key == self.controls.defaults[list(self.controls.defaults.keys())[2]]: noting = not noting; break
                 
             self.screen.blit(notes, (40, 20))
             self.display_notes()
@@ -1624,7 +1636,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
 
                 # Esc/I
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I']: open_inventory = False; break
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[1]]: open_inventory = False; break
 
                 # Right arrow
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7; inventory_coords = {}
@@ -1947,7 +1959,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
                 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key in (pygame.K_ESCAPE, self.controls.defaults['I']):
+                    if event.key in (pygame.K_ESCAPE, self.controls.defaults[list(self.controls.defaults.keys())[1]]):
                         # Moving the watch / animation for it
                         while smart_watch_rect.x >= WIN_WIDTH // 2 - 580:
                             smart_watch_rect.x -= x * 2
@@ -2460,7 +2472,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
 
                 # Esc/I
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I']: open_vtipnicek = not open_vtipnicek; break # BRUH
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[1]]: open_vtipnicek = not open_vtipnicek; break # BRUH
 
             # Updates
             self.clock.tick(FPS)
@@ -3392,6 +3404,8 @@ class Game:
                 pygame.time.delay(500)
                 self.draw()
         elif self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP]: self.player.movement(is_pressed=True)
+
+        # Finished skiing
         if self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP] and self.all_sprites.sprites()[0].rect.y in range(-1290, -1260):
             self.lyz_in_room = self.lyz_rooms[OUTSIDE]
             self.create_tile_map()
@@ -3450,7 +3464,10 @@ class Game:
         # Kitchen
         elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
             if self.lyz_day_number % 2 != 0: self.talking("Hmmm... a kitchen, but I don't have keys to open it.") 
-            elif self.ski_suit_on: self.talking("Finally time to go ski"); self.lyz_day.second.grab_suit()
+            elif self.ski_suit_on: 
+                self.talking("Finally time to go ski")
+                self.lyz_day.second.grab_suit()
+                self.player.player_skin()
             
         # Classmates
         elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground:
@@ -4485,6 +4502,7 @@ class Game:
                     self.talking("So here is a reward.", True, BLUE)
                     self.info("You've recieved a photo.", GREEN)
                     self.talked_with_teacher = False
+                    self.player.player_skin()
                     # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
                 
     def shoes_on(self):

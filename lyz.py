@@ -182,7 +182,9 @@ class secondDay:
                 elif ski_coat_rect.collidepoint(mouse_pos) and can_move_coat: ski_coat_rect.center = mouse_pos
                 elif ski_pants_rect.collidepoint(mouse_pos) and can_move_pants: ski_pants_rect.center = mouse_pos
                 
-            if not can_move_boot and not can_move_coat and not can_move_pants: self.game.ski_suit_on = False; return
+            if not can_move_boot and not can_move_coat and not can_move_pants:
+                self.game.ski_suit_on = False
+                return
             
             self.game.screen.blit(bg, (0,0))
             self.game.screen.blit(person_silhoutte, person_silhoutte_rect)

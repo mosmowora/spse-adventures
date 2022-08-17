@@ -51,8 +51,9 @@ class Player(pygame.sprite.Sprite):
 
         self.facing = "down"
         self.animation_loop = 1
-
-        self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
+        
+        if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 133, self.width, self.height)
+        else: self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
 
         self.player_sitting = False
 
@@ -60,53 +61,84 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+        self.player_skin()
+
+        # Lost guy
+        self.go_left = 0
+        self.go_down = 0
+
+    def player_skin(self):
         # Down animations
-        self.facing_down = [
+        if not self.game.lyz_created: self.facing_down = [
             self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 2, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 2, self.width, self.height)
-        ] if not self.game.lyz_created else [
+        ] 
+        elif not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.facing_down = [
+            self.game.character_spritesheet.get_sprite(4, 133, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(36, 133, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 133, self.width, self.height)
+        ]
+        
+        else: self.facing_down = [
             self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 33, 0, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 66, 0, self.width, self.height)
         ]
 
         # Up animations
-        self.facing_up = [
+        # Classic look
+        if not self.game.lyz_created: self.facing_up = [
             self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 34, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 34, self.width, self.height)
-        ] if not self.game.lyz_created else [
+        ]
+        # Ski suit on
+        elif not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.facing_up = [
+            self.game.character_spritesheet.get_sprite(4, 168, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(36, 168, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 168, self.width, self.height)
+        ]
+        # LYZ DLC
+        else: self.facing_up = [
             self.game.character_spritesheet.get_sprite(141, 35, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 33, 35, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 66, 35, self.width, self.height)
         ]
 
         # Left animations
-        self.facing_left = [
+        if not self.game.lyz_created: self.facing_left = [
             self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 98, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 98, self.width, self.height)
-        ] if not self.game.lyz_created else [
+        ]
+        elif not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.facing_left = [
+            self.game.character_spritesheet.get_sprite(4, 232, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(36, 232, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 232, self.width, self.height)
+        ]
+        else: self.facing_left = [
             self.game.character_spritesheet.get_sprite(141, 99, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 32, 99, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 65, 99, self.width, self.height)
         ]
 
         # Right animations
-        self.facing_right = [
+        if not self.game.lyz_created: self.facing_right = [
             self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(35, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(68, 66, self.width, self.height)
-        ] if not self.game.lyz_created else [
+        ]
+        elif not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.facing_right = [
+            self.game.character_spritesheet.get_sprite(4, 199, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(36, 199, self.width, self.height),
+            self.game.character_spritesheet.get_sprite(68, 199, self.width, self.height)
+        ]
+        else: self.facing_right = [
             self.game.character_spritesheet.get_sprite(141, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 32, 66, self.width, self.height),
             self.game.character_spritesheet.get_sprite(141 + 65, 66, self.width, self.height)
         ]
-
-        # Lost guy
-        self.go_left = 0
-        self.go_down = 0
 
     def update(self):
         """
@@ -307,7 +339,8 @@ class Player(pygame.sprite.Sprite):
         # Down
         if self.facing == "down":
             if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
+                if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 133, self.width, self.height)
+                else: self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
             else:
                 self.image = self.facing_down[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -316,7 +349,8 @@ class Player(pygame.sprite.Sprite):
         # Up
         elif self.facing == "up":
             if self.y_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 35, self.width, self.height)
+                if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 168, self.width, self.height)
+                else: self.image = self.game.character_spritesheet.get_sprite(3, 34, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 35, self.width, self.height)
             else:
                 self.image = self.facing_up[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -325,7 +359,8 @@ class Player(pygame.sprite.Sprite):
         # Left
         elif self.facing == "left":
             if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 99, self.width, self.height)
+                if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 232, self.width, self.height)
+                else: self.image = self.game.character_spritesheet.get_sprite(3, 98, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 99, self.width, self.height)
             else:
                 self.image = self.facing_left[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
@@ -334,7 +369,8 @@ class Player(pygame.sprite.Sprite):
         # Right
         elif self.facing == "right":
             if self.x_change == 0:
-                self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 66, self.width, self.height)
+                if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 199, self.width, self.height)
+                else: self.image = self.game.character_spritesheet.get_sprite(3, 66, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 66, self.width, self.height)
             else:
                 self.image = self.facing_right[math.floor(self.animation_loop)]
                 self.animation_loop += 0.1
