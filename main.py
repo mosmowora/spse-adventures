@@ -1086,6 +1086,7 @@ class Game:
             self.caught = data["quests"]["caught"]
             self.endings = [] if "endings" not in data.keys() else data["endings"]
             self._password = data['credentials'] if 'credentials' in data.keys() else ""
+            self.controls.defaults = data['controls']
 
             # Variables for finding items/doing stuff
             self.key_in_trash = data["quests"]["key_in_trash"]
@@ -1380,11 +1381,18 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
             
-    def update_control(self):
+    def update_key(self) -> pygame.event.Event:
         updating = True
-        
         while updating:
-            if any(x for x in pygame.key.get_pressed()): print('here'); updating = False; return pygame.key.get_mods()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: updating = False; break
+                elif event.type == pygame.QUIT: return
+                elif event.type == pygame.KEYDOWN and event.key != pygame.K_ESCAPE:
+                    updating = False
+                    return event.key
+            
+            self.screen.blit(self.big_font.render("Press key to set:", True, WHITE), (350, 150))
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
@@ -1393,13 +1401,14 @@ class Game:
     def show_controls(self):
         viewing = True
         contents = list(self.controls.defaults.keys())
-        e = Button(100, 150, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("E")], fontsize=32)
-        i = Button(100, 220, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("I")], fontsize=32)
-        n = Button(100, 290, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("N")], fontsize=32)
         bg = pygame.Surface((640, 480))
-        bg.fill((0, 0, 0))
-        
+        bg.fill((0, 0, 0, 20))
         while viewing:
+            # print(contents)
+            e = Button(100, 150, 60, 60, fg=BLACK, bg=WHITE, content=contents[0], fontsize=32)
+            i = Button(100, 220, 60, 60, fg=BLACK, bg=WHITE, content=contents[1], fontsize=32)
+            n = Button(100, 290, 60, 60, fg=BLACK, bg=WHITE, content=contents[2], fontsize=32)
+            desc = ["Interact", "Open inventory", "Notes (DLC)"]
             
             # Position and click of the mouse
             mouse_pos = pygame.mouse.get_pos()
@@ -1407,15 +1416,34 @@ class Game:
             
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: viewing = False; break
+                elif event.type == pygame.QUIT: return
             
-            if e.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("E", self.update_control()) 
-            if n.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("N", self.update_control())
-            if i.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("I", self.update_control()) 
+            
+            if e.is_pressed(mouse_pos, mouse_pressed): 
+                new_key = self.update_key()
+                key_name = pygame.key.name(new_key).upper()
+                self.controls.set_key(key_name, new_key)
+                self.controls.defaults.pop(key_name)
+                contents[0] = key_name
+                e.content = key_name
+            elif i.is_pressed(mouse_pos, mouse_pressed): 
+                new_key = self.update_key()
+                key_name = pygame.key.name(new_key).upper()
+                self.controls.set_key(key_name, new_key)
+                contents[1] = key_name
+                i.content = key_name
+            elif n.is_pressed(mouse_pos, mouse_pressed): 
+                new_key = self.update_key()
+                key_name = pygame.key.name(new_key).upper()
+                self.controls.set_key(key_name, new_key)
+                contents[2] = key_name
+                n.content = key_name
             
             self.screen.blit(bg, (0, 0))
             self.screen.blit(e.image, e.rect)
             self.screen.blit(i.image, i.rect)
             self.screen.blit(n.image, n.rect)
+            for item in range(len(desc)): self.screen.blit(self.font.render(desc[item], True, WHITE), (175, 170 + item*70))
             
             # Updates
             self.clock.tick(FPS)
@@ -2512,6 +2540,7 @@ class Game:
                                     self.lyz_rooms.index(self.lyz_in_room),
                                     self.bought,
                                     self.grades,
+                                    self.controls.defaults,
                                     {
                                         "music": self.music_on,
                                         "talking_speed": self.talking_speed_number
@@ -3372,7 +3401,6 @@ class Game:
             self.player.rect.x += 78 * TILE_SIZE
             self.player.rect.y += 34 * TILE_SIZE
             self.skied_two = False
-            self.screen.blit(self.timer_font.render("Done!", True, BLACK), (100, 65))
             pygame.display.update()
             self.clock.tick(FPS)
             pygame.time.delay(1200)
