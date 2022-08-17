@@ -8,11 +8,13 @@ class Lyziarsky:
         self.game = game
         self.first = firstDay(self.game)
         self.second = secondDay(self.game)
+        self.third = thirdDay(self.game)
         self.day: int = day
         
     def new_day(self):
         print("day: {}".format(self.game.lyz_day_number))
-        if self.first.go_sleep(end_day=True): self.day += 1; self.game.lyz_day_number += 1
+        if self.first._has_all() and self.first.go_sleep(end_day=True) and self.day == 1: self.day += 1; self.game.lyz_day_number += 1
+        elif self.second._has_all() and self.first.go_sleep(end_day=True) and self.day == 2: self.day += 1; self.game.lyz_day_number += 1
     
     def unlock_room(self):
         '''
@@ -190,4 +192,9 @@ class secondDay:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
-        
+
+
+class thirdDay:
+    def __init__(self, game) -> None: 
+        self.game = game
+        self.notes = {1: "Go to the kitchen for your skis.", 2: "Go straight to the ski slope.", 3: "Go meet up with a teacher in the diner.", 4: "Tomorrow is another day"}

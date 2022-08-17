@@ -3,11 +3,13 @@ import base64
 import sys
 from tkinter import messagebox
 from types import NoneType
+from typing import Literal
 import webbrowser
 import pygame, random as r, getpass, requests
 from leaderboard import Leaderboard
 from lyz import Lyziarsky
 from quest import Quest
+from controls import Controls
 from save_progress import SaveProgress
 from camera import Camera
 from bs4 import BeautifulSoup as bs
@@ -78,6 +80,8 @@ class Game:
         '''Room where player is rn (starting point) that's Satna for those who don't know'''
         self.quest = Quest(self)
         '''More complex quests'''
+        self.controls = Controls(self)
+        '''Controls to set for the game - usually those you play with'''
         self.grades: dict[str, int] = {}
         '''Player's grades'''
         self.endings: List[str] = []
@@ -1121,6 +1125,9 @@ class Game:
             self.vybalenie = data["quests"]["vybalenie"]
             self.nap = data["quests"]["nap"]
             self.friends = data["quests"]["friends"]
+            self.ski_suit_on = data['quests']['suit_on']
+            self.skied_two = data['quests']['skied_two']
+            self.talked_with_teacher = data['quests']['talked_with_teacher']
             self.lyz_day_number = data["quests"]["lyz_day"]
 
             # Bananok
@@ -1184,7 +1191,7 @@ class Game:
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: self.exiting()
 
             # Pressed I
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_i and len(self.inv) != 0: 
+            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I'] and len(self.inv) != 0: 
                 pygame.image.save(self.screen, "img/screen.png")
                 self.inventory()
             
@@ -1193,7 +1200,7 @@ class Game:
                 self.notes()
 
             # Pressed E
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+            elif event.type == pygame.KEYDOWN and event.key == self.controls.defaults['E']:
 
                 # What was clicked
                 match self.player.facing:
@@ -1372,6 +1379,48 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+            
+    def update_control(self):
+        updating = True
+        
+        while updating:
+            if any(x for x in pygame.key.get_pressed()): print('here'); updating = False; return pygame.key.get_mods()
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
+            
+    def show_controls(self):
+        viewing = True
+        contents = list(self.controls.defaults.keys())
+        e = Button(100, 150, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("E")], fontsize=32)
+        i = Button(100, 220, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("I")], fontsize=32)
+        n = Button(100, 290, 60, 60, fg=BLACK, bg=WHITE, content=contents[contents.index("N")], fontsize=32)
+        bg = pygame.Surface((640, 480))
+        bg.fill((0, 0, 0))
+        
+        while viewing:
+            
+            # Position and click of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: viewing = False; break
+            
+            if e.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("E", self.update_control()) 
+            if n.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("N", self.update_control())
+            if i.is_pressed(mouse_pos, mouse_pressed): self.controls.set_control("I", self.update_control()) 
+            
+            self.screen.blit(bg, (0, 0))
+            self.screen.blit(e.image, e.rect)
+            self.screen.blit(i.image, i.rect)
+            self.screen.blit(n.image, n.rect)
+            
+            # Updates
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
 
     def exiting(self):
         """
@@ -1384,6 +1433,7 @@ class Game:
         settings_button = Button(WIN_WIDTH // 2 + 5, WIN_HEIGHT // 2 - 45, 150, 40, fg=WHITE, bg=BLACK, content="Settings", fontsize=32)
         sq_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 5, 310, 40, fg=WHITE, bg=BLACK, content="Save & Quit", fontsize=32)
         dlc_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 50, 310, 40, fg=WHITE, bg=BLACK, content="Available DLCs", fontsize=32)
+        controls_button = Button(WIN_WIDTH // 2 - 155, WIN_HEIGHT // 2 + 95, 310, 40, fg=WHITE, bg=BLACK, content="Controls", fontsize=32)
         exit_pause: bool = False
         
         while True:
@@ -1393,7 +1443,7 @@ class Game:
                 if event.type == pygame.QUIT: sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE: exit_pause = not exit_pause; break
-                    elif event.key == pygame.K_s: self.settings()
+                    elif event.key == self.controls.defaults['S']: self.settings()
 
             if exit_pause: break
 
@@ -1412,6 +1462,9 @@ class Game:
             
             # Show all DLCs
             if dlc_button.is_pressed(mouse_pos, mouse_pressed): self.show_dlcs(); break
+            
+            if controls_button.is_pressed(mouse_pos, mouse_pressed): exit_pause = False; self.show_controls(); break
+            
             # BG
             self.screen.blit(bg, (0, 0))
 
@@ -1420,6 +1473,7 @@ class Game:
             self.screen.blit(settings_button.image, settings_button.rect)
             self.screen.blit(sq_button.image, sq_button.rect)
             self.screen.blit(dlc_button.image, dlc_button.rect)
+            self.screen.blit(controls_button.image, controls_button.rect)
 
             # Updates
             self.clock.tick(FPS)
@@ -1466,7 +1520,7 @@ class Game:
             case 2: return [x for x in (self.ski_suit_on, self.skied_two, self.talked_with_teacher) if not x]
             case _: return []
             
-    def grab_notes(self):
+    def grab_notes(self) -> tuple[Literal[''], Literal[-1]] | tuple[list[str], list[int]]:
         match self.lyz_day_number:
             case 1:
                 notes_for_day = list(self.lyz_day.first.notes.values())
@@ -1474,7 +1528,10 @@ class Game:
             case 2:
                 notes_for_day = list(self.lyz_day.second.notes.values())
                 note_order = list(self.lyz_day.second.notes.keys())
-            case _: return None
+            case 3:
+                notes_for_day = list(self.lyz_day.third.notes.values())
+                note_order = list(self.lyz_day.third.notes.keys())
+            case _: return ("", -1)
         return notes_for_day, note_order
 
     def inventory(self):
@@ -1497,8 +1554,19 @@ class Game:
             
 
             if self.lyz_created:
-                if self.lyz_day_number == 2: self.smart_watch_logic(smart_watch, '6'); open_inventory = False
-                elif self.smart_watch_logic(smart_watch): open_inventory = False
+                match self.lyz_day_number: 
+                    case 2:
+                        if not self.skied_two: self.smart_watch_logic(smart_watch, time='14')
+                            
+                        else: self.smart_watch_logic(smart_watch, time='6')
+                        open_inventory = False
+                    case 3:
+                        if not self.cards: self.smart_watch_logic(smart_watch, time='21')
+                        else: self.smart_watch_logic(smart_watch, time='6')
+                        open_inventory = False
+                    case _: 
+                        self.smart_watch_logic(smart_watch)
+                        open_inventory = False
 
             else:
                 # Inv items
@@ -1528,7 +1596,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
 
                 # Esc/I
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == pygame.K_i: open_inventory = False; break
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I']: open_inventory = False; break
 
                 # Right arrow
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7; inventory_coords = {}
@@ -1851,7 +1919,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
                 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key in (pygame.K_ESCAPE, pygame.K_i):
+                    if event.key in (pygame.K_ESCAPE, self.controls.defaults['I']):
                         # Moving the watch / animation for it
                         while smart_watch_rect.x >= WIN_WIDTH // 2 - 580:
                             smart_watch_rect.x -= x * 2
@@ -2364,7 +2432,7 @@ class Game:
                 if event.type == pygame.QUIT: self.exiting()
 
                 # Esc/I
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == pygame.K_i: open_vtipnicek = not open_vtipnicek; break # BRUH
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults['I']: open_vtipnicek = not open_vtipnicek; break # BRUH
 
             # Updates
             self.clock.tick(FPS)
@@ -2417,6 +2485,8 @@ class Game:
                         "nap": self.nap,
                         "friends": self.friends,
                         "suit_on": self.ski_suit_on,
+                        "skied_two": self.skied_two,
+                        "talked_with_teacher": self.talked_with_teacher,
                         "lyz_day": self.lyz_day_number
                         }
         
@@ -3389,8 +3459,8 @@ class Game:
             self.talking("Samko lives here.")
             
         elif self.player.facing == 'down' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
-            self.info("We're getting into untapped territory.")
-            self.lyz_day.first.with_friends()
+            self.talking("We're getting into untapped territory.")
+            self.lyz_day.first.with_friends() if not self.nap and not self.vybalenie and self.lyz_day_number == 1 else self.talking("I shouldn't be here now")
             self.center_player_after_doors()
             
         elif self.player.facing == 'up' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
@@ -4385,7 +4455,7 @@ class Game:
                 else:
                     self.talking("I wanted to congratulate you for your performance on the slope.", True, BLUE)
                     self.talking("So here is a reward.", True, BLUE)
-                    self.info("Your recieved a photo.", GREEN)
+                    self.info("You've recieved a photo.", GREEN)
                     self.talked_with_teacher = False
                     # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
                 
