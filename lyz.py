@@ -2,6 +2,29 @@ import pygame
 from config import *
 
 
+class Cinematic:
+    
+    def __init__(self, game) -> None:
+        self.game = game
+        
+    def first_day_pasteka(self):
+        if not self.game.vybalenie and not self.game.nap and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_FIRST] and self.game.lyz_day_number == 1:
+            tmp_room = self.game.samko_placement((5, 8))
+            self.game.create_tile_map(tmp_room)
+            for sprite in self.game.all_sprites: 
+                sprite.rect.x += 6 * TILE_SIZE
+                sprite.rect.y -= 12 * TILE_SIZE
+            return True
+
+        else:
+            self.game.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.y -= 12 * TILE_SIZE
+                sprite.rect.x += 6 * TILE_SIZE
+            self.game.player.rect.y += 10 * TILE_SIZE
+            self.game.player.rect.x -= 5 * TILE_SIZE
+            return False
+
 class Lyziarsky:
     
     def __init__(self, game, day: int) -> None:

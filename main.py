@@ -7,7 +7,7 @@ from typing import Literal
 import webbrowser
 import pygame, random as r, getpass, requests
 from leaderboard import Leaderboard
-from lyz import Lyziarsky
+from lyz import Lyziarsky, Cinematic
 from quest import Quest
 from controls import Controls
 from save_progress import SaveProgress
@@ -82,6 +82,8 @@ class Game:
         '''More complex quests'''
         self.controls = Controls(self)
         '''Controls to set for the game - usually those you play with'''
+        self.animations = Cinematic(self)
+        '''Used for cinematic shorts, breaks between quests for longer playtime'''
         self.grades: dict[str, int] = {}
         '''Player's grades'''
         self.endings: List[str] = []
@@ -129,6 +131,8 @@ class Game:
         # Sounds
         self.wow_iphone = pygame.mixer.Sound("sounds/wow_iphone.mp3")
         self.wow_iphone.set_volume(0.5)
+        self.lyz_poof = pygame.mixer.Sound("sounds/poof.mp3")
+        self.lyz_poof.set_volume(0.3)
         self.theme = pygame.mixer.Sound("sounds/theme.mp3")
         self.theme.set_volume(0.25)
         self.kacurovanie = pygame.mixer.Sound("sounds/kacurovanie.mp3")
@@ -268,6 +272,7 @@ class Game:
         self.connected_router = True
 
         # Variables for finding items/doing stuff
+        self.lyz_samko_follow = False
         self.key_in_trash: bool = True
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
@@ -776,7 +781,7 @@ class Game:
         # Grader
         self.grades: dict[str, int] = {}
 
-    def create_tile_map(self):
+    def create_tile_map(self, room: List[str] = None):
         """
         Creates tile map
         """
@@ -789,7 +794,8 @@ class Game:
 
         # Creating sprites
         if self.lyz_created:
-            tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
+            if room is not None: tmp_room = room
+            else: tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room') else Ground(self, j, i)
@@ -1015,26 +1021,35 @@ class Game:
             except IndexError:
                 print("Coska wronk")
     
-    def samko_placement(self):
+    def samko_placement(self, force_placement: tuple[int, int] = None):
         '''
         Returns new room with Samko
         '''
         tmp_room: List[str] = self.lyz_in_room.copy()
-        row = r.randint(1, len(self.lyz_in_room) - 3)
-        samko_pos = tmp_room[row]
+        row = 0 
+        if force_placement is None: row = r.randint(1, len(self.lyz_in_room) - 3)
+        samko_pos = tmp_room[row] if force_placement is None else tmp_room[force_placement[0]]
         if "." in samko_pos:
-            private_idx = r.randint(0, len(samko_pos) // 2)
-            samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
-            tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
-        else: 
+            if force_placement is None:
+                private_idx = r.randint(0, len(samko_pos) // 2)
+                samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
+                tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
+            
+            else:
+                samko_pos = samko_pos[force_placement[1]:].replace(".", ":", 1) # Samko NPC load for cinematic
+                tmp_room[force_placement[0]] = tmp_room[force_placement[0]][:force_placement[1]] + samko_pos
+                return tmp_room
+            
+        else:
             for x in range(len(tmp_room)):
-                if "." in tmp_room[x]: 
+                if "." in tmp_room[x]:
                     samko_pos, row = tmp_room[x], x
                     break
-            
+                    
             private_idx = r.randint(0, len(samko_pos) // 2)
             samko_pos = samko_pos[private_idx:].replace(".", ":", 1) # Samko NPC load
             tmp_room[row] = tmp_room[row][:private_idx] + samko_pos
+       
         return tmp_room
                 
     def set_camera(self, level: List[str]):
@@ -3488,15 +3503,24 @@ class Game:
         
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_in_room == lyz_room:
             self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
-            self.create_tile_map()
-            self.camera.set_lyz_camera()
             self.door_info("Bye guys", 'first')
-            for sprite in self.all_sprites:
-                sprite.rect.y -= 12 * TILE_SIZE
-                sprite.rect.x += 6 * TILE_SIZE
+            val = self.animations.first_day_pasteka()
+            if not val:
+                for sprite in self.all_sprites:
+                    sprite.rect.y -= 12 * TILE_SIZE
+                    sprite.rect.x += 6 * TILE_SIZE
+                self.player.rect.y += 10 * TILE_SIZE
+                self.player.rect.x -= 5 * TILE_SIZE
             self.player.rect.y += 10 * TILE_SIZE
             self.player.rect.x -= 5 * TILE_SIZE
-
+            self.draw(); self.update()
+            pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
+            for _ in range(100):
+                for sprite in self.all_sprites: sprite.rect.y += 3
+                pygame.time.wait(30)
+                self.draw(); self.update()
+            self.lyz_samko_follow = True
+            
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             self.talking("Anything can happen, but not me going here.")
             
@@ -4728,7 +4752,7 @@ class Game:
         
         # Lost guy
         elif self.in_room == self.rooms[BASEMENT_FLOOR] and self.interacted[1] == 4 and self.interacted[2] == 45 and self.lost_guy: self.quest.guy_lost_in_school()
-               
+        
     def basement(self):
         """
         Going into the basement
@@ -5257,7 +5281,7 @@ class Game:
         self.talking("Where did he run off?")
         self.talking("And why was he spinning the entire time?")
         self.talking("So many question and no answers.")
-        self.talking("Such is life at SPSE.")
+        self.talking("Such is life at SPŠE.")
         
 
 # Main program

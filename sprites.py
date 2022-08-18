@@ -1,6 +1,7 @@
 # Imports
 import pygame, math, random as r
 from config import *
+from lyz import Lyziarsky
 
 class Spritesheet:
     """
@@ -535,6 +536,8 @@ class Npc(pygame.sprite.Sprite):
         # Lost guy
         self.go_left = 0
         self.go_down = 0
+        self.lyz_samko_follow_count_down = 7 * 10.55555555
+        self.lyz_samko_follow_count_left = 6 * 10.55555555
 
     def update(self):
         """
@@ -545,7 +548,7 @@ class Npc(pygame.sprite.Sprite):
         if self.type in ("C", "9", "p"): self.movement()
         elif self.type == "§" and self.game.g_move: self.y_change += 1.95 * TILE_SIZE; self.movement()
         elif self.type == "§" and self.game.g_leave:
-            if self.go_left < 470: 
+            if self.go_left < 470:
                 self.facing = "left"
                 self.movement()
             elif self.go_down < 40:
@@ -553,6 +556,24 @@ class Npc(pygame.sprite.Sprite):
                 self.movement()
                 self.facing = r.choice(["left", "right", "up"])
             else: self.facing = "left"
+        elif self.type == ":" and self.game.lyz_samko_follow:
+            if self.lyz_samko_follow_count_down > 0:
+                self.facing = "down"
+                self.movement()
+            elif self.lyz_samko_follow_count_left > 0:
+                self.facing = "left"
+                self.movement()
+            else:
+                self.game.lyz_samko_follow = False
+                self.facing = "down"
+                self.game.talking("", True, GOLD, True, 1)
+                self.game.talking("Want pašteka?", True, GOLD)
+                self.game.talking("Not now, I wanted to go and see others.")
+                self.game.talking("Since it's the first day.")
+                self.game.talking("Later then, maybe tomorrow.", True, GOLD)
+                self.game.talking("Sure...")
+                self.rect.x += 999
+                pygame.mixer.Sound.play(self.game.lyz_poof)
         self.animate()
         
         # Collision
@@ -573,29 +594,31 @@ class Npc(pygame.sprite.Sprite):
 
         if self.facing == "left":
             if self.game.g_leave: self.go_left += 1
+            elif self.game.lyz_samko_follow: self.lyz_samko_follow_count_left -= 1
             self.x_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop <= -self.max_travel and self.type != ":": self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "right":
             self.x_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop >= self.max_travel and self.type != ":": self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "up":
             self.y_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop <= -self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop <= -self.max_travel and self.type != ":": self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "down":
             if self.game.g_leave: self.go_down += 1
+            elif self.game.lyz_samko_follow: self.lyz_samko_follow_count_down -= 1 
             self.y_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
-            elif self.movement_loop >= self.max_travel: self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
+            elif self.movement_loop >= self.max_travel and self.type != ":": self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
             
     def collide_blocks(self, direction: str):
         """

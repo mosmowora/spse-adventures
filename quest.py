@@ -1663,7 +1663,7 @@ class Quest:
         pygame.mixer.Sound.play(self.game.door_open)
         pygame.time.delay(int(self.game.door_open.get_length()*1000)-500)
         self.game.g_move = True
-        self.game.player.y_change += 1 * TILE_SIZE
+        self.game.player.y_change += TILE_SIZE
         self.game.update(); self.game.draw() 
         self.game.clock.tick(FPS)
         pygame.display.update()
