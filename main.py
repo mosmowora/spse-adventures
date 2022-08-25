@@ -115,6 +115,10 @@ class Game:
         self.skied_two: bool = True
         self.talked_with_teacher: bool = True
         # 3rd day
+        self.lyz_bratko_count = 1
+        self.lyz_repair_speaker: bool = True
+        self.repaired_bed = True
+        self.cards = True
         # ...
         self.lyz_day_number: int = 1
         self.lyz_day = Lyziarsky(self, self.lyz_day_number)
@@ -266,6 +270,9 @@ class Game:
         self.skied_two: bool = True
         self.talked_with_teacher: bool = True
         self.lyz_day_number: int = 1
+        self.lyz_repair_speaker = True
+        self.repaired_bed = True
+        self.cards = True
 
         # Quests variables
         self.__gul_counter: int = 0
@@ -273,6 +280,7 @@ class Game:
 
         # Variables for finding items/doing stuff
         self.lyz_samko_follow = False
+        self.lyz_bratko_follow = False
         self.key_in_trash: bool = True
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
@@ -1144,6 +1152,9 @@ class Game:
             self.skied_two = data['quests']['skied_two']
             self.talked_with_teacher = data['quests']['talked_with_teacher']
             self.lyz_day_number = data["quests"]["lyz_day"]
+            self.repaired_bed = data["quests"]["repaired bed"]
+            self.lyz_repair_speaker = data["quests"]["repaired speaker"]
+            self.cards = data["quests"]["cards"]
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -1249,7 +1260,12 @@ class Game:
                     case "Battery": self.batteries()
                     case "Flashlight": self.flashlight()
                     case "Ladder": self.ladder()
-                    case "Bag": self.lyz_day.first.unpack_things()
+                    case "Bag": 
+                        if self.lyz_day_number == 1: self.lyz_day.first.unpack_things() 
+                        elif self.lyz_day_number == 3 and not self.lyz_repair_speaker: 
+                            self.lyz_day.third.repair_bed()
+                            self.talking("That should be it...")
+                            self.talking(f"Thanks {self.player_name}", True, GOLD)
                     case "Nap":
                         match self.lyz_day_number: 
                             case 1:
@@ -1257,6 +1273,8 @@ class Game:
                                 else: self.lyz_day.first.go_sleep()
                             case 2:
                                 if self.lyz_day.second._has_all(): self.lyz_day.new_day()
+                            case 3:
+                                if self.lyz_day.third._has_all(): self.lyz_day.new_day()
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -1566,13 +1584,15 @@ class Game:
         for item in range(len(notes_for_day)):
             quest_coords.append((130, 130 + 60 * item))
             self.screen.blit(self.bigger_font.render(notes_for_day[item], True, BLACK), quest_coords[item])
-            self.screen.blit(self.bigger_font.render(str(note_order[item]), True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
+            self.screen.blit(self.bigger_font.render(str(note_order[item]) + ".", True, BLACK), (quest_coords[item][0] - 30, quest_coords[item][1]))
+        
         for quest in range(len(done_quests)): pygame.draw.line(self.screen, BLACK, (quest_coords[quest][0] - 10, quest_coords[quest][1] + 25), (quest_coords[quest][0] + 380, quest_coords[quest][1] + 25), 3)
 
     def get_available_notes(self):
         match self.lyz_day_number:
             case 1: return [x for x in (self.vybalenie, self.nap, self.friends) if not x]
             case 2: return [x for x in (self.ski_suit_on, self.skied_two, self.talked_with_teacher) if not x]
+            case 3: return [x for x in (self.lyz_repair_speaker, self.repaired_bed, self.cards) if not x]
             case _: return []
             
     def grab_notes(self) -> tuple[Literal[''], Literal[-1]] | tuple[list[str], list[int]]:
@@ -1616,8 +1636,9 @@ class Game:
                         else: self.smart_watch_logic(smart_watch, time='6')
                         open_inventory = False
                     case 3:
-                        if not self.cards: self.smart_watch_logic(smart_watch, time='21')
-                        else: self.smart_watch_logic(smart_watch, time='6')
+                        # if not self.cards: self.smart_watch_logic(smart_watch, time='21')
+                        # else: self.smart_watch_logic(smart_watch, time='6')
+                        self.smart_watch_logic(smart_watch, time='6')
                         open_inventory = False
                     case _: 
                         self.smart_watch_logic(smart_watch)
@@ -2542,6 +2563,9 @@ class Game:
                         "suit_on": self.ski_suit_on,
                         "skied_two": self.skied_two,
                         "talked_with_teacher": self.talked_with_teacher,
+                        "repaired speaker": self.lyz_repair_speaker,
+                        "cards": self.cards,
+                        "repaired bed": self.repaired_bed,
                         "lyz_day": self.lyz_day_number
                         }
         
@@ -3504,25 +3528,35 @@ class Game:
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_in_room == lyz_room:
             self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
             self.door_info("Bye guys", 'first')
-            val = self.animations.first_day_pasteka()
-            if not val:
-                for sprite in self.all_sprites:
-                    sprite.rect.y -= 12 * TILE_SIZE
-                    sprite.rect.x += 6 * TILE_SIZE
-                self.player.rect.y += 10 * TILE_SIZE
-                self.player.rect.x -= 5 * TILE_SIZE
-            self.player.rect.y += 10 * TILE_SIZE
-            self.player.rect.x -= 5 * TILE_SIZE
-            self.draw(); self.update()
-            pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
-            for _ in range(100):
-                for sprite in self.all_sprites: sprite.rect.y += 3
-                pygame.time.wait(30)
-                self.draw(); self.update()
-            self.lyz_samko_follow = True
+            val = self.animations.animate()
+            if val:
+                if self.lyz_day_number == 1:
+                    pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
+                    for _ in range(100):
+                        for sprite in self.all_sprites: sprite.rect.y += 3
+                        pygame.time.wait(30)
+                        self.draw(); self.update()
+                    self.lyz_samko_follow = True
+                
+                elif self.lyz_day_number == 3:
+                    pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
+                    for _ in range(105):
+                        for sprite in self.all_sprites: sprite.rect.y += 3
+                        pygame.time.wait(30)
+                        self.draw(); self.update()
+                    self.talking("Pod sem s tym reprakom!!", True, RED)
+                    self.lyz_bratko_follow = True
             
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
-            self.talking("Anything can happen, but not me going here.")
+            if self.lyz_day_number != 3: self.talking("Anything can happen, but not me going here.")
+            else:
+                if self.lyz_repair_speaker: 
+                    self.talking("So... what do you need?")
+                    self.talking("This speaker suddenly stopped working.", True, GOLD)
+                    self.talking("I'll look at it.")
+                    self.lyz_day.third.repair_speaker()
+
+                else: self.talking("Anything can happen, but not me going here.")
             
         elif self.player.facing == 'right' and self.interacted[1] == 5 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             self.talking("Samko lives here.")

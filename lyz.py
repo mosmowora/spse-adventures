@@ -7,20 +7,32 @@ class Cinematic:
     def __init__(self, game) -> None:
         self.game = game
         
-    def first_day_pasteka(self):
+    def animate(self):
         if not self.game.vybalenie and not self.game.nap and self.game.lyz_in_room == self.game.lyz_rooms[LYZ_FIRST] and self.game.lyz_day_number == 1:
             tmp_room = self.game.samko_placement((5, 8))
             self.game.create_tile_map(tmp_room)
             for sprite in self.game.all_sprites: 
                 sprite.rect.x += 6 * TILE_SIZE
                 sprite.rect.y -= 12 * TILE_SIZE
+            self.game.player.rect.y += 10 * TILE_SIZE
+            self.game.player.rect.x -= 5 * TILE_SIZE
+            return True
+        
+        elif self.game.lyz_day_number == 3 and self.game.lyz_bratko_count != 0:
+            tmp_room = self.game.samko_placement((4, 1))
+            self.game.create_tile_map(tmp_room)
+            for sprite in self.game.all_sprites: 
+                sprite.rect.x += 6 * TILE_SIZE
+                sprite.rect.y -= 12 * TILE_SIZE
+            self.game.player.rect.y += 10 * TILE_SIZE
+            self.game.player.rect.x -= 5 * TILE_SIZE
             return True
 
         else:
             self.game.create_tile_map()
-            for sprite in self.all_sprites:
-                sprite.rect.y -= 12 * TILE_SIZE
+            for sprite in self.game.all_sprites:
                 sprite.rect.x += 6 * TILE_SIZE
+                sprite.rect.y -= 6 * TILE_SIZE
             self.game.player.rect.y += 10 * TILE_SIZE
             self.game.player.rect.x -= 5 * TILE_SIZE
             return False
@@ -222,4 +234,95 @@ class secondDay:
 class thirdDay:
     def __init__(self, game) -> None: 
         self.game = game
-        self.notes = {1: "Go to the kitchen for your skis.", 2: "Go straight to the ski slope.", 3: "Go meet up with a teacher in the diner.", 4: "Tomorrow is another day"}
+        self.notes = {1: "Help your friend repair the speaker.", 2: "A bed in your room has broken down.", 3: "You've been invited to the top floor.", 4: "Tomorrow is another day"}
+        
+    def repair_speaker(self):
+        repairing: bool = True
+        speaker_arrow = pygame.image.load("img/speaker_arrow.png")
+        speaker_room = pygame.image.load("img/speaker_room.jpg")
+        speaker_bar = pygame.image.load("img/repair_speaker.png")
+        speaker = pygame.image.load("img/speaker_to_repair.png")
+        x_coord = 110
+        left: bool = False
+        speed: int = 5
+        repaired: int = 0
+        while repairing:
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button/Esc
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: return
+                
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and speaker_arrow.get_rect(x=x_coord, y=20).center[0] in range(110+192, 110+253):
+                    repaired += 1
+                    speed += 5
+            
+            if x_coord <= 420 and not left:
+                x_coord += speed
+            elif x_coord >= 110:
+                x_coord -= speed
+                left = True
+            else: 
+                left = False
+                
+            self.game.screen.blit(speaker_room, (0, 0))
+            self.game.screen.blit(self.game.big_font.render(f"repaired: {repaired}/4", True, WHITE), (0, 0))
+            self.game.screen.blit(speaker_arrow, (x_coord, 20))
+            self.game.screen.blit(speaker_bar, (120, 80))
+            self.game.screen.blit(speaker, (100, 185))
+
+            if repaired == 4: self.game.lyz_repair_speaker = False; repairing = False
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()
+            
+            
+    def _has_all(self): return True if not self.game.repaired_bed and not self.game.lyz_repair_speaker and not self.game.cards else False
+
+    def repair_bed(self):
+        bg = pygame.image.load("img/speaker_room.jpg")
+        bed_img = pygame.image.load("img/repair_bed.png")
+        bed_one = pygame.image.load("img/bed_one.png")
+        bed_two = pygame.image.load("img/bed_two.png")
+        rects: list[pygame.Rect] = []
+        repaired: int = 0
+        repairing: bool = True
+        for i in range(4):
+            if i < 2:
+                rects.append(pygame.Rect(90 + i*130, 210, 120, 80))
+            else:
+                rects.append(pygame.Rect(150 + (i-1)*130, 210, 120, 80))
+                
+        
+        while repairing:
+            
+            # Position, and state of the mouse
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()[0]
+            
+            # Events
+            for event in pygame.event.get():
+
+                # Close button/Esc
+                if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: return
+                
+            for i in rects:
+                if i.collidepoint(mouse_pos) and mouse_pressed:
+                    i.center = (690, 530)
+                    repaired += 1
+                    
+            
+            self.game.screen.blit(bg, (0, 0))
+            for i in range(2):
+                self.game.screen.blit(bed_one, rects[i])
+            for i in range(2, 4):
+                self.game.screen.blit(bed_two, rects[i])
+            self.game.screen.blit(bed_img, (80, 80))
+                
+            if repaired == 4: self.game.repaired_bed = False; repairing = False
+            
+            # Updates
+            self.game.clock.tick(FPS)
+            pygame.display.update()

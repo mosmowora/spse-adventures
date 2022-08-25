@@ -53,6 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.facing = "down"
         self.animation_loop = 1
         
+        # ski suit on
         if not self.game.ski_suit_on and self.game.talked_with_teacher and self.game.lyz_created: self.image = self.game.character_spritesheet.get_sprite(4, 133, self.width, self.height)
         else: self.image = self.game.character_spritesheet.get_sprite(3, 2, self.width, self.height) if not self.game.lyz_created else self.game.character_spritesheet.get_sprite(141, 0, self.width, self.height)
 
@@ -211,7 +212,7 @@ class Player(pygame.sprite.Sprite):
             for sprite in self.game.all_sprites: sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = "right"
-        elif keys[pygame.K_w]: 
+        elif keys[pygame.K_w] and self.game.lyz_in_room != self.game.lyz_rooms[LYZ_SKI_MAP]: 
             for sprite in self.game.all_sprites: sprite.rect.y += PLAYER_SPEED
             self.y_change -= PLAYER_SPEED
             self.facing = "up"
@@ -403,7 +404,7 @@ class Npc(pygame.sprite.Sprite):
         """
         Initialization for NPCs
         """
-
+        self.NPC_SPEED = 10.55555555
         self.type = type
         self.game = game
         self._layer = NPC_LAYER
@@ -536,8 +537,9 @@ class Npc(pygame.sprite.Sprite):
         # Lost guy
         self.go_left = 0
         self.go_down = 0
-        self.lyz_samko_follow_count_down = 7 * 10.55555555
-        self.lyz_samko_follow_count_left = 6 * 10.55555555
+        self.lyz_samko_follow_count_down = 7 * self.NPC_SPEED
+        self.lyz_samko_follow_count_left = 6 * self.NPC_SPEED
+        self.lyz_bratko_follow_count_right = 8 * self.NPC_SPEED
 
     def update(self):
         """
@@ -556,7 +558,7 @@ class Npc(pygame.sprite.Sprite):
                 self.movement()
                 self.facing = r.choice(["left", "right", "up"])
             else: self.facing = "left"
-        elif self.type == ":" and self.game.lyz_samko_follow:
+        elif self.type == ":" and self.game.lyz_samko_follow and self.game.lyz_day_number == 1:
             if self.lyz_samko_follow_count_down > 0:
                 self.facing = "down"
                 self.movement()
@@ -574,6 +576,11 @@ class Npc(pygame.sprite.Sprite):
                 self.game.talking("Sure...")
                 self.rect.x += 999
                 pygame.mixer.Sound.play(self.game.lyz_poof)
+        elif self.type == ":" and self.game.lyz_bratko_follow and self.game.lyz_day_number == 3 and self.game.lyz_bratko_count != 0:
+            if self.lyz_bratko_follow_count_right > 0:
+                self.facing = "right"
+                self.movement()
+            else: self.rect.x += 999; self.game.lyz_bratko_count = 0
         self.animate()
         
         # Collision
@@ -601,6 +608,7 @@ class Npc(pygame.sprite.Sprite):
             elif self.movement_loop <= -self.max_travel and self.type != ":": self.max_travel, self.facing = r.randint(7, 15), r.choice(["left", "right", "up", "down"])
 
         elif self.facing == "right":
+            if self.game.lyz_bratko_follow: self.lyz_bratko_follow_count_right -= 1
             self.x_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()
@@ -788,7 +796,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "^"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "]", "^"]
 
         self.game = game
         self.type = type
@@ -1137,6 +1145,7 @@ class Interact(pygame.sprite.Sprite):
 
                     # Unpacking things
                     elif self.interactive[hits[0]] == "[" + str(i) + str(j): self.game.interacted = ["Bag", i, j]
+                    
                     # Napping
                     elif self.interactive[hits[0]] == "^" + str(i) + str(j): self.game.interacted = ["Nap", i, j]
 
