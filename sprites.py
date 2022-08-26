@@ -1108,7 +1108,7 @@ class Interact(pygame.sprite.Sprite):
                     elif self.interactive[hits[0]] in ("y" + str(i) + str(j), "Y" + str(i) + str(j)): self.game.interacted = ["Bench_press", i ,j]
                     
                     # Teacher
-                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]
+                    elif self.interactive[hits[0]] == "N" + str(i) + str(j): self.game.interacted = ["Teacher", i, j]; print(j, i)
                     
                     # Samko
                     elif self.interactive[hits[0]] == ":" + str(i) + str(j): self.game.interacted = ["Samko", i, j]

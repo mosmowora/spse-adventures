@@ -1,6 +1,6 @@
 import pygame
 from config import *
-
+from card_game.cards import start
 
 class Cinematic:
     
@@ -326,3 +326,9 @@ class thirdDay:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+            
+    def play_cards(self):
+        
+        if self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SECOND] and not self.game.repaired_bed and not self.game.lyz_repair_speaker:
+            result = start()
+            return result

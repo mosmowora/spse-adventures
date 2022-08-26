@@ -49,6 +49,8 @@ class Game:
         '''BIGGERR FOOONT'''
         self.font = pygame.font.Font("Roboto.ttf", 22)
         '''just a normal font'''
+        self.small_font = pygame.font.Font("Roboto.ttf", 12)
+        '''Small font for long texts'''
         self.settings_font = pygame.font.Font("Caveat.ttf", 45)
         '''Another font, but now usable for settings'''
         self.lrob_font = pygame.font.Font("Roboto.ttf", 13) 
@@ -4138,7 +4140,7 @@ class Game:
         
         if self.interacted[0] == "Teacher":
 
-            # Liascinska
+            # Liscinska
             if self.interacted[2] == 100 and self.interacted[1] == 19:
 
                 # Before test 
@@ -4552,6 +4554,8 @@ class Game:
                 elif not self.prayed:
                     self.talking("Why are you still here?", True, SILVER)
                     self.talking("I believe the Lord will forgive you.", True, SILVER)
+            
+            # LYZ DLC
             if self.lyz_created and self.interacted[2] == 6 and self.interacted[1] == 11 and self.talked_with_teacher:
                 if self.ski_suit_on: self.talking("Go get yourself ready for the day.", True, BLUE)
                 elif self.skied_two: self.talking("I have to prepare certain things for this day.", True, BLUE); self.talking("You should go straight to the ski slope.", True, BLUE)
@@ -4562,7 +4566,77 @@ class Game:
                     self.talked_with_teacher = False
                     self.player.player_skin()
                     # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
+            
+            elif self.lyz_created and self.interacted[2] in (1, 2, 7, 8) and self.interacted[1] in (8, 9, 11, 13):
+                self.talking("This is a duel type of a card game", True, GOLD)
+                self.talking("We invited you to play with us.", True, GOLD)
+                self.talking("Since we're half way through this DLC.", True, GOLD)
+                self.talking("Or do you think something is still missing?", True, GOLD)
+                self.talking("Perhaps you missed something.", True, GOLD)
+                self.talking("Tell, us... do you want to explore a bit more?", True, GOLD)
+                yes = Button(WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 - 60, 80, 60, fg=WHITE, bg=BLACK, content="YES", fontsize=32)
+                no = Button(WIN_WIDTH // 2 + 40, WIN_HEIGHT // 2 - 60, 80, 60, fg=WHITE, bg=BLACK, content="NO", fontsize=32)
+                answer = False
+                pressed = False
+                answering = True
                 
+                while answering:
+                    
+                    # Events
+                    for event in pygame.event.get():
+
+                        # Close button
+                        if event.type == pygame.QUIT: return
+                
+                    # Position and click of the mouse
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse_pressed = pygame.mouse.get_pressed()
+                
+                    if yes.is_pressed(mouse_pos, mouse_pressed) and not pressed:
+                        pressed = True
+                        self.talking("Happy hunting then!", True, GOLD)
+                        self.talking("Come back once you're ready, we'll be waiting on you.", True, GOLD)
+                    
+                    elif no.is_pressed(mouse_pos, mouse_pressed) and not pressed:
+                        pressed = True
+                        answer = True
+                        rules = ["The deck is shuffled, and dealt evenly between the two players.",
+                        "Each player takes turns drawing a card and places it face up on top of the last card drawn.",
+                        "If the card placed is a match (by value) of the previous card, the first player to call 'Snap!' wins the entire pile of cards.",
+                        "These cards are added to their hand.",
+                        "If a player calls 'Snap!' and the card placed is not a match (i.e. falsely calls 'Snap!'), then the other player takes the pile",
+                        "of cards.",
+                        "The first player to run out of cards loses, and the other player wins.",
+                        "Are you prepared to play?"
+                        ]
+                        self.talking("Then prepare to face me.", True, GOLD)
+                        self.talking("But first, the rules.", True, GOLD)
+                        for rule in rules:
+                            if rules.index(rule) != len(rules) - 1:
+                                self.screen.blit(self.small_font.render(rule, True, WHITE), (0, 30 + rules.index(rule)*30))
+                            else:
+                                self.screen.blit(self.font.render(rule, True, WHITE), (200, 30 + rules.index(rule)*30))
+                    if not answer and not pressed:
+                        self.screen.blit(yes.image, yes.rect)
+                        self.screen.blit(no.image, no.rect)
+                    elif pressed:
+                        yes.rect.center = (WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 + 150)
+                        no.rect.center = (WIN_WIDTH // 2 + 40, WIN_HEIGHT // 2 + 150)
+                        self.screen.blit(yes.image, yes.rect)
+                        self.screen.blit(no.image, no.rect)
+                        
+                    if answer and yes.is_pressed(mouse_pos, mouse_pressed):
+                        yes = no = None
+                        self.screen = pygame.display.set_mode((1024, 768))
+                        result = self.lyz_day.third.play_cards()
+                        self.cards = result
+                        self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+                        return
+                                            
+                    # Updates
+                    self.clock.tick(FPS)
+                    pygame.display.update()
+                        
     def shoes_on(self):
         """
         Checks if player has shoes on
