@@ -332,3 +332,5 @@ class thirdDay:
         if self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SECOND] and not self.game.repaired_bed and not self.game.lyz_repair_speaker:
             result = start()
             return result
+        
+        return True

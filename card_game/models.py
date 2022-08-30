@@ -48,8 +48,8 @@ class Pile:
     def peek(self):
         if (len(self.cards) > 0):
             return self.cards[-1]
-        else:
-            return None
+        
+        return None
         
     def popAll(self):
         return self.cards
@@ -74,7 +74,7 @@ class Player:
         self.snapKey = snapKey
         self.name = name
         
-    def draw(self, deck):
+    def draw(self, deck: Deck):
         self.hand.append(deck.deal())
         
     def play(self):

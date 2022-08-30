@@ -60,15 +60,25 @@ def start():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                return
             if event.type == pygame.KEYDOWN:
                 key = event.key
+            if gameEngine.currentPlayer == gameEngine.player2:
+                pygame.time.delay(800)
+                try:
+                    if gameEngine.pile.cards[-1].value == gameEngine.pile.cards[-2].value:
+                        key = gameEngine.player2.snapKey
+                    else: 
+                        key = gameEngine.player2.flipKey
+                except IndexError:
+                    key = gameEngine.player2.flipKey
         
         gameEngine.play(key)
-        run = renderGame(window)
+        run: bool = renderGame(window)
         pygame.display.update()
 
         if gameEngine.state == GameState.SNAPPING:
-            pygame.time.delay(3000)
+            pygame.time.delay(2500)
             gameEngine.state = GameState.PLAYING
     
     return False

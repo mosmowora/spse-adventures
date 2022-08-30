@@ -1,5 +1,5 @@
-from enum import Enum
 import pygame
+from enum import Enum
 from .models import *
 
 class GameState(Enum):
@@ -21,7 +21,7 @@ class SnapEngine:
         self.deck = Deck()
         self.deck.shuffle()
         self.player1 = Player("Player 1", pygame.K_q, pygame.K_w)
-        self.player2 = Player("Player 2", pygame.K_o,pygame.K_p)
+        self.player2 = Player("Player 2", pygame.K_o, pygame.K_p)
         self.pile = Pile()
         self.deal()
         self.currentPlayer = self.player1
@@ -39,7 +39,7 @@ class SnapEngine:
         else:
             self.currentPlayer = self.player1
             
-    def winRound(self, player):
+    def winRound(self, player: 'Player'):
         self.state = GameState.SNAPPING
         player.hand.extend(self.pile.popAll())
         self.pile.clear()

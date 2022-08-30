@@ -63,7 +63,7 @@ class Game:
         self.terrain_spritesheet = Spritesheet("img/terrain.png")
         self.npcs_spritesheet = Spritesheet("img/npc.png")
 
-        # Into and Game Over backgrounds
+        # Inrto and Game Over backgrounds
         self.intro_background = pygame.image.load("img/intro_background.png")
         self.settings_background = pygame.image.load("img/settings_bg.jpg")
         
@@ -181,6 +181,9 @@ class Game:
                 webbrowser.open('https://aeternix-forum.herokuapp.com/releases/')
                 sys.exit()
             else: sys.exit()
+    
+    def get_name(self):
+        return self.player_name
         
     def encode_password(self, password: str): 
         password = base64.b85encode(password.encode('utf-8')).decode('utf-8')
@@ -4569,6 +4572,8 @@ class Game:
             
             elif self.lyz_created and self.interacted[2] in (1, 2, 7, 8) and self.interacted[1] in (8, 9, 11, 13):
                 self.talking("This is a duel type of a card game", True, GOLD)
+                self.talking("I highly suggest you saving the game now if you ever wanted", True, GOLD)
+                self.talking("... to play cards again", True, GOLD)
                 self.talking("We invited you to play with us.", True, GOLD)
                 self.talking("Since we're half way through this DLC.", True, GOLD)
                 self.talking("Or do you think something is still missing?", True, GOLD)
