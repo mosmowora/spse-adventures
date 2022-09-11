@@ -121,6 +121,10 @@ class Game:
         self.lyz_repair_speaker: bool = True
         self.repaired_bed = True
         self.cards = True
+        # 4th day
+        self.ski_suit: bool = True
+        self.skied_four: bool = True
+        self.enjoyed_show: bool = True
         # ...
         self.lyz_day_number: int = 1
         self.lyz_day = Lyziarsky(self, self.lyz_day_number)
@@ -278,6 +282,9 @@ class Game:
         self.lyz_repair_speaker = True
         self.repaired_bed = True
         self.cards = True
+        self.ski_suit = True
+        self.skied_four = True
+        self.enjoyed_show = True
 
         # Quests variables
         self.__gul_counter: int = 0
@@ -1160,6 +1167,9 @@ class Game:
             self.repaired_bed = data["quests"]["repaired bed"]
             self.lyz_repair_speaker = data["quests"]["repaired speaker"]
             self.cards = data["quests"]["cards"]
+            self.ski_suit = data['quests']['ski suit']
+            self.skied_four = data['quests']['skied four']
+            self.enjoyed_show = data['quests']['enjoyed show']
 
             # Bananok
             self.number_bananok = data["number_bananok"]
@@ -1598,6 +1608,7 @@ class Game:
             case 1: return [x for x in (self.vybalenie, self.nap, self.friends) if not x]
             case 2: return [x for x in (self.ski_suit_on, self.skied_two, self.talked_with_teacher) if not x]
             case 3: return [x for x in (self.lyz_repair_speaker, self.repaired_bed, self.cards) if not x]
+            case 4: return [x for x in (self.enjoyed_show, self.skied_four, self.ski_suit) if not x]
             case _: return []
             
     def grab_notes(self) -> tuple[Literal[''], Literal[-1]] | tuple[list[str], list[int]]:
@@ -1611,6 +1622,9 @@ class Game:
             case 3:
                 notes_for_day = list(self.lyz_day.third.notes.values())
                 note_order = list(self.lyz_day.third.notes.keys())
+            case 4:
+                notes_for_day = list(self.lyz_day.fourth.notes.values())
+                note_order = list(self.lyz_day.fourth.notes.keys())
             case _: return ("", -1)
         return notes_for_day, note_order
 
@@ -1637,13 +1651,18 @@ class Game:
                 match self.lyz_day_number: 
                     case 2:
                         if not self.skied_two: self.smart_watch_logic(smart_watch, time='14')
-                            
+                        elif not self.ski_suit_on: self.smart_watch_logic(smart_watch, time='8')
                         else: self.smart_watch_logic(smart_watch, time='6')
                         open_inventory = False
                     case 3:
-                        # if not self.cards: self.smart_watch_logic(smart_watch, time='21')
-                        # else: self.smart_watch_logic(smart_watch, time='6')
-                        self.smart_watch_logic(smart_watch, time='6')
+                        if not self.cards: self.smart_watch_logic(smart_watch, time='21')
+                        elif not self.repaired_bed: self.smart_watch_logic(smart_watch, time='15')
+                        else: self.smart_watch_logic(smart_watch, time='6')
+                        open_inventory = False
+                    case 4:
+                        if not self.ski_suit: self.smart_watch_logic(smart_watch, time='7')
+                        elif not self.skied_four: self.smart_watch_logic(smart_watch, time='16')
+                        else: self.smart_watch_logic(smart_watch, time='6')
                         open_inventory = False
                     case _: 
                         self.smart_watch_logic(smart_watch)
@@ -2436,7 +2455,7 @@ class Game:
         
         retaking = True
         
-        x: int = 2.5
+        x: float = 2.5
         y: int = 200
 
         retakeable = ["MAT", "SJL", "OBN", "OSY", "AEN", "IOT", "TSV", "ICD", "PRO", "ANJ"]
@@ -2571,6 +2590,9 @@ class Game:
                         "repaired speaker": self.lyz_repair_speaker,
                         "cards": self.cards,
                         "repaired bed": self.repaired_bed,
+                        "ski suit": self.ski_suit,
+                        "enjoyed show": self.enjoyed_show,
+                        "skied four": self.skied_four,
                         "lyz_day": self.lyz_day_number
                         }
         
@@ -3431,7 +3453,7 @@ class Game:
             pygame.display.update()
     
     def gotta_ski(self):
-        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y in range(-1200, -1118) and self.lyz_saved_data == 'outside' and self.skied_two:
+        if self.all_sprites.sprites()[0].rect.x in range(-2646, -2506) and self.all_sprites.sprites()[0].rect.y in range(-1200, -1118) and self.lyz_saved_data == 'outside' and (self.skied_two or self.skied_four):
             if self.ski_suit_on:
                 for sprite in self.all_sprites: sprite.rect.y += 3 * TILE_SIZE
                 self.player.rect.y -= 3 * TILE_SIZE
@@ -3458,7 +3480,8 @@ class Game:
                 sprite.rect.y -= 34 * TILE_SIZE
             self.player.rect.x += 78 * TILE_SIZE
             self.player.rect.y += 34 * TILE_SIZE
-            self.skied_two = False
+            if self.lyz_day_number == 2: self.skied_two = False 
+            else: self.skied_four = False
             pygame.display.update()
             self.clock.tick(FPS)
             pygame.time.delay(1200)
@@ -3508,9 +3531,9 @@ class Game:
         # Kitchen
         elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
             if self.lyz_day_number % 2 != 0: self.talking("Hmmm... a kitchen, but I don't have keys to open it.") 
-            elif self.ski_suit_on: 
+            elif self.ski_suit_on or self.ski_suit: 
                 self.talking("Finally time to go ski")
-                self.lyz_day.second.grab_suit()
+                self.lyz_day.second.grab_suit() if self.lyz_day_number == 2 else self.lyz_day.fourth.grab_suit()
                 self.player.player_skin()
             
         # Classmates
@@ -3568,7 +3591,7 @@ class Game:
             
         elif self.player.facing == 'down' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
             self.talking("We're getting into untapped territory.")
-            self.lyz_day.first.with_friends() if not self.nap and not self.vybalenie and self.lyz_day_number == 1 else self.talking("I shouldn't be here now")
+            if not self.nap and not self.vybalenie and self.lyz_day_number == 1: self.lyz_day.first.with_friends()
             self.center_player_after_doors()
             
         elif self.player.facing == 'up' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
@@ -4612,6 +4635,8 @@ class Game:
                         "If a player calls 'Snap!' and the card placed is not a match (i.e. falsely calls 'Snap!'), then the other player takes the pile",
                         "of cards.",
                         "The first player to run out of cards loses, and the other player wins.",
+                        "Flip card - Q",
+                        "Snap - W",
                         "Are you prepared to play?"
                         ]
                         self.talking("Then prepare to face me.", True, GOLD)

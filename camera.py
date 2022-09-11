@@ -4,7 +4,11 @@ from config import *
 
 class Camera:
     
-    def __init__(self, game): self.game = game
+    def __init__(self, game): 
+        '''
+        Setting the game camera
+        '''
+        self.game = game
     
     def set_ground_camera(self):
         """
