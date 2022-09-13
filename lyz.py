@@ -392,3 +392,4 @@ class fourthDay:
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
+

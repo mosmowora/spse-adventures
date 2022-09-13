@@ -1,10 +1,11 @@
 # Imports
 import base64
-import sys
+import sys, cv2
 from tkinter import messagebox
 from types import NoneType
 from typing import Literal
 import webbrowser
+import numpy as np
 import pygame, random as r, getpass, requests
 from leaderboard import Leaderboard
 from lyz import Lyziarsky, Cinematic
@@ -14,7 +15,7 @@ from save_progress import SaveProgress
 from camera import Camera
 from bs4 import BeautifulSoup as bs
 from time import strftime
-
+from ffpyplayer.player import MediaPlayer
 from sprites import *; from config import *
 
 class Game:
@@ -3508,6 +3509,26 @@ class Game:
         elif self.player.facing == 'down' and self.interacted[1] == 5 and self.interacted[2] in (112, 113):
             self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
             self.door_info('Finally somewhere warm', 'ground')
+            if not self.ski_suit and not self.skied_four:
+                video = cv2.VideoCapture("videos/sb.mp4.mp4")
+                ret, frame = video.read()
+                # self.talking("Well... this memory is like 8mins")
+                # self.talking("Enjoy it :D")
+                # self.talking("Just press 'q' if you want to continue to the final day")
+                player = MediaPlayer("videos/sb.mp4.mp4")
+                val = ''
+                while val != 'eof':
+                    frame, val = player.get_frame()
+                    
+                    if val != 'eof' and frame is not None:
+                        img, t = frame
+                        w = img.get_size()[0]
+                        h = img.get_size()[1]
+                        arr = np.uint8(np.asarray(list(img.to_bytearray()[0])).reshape(h, w, 3)) # h - height of frame, w - width of frame, 3 - number of channels in frame
+                        cv2.imshow('Our trip to Lyziarsky (2022)', arr)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            cv2.destroyAllWindows()
+                            break
             self.create_tile_map()
             self.camera.set_lyz_camera()
         
