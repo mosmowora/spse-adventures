@@ -3512,7 +3512,7 @@ class Game:
         elif self.player.facing == 'down' and self.interacted[1] == 5 and self.interacted[2] in (112, 113):
             self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
             self.door_info('Finally somewhere warm', 'ground')
-            if not self.ski_suit and not self.skied_four:
+            if not self.ski_suit and not self.skied_four and self.lyz_day_number == 4:
                 self.talking("Well... this memory is like 8mins")
                 self.talking("Enjoy it :D")
                 self.talking("Just press 'q' if you want to continue to the final day")
@@ -3545,9 +3545,10 @@ class Game:
                 
             self.create_tile_map()
             self.camera.set_lyz_camera()
-            self.talking("Tomorrow is our last day here.")
-            self.talking("Hope you haven't forgotten anything")
-            self.talking("If so, then let's hop onto the last day")
+            if self.lyz_day_number == 4:
+                self.talking("Tomorrow is our last day here.")
+                self.talking("Hope you haven't forgotten anything")
+                self.talking("If so, then let's hop onto the last day")
         
         # Outside
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] in (4, 5):
