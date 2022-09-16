@@ -48,7 +48,6 @@ class Lyziarsky:
         self.day: int = day
         
     def new_day(self):
-        print("day: {}".format(self.game.lyz_day_number))
         if self.first._has_all() and self.first.go_sleep(end_day=True) and self.day == 1: self.day += 1; self.game.lyz_day_number += 1
         elif self.second._has_all() and self.first.go_sleep(end_day=True) and self.day == 2: self.day += 1; self.game.lyz_day_number += 1
         elif self.third._has_all() and self.first.go_sleep(end_day=True) and self.day == 3: self.day += 1; self.game.lyz_day_number += 1

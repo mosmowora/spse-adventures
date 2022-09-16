@@ -3541,9 +3541,13 @@ class Game:
                 cap.release()
                 cv2.destroyAllWindows()
                 self.enjoyed_show = False
+                self.lyz_in_room = self.lyz_rooms[LYZ_ROOM]
                 
             self.create_tile_map()
             self.camera.set_lyz_camera()
+            self.talking("Tomorrow is our last day here.")
+            self.talking("Hope you haven't forgotten anything")
+            self.talking("If so, then let's hop onto the last day")
         
         # Outside
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] in (4, 5):
