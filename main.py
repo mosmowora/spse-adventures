@@ -1,6 +1,7 @@
 # Imports
 import base64
 import sys, cv2
+import time
 from tkinter import messagebox
 from types import NoneType
 from typing import Literal
@@ -1291,6 +1292,8 @@ class Game:
                                 if self.lyz_day.second._has_all(): self.lyz_day.new_day()
                             case 3:
                                 if self.lyz_day.third._has_all(): self.lyz_day.new_day()
+                            case 4:
+                                if self.lyz_day.fourth._has_all(): self.lyz_day.new_day()
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -3510,25 +3513,35 @@ class Game:
             self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
             self.door_info('Finally somewhere warm', 'ground')
             if not self.ski_suit and not self.skied_four:
-                video = cv2.VideoCapture("videos/sb.mp4.mp4")
-                ret, frame = video.read()
-                # self.talking("Well... this memory is like 8mins")
-                # self.talking("Enjoy it :D")
-                # self.talking("Just press 'q' if you want to continue to the final day")
+                self.talking("Well... this memory is like 8mins")
+                self.talking("Enjoy it :D")
+                self.talking("Just press 'q' if you want to continue to the final day")
+                cap = cv2.VideoCapture("videos/sb.mp4.mp4")
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
                 player = MediaPlayer("videos/sb.mp4.mp4")
-                val = ''
-                while val != 'eof':
-                    frame, val = player.get_frame()
+                start_time = time.time()
+                
+                while True:
                     
-                    if val != 'eof' and frame is not None:
-                        img, t = frame
-                        w = img.get_size()[0]
-                        h = img.get_size()[1]
-                        arr = np.uint8(np.asarray(list(img.to_bytearray()[0])).reshape(h, w, 3)) # h - height of frame, w - width of frame, 3 - number of channels in frame
-                        cv2.imshow('Our trip to Lyziarsky (2022)', arr)
-                        if cv2.waitKey(1) & 0xFF == ord('q'):
-                            cv2.destroyAllWindows()
-                            break
+                    ret, frame = cap.read()
+                    if not ret: break
+                    _, val = player.get_frame(show=False)
+                    if val == "eof": break
+                    
+                    cv2.imshow("Our trip to Lyziarsky", frame)
+
+                    elapsed = (time.time() - start_time) * 1000  # msec
+                    play_time = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+                    sleep = max(1, int(play_time - elapsed))
+                    if cv2.waitKey(sleep) & 0xFF == ord('q'):
+                        break
+                    
+                player.close_player()
+                cap.release()
+                cv2.destroyAllWindows()
+                self.enjoyed_show = False
+                
             self.create_tile_map()
             self.camera.set_lyz_camera()
         
