@@ -156,7 +156,7 @@ class firstDay:
         elif self.game.interacted[1] == 4 and self.game.interacted[2] in (5, 6) and end_day and not self.game.vybalenie and not self.game.nap and not self.game.friends:
             fade = pygame.Surface((640, 480))
             fade.fill((0,0,0))
-            self.__fade_transition(fade, True, "Tomorrow is another day", (230, 380))
+            self.__fade_transition(fade, True, "Tomorrow is another day" if self.game.lyz_day_number != 4 else "Tomorrow is the last day", (230, 380))
             return True
     
     def _has_all(self): return True if not self.game.nap and not self.game.friends and not self.game.vybalenie else False
@@ -167,7 +167,8 @@ class firstDay:
             self.game.screen.blit(fade, (0,0))
             pygame.display.update()
             pygame.time.delay(25)
-            if alpha >= 100: fade.blit(self.game.settings_font.render("You took a nap..." if not end_day else text, False, WHITE), (200, 190) if placement is None else placement)
+            if alpha >= 100: 
+                fade.blit(self.game.settings_font.render("You took a nap..." if not end_day else text, False, WHITE), (200, 190) if placement is None else placement)
     
     def with_friends(self):
         if self.game.lyz_saved_data == 'second': self.game.friends = False; return True

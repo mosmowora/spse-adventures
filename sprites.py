@@ -1,7 +1,6 @@
 # Imports
 import pygame, math, random as r
 from config import *
-from lyz import Lyziarsky
 
 class Spritesheet:
     """
@@ -567,9 +566,13 @@ class Npc(pygame.sprite.Sprite):
         # Lost guy
         self.go_left = 0
         self.go_down = 0
+
+        # samko attributes
         self.lyz_samko_follow_count_down = 7 * self.NPC_SPEED
         self.lyz_samko_follow_count_left = 6 * self.NPC_SPEED
         self.lyz_bratko_follow_count_right = 8 * self.NPC_SPEED
+        self.lyz_samko_preko_follow_down = 7 * self.NPC_SPEED
+        self.lyz_samko_preko_follow_left = 5 * self.NPC_SPEED
 
     def update(self):
         """
@@ -611,6 +614,23 @@ class Npc(pygame.sprite.Sprite):
                 self.facing = "right"
                 self.movement()
             else: self.rect.x += 999; self.game.lyz_bratko_count = 0
+        
+        elif self.type == ":" and self.game.lyz_samko_preko_follow and self.game.lyz_day_number == 4:
+            if self.lyz_samko_preko_follow_down > 0:
+                self.facing = "down"
+                self.movement()
+            elif self.lyz_samko_preko_follow_left > 0:
+                self.facing = "left"
+                self.movement()
+            else:
+                self.game.lyz_samko_preko_follow = False
+                self.facing = "down"
+                self.game.talking("Čo tu je?", True, GOLD)
+                pygame.time.delay(2500)
+                self.game.talking("Prečo tu som?", True, GOLD)
+                pygame.time.delay(1500)
+                self.rect.x = 99999
+                
         self.animate()
         
         # Collision
@@ -632,6 +652,7 @@ class Npc(pygame.sprite.Sprite):
         if self.facing == "left":
             if self.game.g_leave: self.go_left += 1
             elif self.game.lyz_samko_follow: self.lyz_samko_follow_count_left -= 1
+            elif self.game.lyz_samko_preko_follow: self.lyz_samko_preko_follow_left -= 1
             self.x_change -= NPC_SPEED
             self.movement_loop -= 1
             if self.type == "9": self.move_towards_player()
@@ -653,6 +674,7 @@ class Npc(pygame.sprite.Sprite):
         elif self.facing == "down":
             if self.game.g_leave: self.go_down += 1
             elif self.game.lyz_samko_follow: self.lyz_samko_follow_count_down -= 1 
+            elif self.game.lyz_samko_preko_follow: self.lyz_samko_preko_follow_down -= 1
             self.y_change += NPC_SPEED
             self.movement_loop += 1
             if self.type == "9": self.move_towards_player()

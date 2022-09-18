@@ -127,6 +127,7 @@ class Game:
         self.ski_suit: bool = True
         self.skied_four: bool = True
         self.enjoyed_show: bool = True
+        self.lyz_samko_follow_counter = 0
         # ...
         self.lyz_day_number: int = 1
         self.lyz_day = Lyziarsky(self, self.lyz_day_number)
@@ -295,6 +296,7 @@ class Game:
         # Variables for finding items/doing stuff
         self.lyz_samko_follow = False
         self.lyz_bratko_follow = False
+        self.lyz_samko_preko_follow = False
         self.key_in_trash: bool = True
         self.locked_locker: bool = True
         self.locked_changing_room: bool = True
@@ -1293,7 +1295,35 @@ class Game:
                             case 3:
                                 if self.lyz_day.third._has_all(): self.lyz_day.new_day()
                             case 4:
-                                if self.lyz_day.fourth._has_all(): self.lyz_day.new_day()
+                                if self.lyz_day.fourth._has_all():
+                                    if not self.lyz_samko_preko_follow and self.lyz_samko_follow_counter == 0:
+                                        self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+                                        self.lyz_in_room = self.samko_placement((5, 8))
+                                        self.lyz_in_room[3] = self.lyz_in_room[3].replace("P", ".")
+                                        lyz_room_coords_x, lyz_room_coords_y = self.all_sprites.sprites()[0].rect.x, self.all_sprites.sprites()[0].rect.y
+                                        self.create_tile_map(self.lyz_in_room)
+                                        self.lyz_samko_preko_follow = True
+                                        pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
+                                        self.draw(); self.update()
+
+                                        for _ in range(90):
+                                            for sprite in self.all_sprites: sprite.rect.y -= 3
+                                            pygame.time.delay(30)
+                                            self.draw(); self.update()
+                                        self.lyz_in_room = self.lyz_rooms[LYZ_ROOM]
+                                        self.lyz_in_room = self.samko_placement((2, 5))
+                                        self.player.facing = 'right'
+                                        self.create_tile_map(self.lyz_in_room)
+                                        self.player.rect.y = lyz_room_coords_y - TILE_SIZE // 2
+                                        self.player.rect.x = lyz_room_coords_x
+                                        
+                                        # Updates
+                                        self.draw(); self.update()
+                                        self.lyz_samko_follow_counter = 1
+                                        
+                                    else: 
+                                        self.lyz_day.new_day()
+                                        self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -3601,7 +3631,7 @@ class Game:
                     pygame.event.clear(eventtype=[pygame.KEYDOWN, pygame.KEYUP])
                     for _ in range(100):
                         for sprite in self.all_sprites: sprite.rect.y += 3
-                        pygame.time.wait(30)
+                        pygame.time.delay(30)
                         self.draw(); self.update()
                     self.lyz_samko_follow = True
                 
@@ -3613,7 +3643,7 @@ class Game:
                         self.draw(); self.update()
                     self.talking("Pod sem s tym reprakom!!", True, RED)
                     self.lyz_bratko_follow = True
-            
+                
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             if self.lyz_day_number != 3: self.talking("Anything can happen, but not me going here.")
             else:
