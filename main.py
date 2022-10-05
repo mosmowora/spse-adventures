@@ -3599,6 +3599,13 @@ class Game:
         elif self.player.facing == 'left' and self.interacted[1] == 8 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
             self.talking("What do you want?", True, BLUE)
             self.talking("Go to YOUR room.", True, BLUE)
+            if self.lyz_day_number == 5:
+                self.talking("You want to come here that badly?", True, BLUE)
+                self.talking("There really isn't anything left to see", True, BLUE)
+                self.talking("Whatevs...", True, BLUE)
+                # TODO add new room for the fifth day if player persists on getting into this room
+                # self.lyz_in_room = self.lyz_rooms[LYZ_FIFTH_REJECTED]
+                # self.create_tile_map()
         
         # Kitchen
         elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
