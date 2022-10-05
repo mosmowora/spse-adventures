@@ -274,14 +274,14 @@ class thirdDay:
             self.game.screen.blit(speaker_bar, (120, 80))
             self.game.screen.blit(speaker, (100, 185))
 
-            if repaired == 4: self.game.lyz_repair_speaker = False; repairing = False
+            if repaired == 4: self.game.lyz_repaired_speaker = False; repairing = False
             
             # Updates
             self.game.clock.tick(FPS)
             pygame.display.update()
             
             
-    def _has_all(self): return True if not self.game.repaired_bed and not self.game.lyz_repair_speaker and not self.game.cards else False
+    def _has_all(self): return True if not self.game.repaired_bed and not self.game.lyz_repaired_speaker and not self.game.cards else False
 
     def repair_bed(self):
         bg = pygame.image.load("img/speaker_room.jpg")
@@ -331,7 +331,7 @@ class thirdDay:
             
     def play_cards(self):
         
-        if self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SECOND] and not self.game.repaired_bed and not self.game.lyz_repair_speaker:
+        if self.game.lyz_in_room == self.game.lyz_rooms[LYZ_SECOND] and not self.game.repaired_bed and not self.game.lyz_repaired_speaker:
             result = start()
             return result
         

@@ -120,7 +120,7 @@ class Game:
         self.talked_with_teacher: bool = True
         # 3rd day
         self.lyz_bratko_count = 1
-        self.lyz_repair_speaker: bool = True
+        self.lyz_repaired_speaker: bool = True
         self.repaired_bed = True
         self.cards = True
         # 4th day
@@ -282,7 +282,7 @@ class Game:
         self.skied_two: bool = True
         self.talked_with_teacher: bool = True
         self.lyz_day_number: int = 1
-        self.lyz_repair_speaker = True
+        self.lyz_repaired_speaker = True
         self.repaired_bed = True
         self.cards = True
         self.ski_suit = True
@@ -1169,7 +1169,7 @@ class Game:
             self.talked_with_teacher = data['quests']['talked_with_teacher']
             self.lyz_day_number = data["quests"]["lyz_day"]
             self.repaired_bed = data["quests"]["repaired bed"]
-            self.lyz_repair_speaker = data["quests"]["repaired speaker"]
+            self.lyz_repaired_speaker = data["quests"]["repaired speaker"]
             self.cards = data["quests"]["cards"]
             self.ski_suit = data['quests']['ski suit']
             self.skied_four = data['quests']['skied four']
@@ -1281,7 +1281,7 @@ class Game:
                     case "Ladder": self.ladder()
                     case "Bag": 
                         if self.lyz_day_number == 1: self.lyz_day.first.unpack_things() 
-                        elif self.lyz_day_number == 3 and not self.lyz_repair_speaker: 
+                        elif self.lyz_day_number == 3 and not self.lyz_repaired_speaker and self.repaired_bed: 
                             self.lyz_day.third.repair_bed()
                             self.talking("That should be it...")
                             self.talking(f"Thanks {self.player_name}", True, GOLD)
@@ -1323,7 +1323,9 @@ class Game:
                                         
                                     else: 
                                         self.lyz_day.new_day()
+                                        print('Entered here in if')
                                         self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+                                        return
 
                 # Reset and multiple event entries fix
                 self.interacted = ["", "", ""]
@@ -1435,12 +1437,12 @@ class Game:
             # Close button
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and self.bought:
+                if event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and not self.bought:
                     previewing = False
                     self.lyz_created = True
                     self.create_tile_map()
                     self.camera.set_lyz_camera()
-                elif event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and not self.bought: pressed = True
+                elif event.type == pygame.MOUSEBUTTONDOWN and lyziarak_rect.collidepoint(mouse_pos) and self.bought: pressed = True
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: previewing = False; break
             
             
@@ -1463,7 +1465,7 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
             
-    def update_key(self) -> pygame.event.Event:
+    def update_key(self):
         updating = True
         while updating:
             
@@ -1486,7 +1488,6 @@ class Game:
         contents = list(self.controls.defaults.keys())
         bg.fill((0, 0, 0, 20))
         while viewing:
-            print(contents)
             e = Button(100, 150, 60, 60, fg=BLACK, bg=WHITE, content=contents[0], fontsize=32)
             i = Button(100, 220, 60, 60, fg=BLACK, bg=WHITE, content=contents[1], fontsize=32)
             n = Button(100, 290, 60, 60, fg=BLACK, bg=WHITE, content=contents[2], fontsize=32)
@@ -1641,7 +1642,7 @@ class Game:
         match self.lyz_day_number:
             case 1: return [x for x in (self.vybalenie, self.nap, self.friends) if not x]
             case 2: return [x for x in (self.ski_suit_on, self.skied_two, self.talked_with_teacher) if not x]
-            case 3: return [x for x in (self.lyz_repair_speaker, self.repaired_bed, self.cards) if not x]
+            case 3: return [x for x in (self.lyz_repaired_speaker, self.repaired_bed, self.cards) if not x]
             case 4: return [x for x in (self.enjoyed_show, self.skied_four, self.ski_suit) if not x]
             case _: return []
             
@@ -2621,7 +2622,7 @@ class Game:
                         "suit_on": self.ski_suit_on,
                         "skied_two": self.skied_two,
                         "talked_with_teacher": self.talked_with_teacher,
-                        "repaired speaker": self.lyz_repair_speaker,
+                        "repaired speaker": self.lyz_repaired_speaker,
                         "cards": self.cards,
                         "repaired bed": self.repaired_bed,
                         "ski suit": self.ski_suit,
@@ -3550,6 +3551,7 @@ class Game:
                 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
                 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
                 player = MediaPlayer("videos/sb.mp4.mp4")
+                pygame.mixer.Sound.stop(self.theme)
                 start_time = time.time()
                 
                 while True:
@@ -3572,6 +3574,7 @@ class Game:
                 cv2.destroyAllWindows()
                 self.enjoyed_show = False
                 self.lyz_in_room = self.lyz_rooms[LYZ_ROOM]
+                pygame.mixer.Sound.play(self.theme)
                 
             self.create_tile_map()
             self.camera.set_lyz_camera()
@@ -3622,7 +3625,7 @@ class Game:
             self.create_tile_map()
             self.camera.set_lyz_camera()
         
-        elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_in_room == lyz_room:
+        elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_in_room == self.lyz_rooms[LYZ_ROOM]:
             self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
             self.door_info("Bye guys", 'first')
             val = self.animations.animate()
@@ -3643,11 +3646,17 @@ class Game:
                         self.draw(); self.update()
                     self.talking("Pod sem s tym reprakom!!", True, RED)
                     self.lyz_bratko_follow = True
+        
+        elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_day_number == 5:
+            self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
+            self.door_info("Bye guys", 'first')
+            self.create_tile_map()
+            self.camera.set_lyz_camera()
                 
         elif self.player.facing == 'right' and self.interacted[1] == 12 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
             if self.lyz_day_number != 3: self.talking("Anything can happen, but not me going here.")
             else:
-                if self.lyz_repair_speaker: 
+                if self.lyz_repaired_speaker: 
                     self.talking("So... what do you need?")
                     self.talking("This speaker suddenly stopped working.", True, GOLD)
                     self.talking("I'll look at it.")
@@ -3666,7 +3675,7 @@ class Game:
         elif self.player.facing == 'up' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
             self.talking("Where next?")
             self.center_player_after_doors()
-        
+            
     def ground_floor_doors(self):
         """
         Doors on the ground floor
@@ -4662,7 +4671,7 @@ class Game:
                     self.player.player_skin()
                     # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
             
-            elif self.lyz_created and self.interacted[2] in (1, 2, 7, 8) and self.interacted[1] in (8, 9, 11, 13):
+            elif self.lyz_created and self.interacted[2] in (1, 2, 7, 8) and self.interacted[1] in (8, 9, 11, 13) and self.lyz_day_number == 3 and not self.repaired_bed and not self.lyz_repaired_speaker:
                 self.talking("This is a duel type of a card game", True, GOLD)
                 self.talking("I highly suggest you saving the game now if you ever wanted", True, GOLD)
                 self.talking("... to play cards again", True, GOLD)
@@ -4675,6 +4684,7 @@ class Game:
                 no = Button(WIN_WIDTH // 2 + 40, WIN_HEIGHT // 2 - 60, 80, 60, fg=WHITE, bg=BLACK, content="NO", fontsize=32)
                 answer = False
                 pressed = False
+                hunting = False
                 answering = True
                 
                 while answering:
@@ -4691,8 +4701,10 @@ class Game:
                 
                     if yes.is_pressed(mouse_pos, mouse_pressed) and not pressed:
                         pressed = True
+                        hunting = True
                         self.talking("Happy hunting then!", True, GOLD)
                         self.talking("Come back once you're ready, we'll be waiting on you.", True, GOLD)
+                        return
                     
                     elif no.is_pressed(mouse_pos, mouse_pressed) and not pressed:
                         pressed = True
@@ -4715,10 +4727,10 @@ class Game:
                                 self.screen.blit(self.small_font.render(rule, True, WHITE), (0, 30 + rules.index(rule)*30))
                             else:
                                 self.screen.blit(self.font.render(rule, True, WHITE), (200, 30 + rules.index(rule)*30))
-                    if not answer and not pressed:
+                    if not answer and not hunting:
                         self.screen.blit(yes.image, yes.rect)
                         self.screen.blit(no.image, no.rect)
-                    elif pressed:
+                    elif pressed and not hunting:
                         yes.rect.center = (WIN_WIDTH // 2 - 80, WIN_HEIGHT // 2 + 150)
                         no.rect.center = (WIN_WIDTH // 2 + 40, WIN_HEIGHT // 2 + 150)
                         self.screen.blit(yes.image, yes.rect)
@@ -4730,6 +4742,10 @@ class Game:
                         result = self.lyz_day.third.play_cards()
                         self.cards = result
                         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+                        return
+                    
+                    elif answer and no.is_pressed(mouse_pos, mouse_pressed):
+                        self.talking("Well, you know where to find us", True, GOLD)
                         return
                                             
                     # Updates
