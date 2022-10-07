@@ -3509,6 +3509,19 @@ class Game:
         # Finished skiing
         if self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP] and self.all_sprites.sprites()[0].rect.y in range(-1290, -1260):
             self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+            if self.lyz_day_number == 4:
+                wathing = True
+                while wathcing:
+                    
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                            watching = False
+                            
+                    self.screen.blit(pygame.image.load("img/marko_face.jpg", (0,0)))
+                            
+                    # Updates
+                    pygame.clock.tick(FPS)
+                    pygame.display.update()
             self.create_tile_map()
             for sprite in self.all_sprites:
                 sprite.rect.x -= 78 * TILE_SIZE
@@ -4676,7 +4689,19 @@ class Game:
                     self.info("You've recieved a photo.", GREEN)
                     self.talked_with_teacher = False
                     self.player.player_skin()
-                    # FIXME add a class photo of a destroyed snowman for memories (EASTER EGG)
+                    watching: bool = True
+                    img = pygame.image.load("img/destroyed_snowman.jpg")
+                    while watching:
+                        
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                                watching = False
+                            
+                        self.screen.blit(img, (WIN_WIDTH//2 - img.get_width()//2, WIN_HEIGHT//2 - img.get_height()//2))
+                        
+                        # Updates
+                        self.clock.tick(FPS)
+                        pygame.display.update()
             
             elif self.lyz_created and self.interacted[2] in (1, 2, 7, 8) and self.interacted[1] in (8, 9, 11, 13) and self.lyz_day_number == 3 and not self.repaired_bed and not self.lyz_repaired_speaker:
                 self.talking("This is a duel type of a card game", True, GOLD)
