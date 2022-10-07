@@ -1697,10 +1697,10 @@ class Game:
                     case 4:
                         if not self.ski_suit: self.smart_watch_logic(smart_watch, time='7')
                         elif not self.skied_four: self.smart_watch_logic(smart_watch, time='16')
-                        else: self.smart_watch_logic(smart_watch, time='6')
+                        elif not self.enjoyed_show: self.smart_watch_logic(smart_watch, time='22')
                         open_inventory = False
-                    case _: 
-                        self.smart_watch_logic(smart_watch)
+                    case _:
+                        self.smart_watch_logic(smart_watch, time='©©:©©')
                         open_inventory = False
 
             else:
@@ -2038,7 +2038,7 @@ class Game:
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
         watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
         if len([x for x in (self.vybalenie, self.nap) if not x]) == 2 and self.lyz_day_number == 1: watch_time = self.settings_font.render("18:"+strftime("%R").split(":")[1], True, WHITE)
-        elif time is not None: watch_time = self.settings_font.render(time+':'+strftime("%R").split(":")[1], True, WHITE)
+        elif time is not None: watch_time = self.settings_font.render(time+":"+strftime("%R").split(":")[1] if ":" not in time else time, True, WHITE)
             
 
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
@@ -3509,20 +3509,20 @@ class Game:
         # Finished skiing
         if self.lyz_in_room == self.lyz_rooms[LYZ_SKI_MAP] and self.all_sprites.sprites()[0].rect.y in range(-1290, -1260):
             self.lyz_in_room = self.lyz_rooms[OUTSIDE]
+            self.create_tile_map()
             if self.lyz_day_number == 4:
-                wathing = True
-                while wathcing:
+                watching = True
+                while watching:
                     
                     for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                             watching = False
                             
-                    self.screen.blit(pygame.image.load("img/marko_face.jpg", (0,0)))
+                    self.screen.blit(pygame.image.load("img/marko_face.jpg"), (80,0))
                             
                     # Updates
-                    pygame.clock.tick(FPS)
+                    self.clock.tick(FPS)
                     pygame.display.update()
-            self.create_tile_map()
             for sprite in self.all_sprites:
                 sprite.rect.x -= 78 * TILE_SIZE
                 sprite.rect.y -= 34 * TILE_SIZE
