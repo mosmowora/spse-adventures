@@ -21,7 +21,7 @@ class SaveProgress():
     dlc_bought: bool
     grades: dict[str, int]
     controls: dict[str, int]
-    settings: dict[str, bool | int] = None
+    settings: dict[str, bool | int] = {}
     
     @staticmethod
     def load_data(name: str):
@@ -58,4 +58,4 @@ class SaveProgress():
         # No profile for u big man
         if not has_profile: 
             loaded_data.append(write_data)
-            firedatabase.push_data(loaded_data, write_data['name'])
+            firedatabase.push_data(loaded_data, write_data["name"])

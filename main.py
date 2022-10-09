@@ -188,9 +188,6 @@ class Game:
                 webbrowser.open('https://aeternix-forum.herokuapp.com/releases/')
                 sys.exit()
             else: sys.exit()
-    
-    def get_name(self):
-        return self.player_name
         
     def encode_password(self, password: str): 
         password = base64.b85encode(password.encode('utf-8')).decode('utf-8')
@@ -3579,7 +3576,7 @@ class Game:
                     elapsed = (time.time() - start_time) * 1000  # msec
                     play_time = int(cap.get(cv2.CAP_PROP_POS_MSEC))
                     sleep = max(1, int(play_time - elapsed))
-                    if cv2.waitKey(sleep) & 0xFF == ord('q'):
+                    if cv2.waitKey(sleep) & 0xFF == ord('q'): 
                         break
                     
                 player.close_player()
