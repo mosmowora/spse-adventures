@@ -21,7 +21,7 @@ class SaveProgress():
     dlc_bought: bool
     grades: dict[str, int]
     controls: dict[str, int]
-    settings: dict[str, bool | int] = {}
+    settings: dict[str, bool | int] = None
     
     @staticmethod
     def load_data(name: str):

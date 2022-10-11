@@ -76,7 +76,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_ski_map, lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_ski_map, lyz_reject_room, lyz_fifa_room, lyz_diner]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -819,7 +819,7 @@ class Game:
             else: tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
-                    Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room') else Ground(self, j, i)
+                    Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room') else Ground(self, j, i)
                     if column == '´': Ground(self, j, i, dirt=True)
                     if column == "↨": Ground(self, j, i, carpet=True)
                     elif column == "P": self.player = Player(self, j, i) # Player
@@ -3246,7 +3246,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        if room_number not in ('outside', 'diner', 'ground', 'first', 'second', 'room'): self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room'): self.saved_room_data = room_number
         else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
@@ -3612,10 +3612,10 @@ class Game:
             if self.lyz_day_number == 5:
                 self.talking("You want to come here that badly?", True, BLUE)
                 self.talking("There really isn't anything left to see", True, BLUE)
-                self.talking("Whatevs...", True, BLUE)
-                # TODO add new room for the fifth day if player persists on getting into this room
-                # self.lyz_in_room = self.lyz_rooms[LYZ_FIFTH_REJECTED]
-                # self.create_tile_map()
+                self.door_info('Whatevs...', 'rejected_room')
+                self.lyz_in_room = self.lyz_rooms[LYZ_REJECT_ROOM]
+                self.create_tile_map()
+                self.camera.set_lyz_camera()
         
         # Kitchen
         elif self.player.facing == 'left' and self.interacted[1] == 12 and self.interacted[2] == 0 and self.lyz_in_room == lyz_ground:
@@ -3626,7 +3626,7 @@ class Game:
                 self.player.player_skin()
             
         # Classmates
-        elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground:
+        elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground and self.lyz_day_number != 5:
             self.talking("Bring us food and you can play FIFA with us.", True, BLUE)
         
         elif self.player.facing == 'left' and self.interacted[1] == 4 and self.interacted[2] == 0 and self.lyz_in_room == lyz_first:
@@ -3664,6 +3664,7 @@ class Game:
                     self.talking("Pod sem s tym reprakom!!", True, RED)
                     self.lyz_bratko_follow = True
         
+        # for the fifth day, works just like the one above ↑
         elif self.player.facing == 'up' and self.interacted[1] == 0 and self.interacted[2] == 8 and self.lyz_day_number == 5:
             self.lyz_in_room = self.lyz_rooms[LYZ_FIRST]
             self.door_info("Bye guys", 'first')
@@ -3682,8 +3683,37 @@ class Game:
                 else: self.talking("Anything can happen, but not me going here.")
             
         elif self.player.facing == 'right' and self.interacted[1] == 5 and self.interacted[2] == 9 and self.lyz_in_room == lyz_first:
-            self.talking("Samko lives here.")
+            self.talking("HE lives here.")
             
+        elif self.player.facing == 'right' and self.interacted[1] == 32 and self.interacted[2] == 1 and self.lyz_in_room == lyz_reject_room:
+            self.door_info("Well nothing's really here", 'ground')
+            self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
+            self.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.y -= 2 * TILE_SIZE
+                sprite.rect.x += 8 * TILE_SIZE
+            self.player.rect.y += 7 * TILE_SIZE
+            self.player.rect.x -= 4 * TILE_SIZE
+            
+        elif self.player.facing == 'right' and self.interacted[1] == 7 and self.interacted[2] == 9 and self.lyz_in_room == lyz_ground and self.lyz_day_number == 5:
+            self.door_info('Brought you the food', 'fifa_room')
+            self.lyz_in_room = self.lyz_rooms[LYZ_FIFA_ROOM]
+            self.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.y += TILE_SIZE
+                sprite.rect.x += 8 * TILE_SIZE
+        
+        elif self.player.facing == 'left' and self.interacted[1] == 4 and self.interacted[2] == 0 and self.lyz_in_room == lyz_fifa_room and self.lyz_day_number == 5:
+            self.door_info('Good game bois', 'ground')
+            self.lyz_in_room = self.lyz_rooms[LYZ_GROUND]
+            self.create_tile_map()
+            for sprite in self.all_sprites:
+                sprite.rect.y += TILE_SIZE
+                sprite.rect.x += TILE_SIZE
+            self.player.rect.y += 6 * TILE_SIZE
+            self.player.rect.x += 3 * TILE_SIZE
+            
+        
         elif self.player.facing == 'down' and self.interacted[1] == 6 and self.interacted[2] in (4, 5) and self.lyz_in_room == lyz_second:
             self.talking("We're getting into untapped territory.")
             if not self.nap and not self.vybalenie and self.lyz_day_number == 1: self.lyz_day.first.with_friends()
@@ -5295,8 +5325,8 @@ class Game:
     def stairs(self):
         """
         Going up/down the stairs \n
-        self.interacted[2] = x coordinates\n
-        self.interacted[1] = y coordinates
+        self.interacted[2] = x coords\n
+        self.interacted[1] = y coords
         """
         
         if self.lyz_created:

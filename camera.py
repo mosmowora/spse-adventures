@@ -507,4 +507,14 @@ class Camera:
                 for sprite in self.game.all_sprites:
                     sprite.rect.y += 6 * TILE_SIZE
                     sprite.rect.x += TILE_SIZE
+            
+            case 'rejected_room':
+                for sprite in self.game.all_sprites:
+                    sprite.rect.y += 2 * TILE_SIZE
+                    sprite.rect.x -= 11 * TILE_SIZE
+            
+            case 'fifa_room':
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x += 8 * TILE_SIZE
+                    sprite.rect.y += 3 * TILE_SIZE
                     
