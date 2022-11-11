@@ -1363,7 +1363,7 @@ class Quest:
     def haram(self):
         """
         Haramgozo likes to bully his students\n
-        Sometimes the answer is weird (2.7800000000000002 i.e) Idk why. pls fix :pray:
+        Sometimes the answer is weird (2.7800000000000002 i.e)
         """
 
         pygame.mixer.Sound.play(self.game.wrong_house)

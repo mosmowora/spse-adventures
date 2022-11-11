@@ -1,23 +1,31 @@
 # Imports
 import base64
-import sys, cv2
+import getpass
+import random as r
+import sys
 import time
+import webbrowser
+from time import strftime
 from tkinter import messagebox
 from types import NoneType
 from typing import Literal
-import webbrowser
+
+import cv2
 import numpy as np
-import pygame, random as r, getpass, requests
-from leaderboard import Leaderboard
-from lyz import Lyziarsky, Cinematic
-from quest import Quest
-from controls import Controls
-from save_progress import SaveProgress
-from camera import Camera
+import pygame
+import requests
 from bs4 import BeautifulSoup as bs
-from time import strftime
 from ffpyplayer.player import MediaPlayer
-from sprites import *; from config import *
+
+from camera import Camera
+from config import *
+from controls import Controls
+from leaderboard import Leaderboard
+from lyz import Cinematic, Lyziarsky
+from quest import Quest
+from save_progress import SaveProgress
+from sprites import *
+
 
 class Game:
     """
@@ -33,10 +41,10 @@ class Game:
         pygame.init()
         
         # Game version
-        web = requests.get('https://aeternix-forum.herokuapp.com/releases/')
-        soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split("v")[-1] if web.status_code != 503 else None
-        self.__LOCAL_VERSION__ = float(open('version_info.txt', 'r').read())
-        self.__REMOTE_VERSION__ = float(soup) if soup is not None else self.__LOCAL_VERSION__
+        # web = requests.get('https://aeternix-forum.herokuapp.com/releases/')
+        # soup = bs(web.text, 'html.parser').find('main').find_next('main').find_next('div').find_next('h1').text.split("v")[-1] if web.status_code != 503 else None
+        self.__LOCAL_VERSION__ = 1.21 # float(open('version_info.txt', 'r').read())
+        self.__REMOTE_VERSION__ = 1.21 # float(soup) if soup is not None else self.__LOCAL_VERSION__
         
         # Screen, time, font, running
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
@@ -1364,10 +1372,10 @@ class Game:
 
         if "ladder" not in self.inv.keys():
             self.inv["ladder"] = "img/ladder.png"
-            self.talking("I might need this ladder. Yoink.")
+            self.talking("I might need this ladder.")
             self.talking("How did I managed to put that in my pocket?")
         
-        else: self.talking("There sure is a lot of ladders down here.")
+        else: self.talking("There sure are a lot of ladders down here.")
 
     def routering(self):
         """
@@ -1643,7 +1651,7 @@ class Game:
             case 4: return [x for x in (self.enjoyed_show, self.skied_four, self.ski_suit) if not x]
             case _: return []
             
-    def grab_notes(self) -> tuple[Literal[''], Literal[-1]] | tuple[list[str], list[int]]:
+    def grab_notes(self):
         match self.lyz_day_number:
             case 1:
                 notes_for_day = list(self.lyz_day.first.notes.values())
@@ -1681,6 +1689,9 @@ class Game:
 
             if self.lyz_created:
                 match self.lyz_day_number: 
+                    case 1:
+                        if not self.vybalenie: self.smart_watch(smart_watch, time='14')
+                        elif not self.nap: self.smart_watch(smart_watch, time='18')
                     case 2:
                         if not self.skied_two: self.smart_watch_logic(smart_watch, time='14')
                         elif not self.ski_suit_on: self.smart_watch_logic(smart_watch, time='8')
@@ -1739,11 +1750,15 @@ class Game:
                 # Items in inv
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for i in inventory_coords:
-                        if inventory_coords[i].collidepoint(event.pos): open_inventory = self.inventory_item_info(i); break
+                        if inventory_coords[i].collidepoint(event.pos): 
+                            open_inventory = self.inventory_item_info(i)
+                            break
 
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
+            self.update()
+            # self.draw()
                          
     def inventory_item_info(self, img: str):
         """
@@ -1784,6 +1799,7 @@ class Game:
             case "img/vujcheek fender.png": self.info("That old geezer can't touch me with this.", BRITISH_WHITE, 90) # Vujcheek fender
             case "img/ladder.png": self.info("I still don't know how I put it in my pocket.", BRITISH_WHITE, 90) # Ladder
 
+        self.draw()
         return True
 
     def show_kokosky(self, img: str):
@@ -3288,7 +3304,7 @@ class Game:
         # In changing room
         if self.interacted[1] == 13 and self.interacted[2] == 165 and self.in_room == self.rooms[GROUND_FLOOR]:
             self.talking("There's paper on the side of the trashcan.")
-            self.talking("It says 2.SA. You agree with this statement.")
+            # self.talking("It says 3.SA. You agree with this statement.")
 
             # Key in trash
             if self.key_in_trash: 
@@ -3343,7 +3359,7 @@ class Game:
         elif self.interacted[1] == 13 and self.interacted[2] == 163 and self.in_room == self.rooms[GROUND_FLOOR] and self.referat:
                 self.talking("OMG!")
                 self.talking("Why would someone throw this in the trash")
-                self.talking("It's someone's OBN referat")
+                # self.talking("It's someone's OBN referat")
                 self.inv["referat"] = "img/referat.png"
                 self.referat = False
 
@@ -3622,7 +3638,7 @@ class Game:
             if self.lyz_day_number % 2 != 0: self.talking("Hmmm... a kitchen, but I don't have keys to open it.") 
             elif self.ski_suit_on or self.ski_suit: 
                 self.talking("Finally time to go ski")
-                self.lyz_day.second.grab_suit() if self.lyz_day_number == 2 else self.lyz_day.fourth.grab_suit()
+                self.lyz_day.second.grab_suit() if self.lyz_day_number == 2 and self.skied_two or self.skied_four else self.lyz_day.fourth.grab_suit()
                 self.player.player_skin()
             
         # Classmates
@@ -3833,7 +3849,7 @@ class Game:
         elif self.player.facing == "up" and self.interacted[1] == 20 and self.interacted[2] == 33: self.door_info("Hall", "Hall"); self.center_player_after_doors()
 
         # Toilet room -> Stall
-        elif self.player.facing == "up" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.talking("PeePeePooPoo time"); self.center_player_after_doors()
+        elif self.player.facing == "up" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
 
         # Stall -> Toilet room
         elif self.player.facing == "down" and self.interacted[1] == 24 and self.interacted[2] in (37, 39): self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
@@ -3946,7 +3962,7 @@ class Game:
         elif self.player.facing == "left" and self.interacted[2] == 166 and self.interacted[1] == 12: self.door_info("Toilets", "Toilets_1"); self.center_player_after_doors()
         
         # Toilets -> Stall
-        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("PeePeePooPoo Time"); self.center_player_after_doors()
+        elif self.player.facing == "down" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("Don't forget to wash yo hands"); self.center_player_after_doors()
 
         # Stall -> Toilets
         elif self.player.facing == "up" and self.interacted[2] == 161 and self.interacted[1] == 13: self.talking("Don't forget to wash your hands"); self.center_player_after_doors()
@@ -4296,7 +4312,7 @@ class Game:
 
                 # Before test 
                 if self.mat_test: 
-                    self.talking("LIA is just standing here.")
+                    self.talking("That teacher is just standing here.")
                     self.talking("MENACINGLY!")
                     self.talking("Oh, hey {}, fancy seeing you here.".format(self.player_name), True, LIGHTBLUE)
                     self.talking("School work can't be postponed.", True, LIGHTBLUE)
@@ -4398,7 +4414,7 @@ class Game:
                         self.talking("Can you bring me chalks for the next lesson?", True)
                         self.talking("Thanks in advance", True)
                         self.talking("They should be in the first floor cabinet", True)
-                        self.talking("On the right that is...", True)
+                        self.talking("On the right side...", True)
 
                     # Yes chalks
                     elif "chalks" in list(self.inv.keys()):
@@ -4439,7 +4455,7 @@ class Game:
                 # Resistor
                 if self.resistor:
                     self.talking("It's time for your AEN test today.", True, BLUE)
-                    self.talking("I Hope you studied resistors yesterday.", True, BLUE)
+                    self.talking("I hope you studied resistors yesterday.", True, BLUE)
                     self.grades["AEN"] = self.quest.resistor()
                     self.draw(); self.update()
 
@@ -4463,7 +4479,7 @@ class Game:
             if self.interacted[2] == 188 and self.interacted[1] == 13:
 
                 # Already talked
-                if not self.nepusti: self.talking("Would you like to learn more about Sie?", True)
+                if not self.nepusti: self.talking("Would you like to learn more about SIE?", True)
 
                 # Not yet done
                 elif self.nepusti:
@@ -4575,7 +4591,7 @@ class Game:
                 if self.osy:
                     self.talking("Oh, hey there", True, YELLOW)
                     self.talking("I wasn't planning to give you a test today", True, YELLOW)
-                    self.talking("But while you're here", True, YELLOW)
+                    self.talking("But since you're here", True, YELLOW)
                     self.talking("I think I should.", True, YELLOW)
                     osy_test = self.quest.bash()
                     if isinstance(osy_test, int): self.osy = not self.osy; self.grades["OSY"] = osy_test; self.talking("You can't leave without a mark", True, YELLOW)
@@ -4588,7 +4604,7 @@ class Game:
                     elif self.grades["OSY"] == 3: self.talking("You have a lot to learn, but I'll give you a 3.", True, YELLOW)
 
                 # When quest completed
-                else: self.talking("Hi, leave me alone i need to", True, YELLOW); self.talking("install Linux on this machine", True, YELLOW)
+                else: self.talking("Hi, leave me alone I need to", True, YELLOW); self.talking("install Linux on this machine", True, YELLOW)
                 
             # Kôňtura
             elif self.interacted[2] == 21 and self.interacted[1] == 3: 
@@ -4598,7 +4614,7 @@ class Game:
                     self.talking(f"Hello student {self.player_name},", True, BLUE)
                     self.talking("you missed the last lesson", True, BLUE)
                     self.talking("I have a test for you", True, BLUE)
-                    self.talking("you have to take it or else you'll recieve an a.", True, BLUE)
+                    self.talking("you have to take it or else you'll recieve a 5.", True, BLUE)
                     iot_test = self.quest.iotest()
                     if isinstance(iot_test, int): self.grades["IOT"] = iot_test
                     else: self.talking("I need you to do this test later", True, BLUE); return
@@ -4619,7 +4635,7 @@ class Game:
             # Haramgozo
             elif self.interacted[2] == 8 and self.interacted[1] == 28: 
                 self.talking("Ohm's law is used to calculate....", True, RED)
-                self.talking("I rather leave him be.")
+                self.talking("I better leave him be.")
             
             # Mohyla
             elif self.interacted[2] == 190 and self.interacted[1] == 19:
@@ -4944,7 +4960,7 @@ class Game:
             if not looking and "phone" not in self.inv.keys():
                 self.draw(); self.update()
                 self.talking("Crap, I don't have my phone with me.")
-                self.talking("I think I left it somewhere in our class.")
+                self.talking("I think I left it somewhere in room 201.")
                 self.info("Find your iPhone", GREEN)
 
             # Updates
