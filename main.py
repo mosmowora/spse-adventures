@@ -1727,7 +1727,6 @@ class Game:
                         
                         # Inventory coords for items
                         inventory_coords[self.inv[i]] = rect
-
                         m += 1
                     n += 1
                     if n == max_items: break
@@ -1742,10 +1741,20 @@ class Game:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.KEYDOWN and event.key == self.controls.defaults[list(self.controls.defaults.keys())[1]]: open_inventory = False; break
 
                 # Right arrow
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: max_items += 7; min_items += 7; inventory_coords = {}
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and len(self.inv.keys()) > max_items: 
+                    max_items += 7
+                    min_items += 7
+                    inventory_coords = {}
+                    self.update()
+                    self.draw()
 
                 # Left arrow
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: max_items -= 7; min_items -= 7; inventory_coords = {}
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and min_items != 0: 
+                    max_items -= 7
+                    min_items -= 7
+                    inventory_coords = {}
+                    self.update()
+                    self.draw()
                 
                 # Items in inv
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1757,8 +1766,6 @@ class Game:
             # Updates
             self.clock.tick(FPS)
             pygame.display.update()
-            self.update()
-            # self.draw()
                          
     def inventory_item_info(self, img: str):
         """
