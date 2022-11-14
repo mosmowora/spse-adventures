@@ -162,8 +162,6 @@ class Game:
         self.tsv_theme.set_volume(0.05)
         self.fall = pygame.mixer.Sound("sounds/fall.mp3")
         self.fall.set_volume(0.25)
-        self.car = pygame.mixer.Sound("sounds/car.mp3")
-        self.car.set_volume(0.1)
         self.lost = pygame.mixer.Sound("sounds/lost.mp3")
         self.lost.set_volume(0.5)
         self.lock = pygame.mixer.Sound("sounds/lock.mp3")
@@ -2713,7 +2711,6 @@ class Game:
             car_dead = pygame.image.load("img/car_dead.png")
             car_oops_move = -270
             car_dead_move = -700
-            if self.music_on: pygame.mixer.Sound.play(self.car, -1)
 
         # Lost 
         elif img == "img/lost.png" and self.music_on: pygame.mixer.Sound.play(self.lost, -1)
@@ -2745,7 +2742,8 @@ class Game:
             if restart_button.is_pressed(mouse_pos, mouse_pressed): 
                 if end: 
                     if img not in all_endings: self.endings.append(img[4:-4]) # Appends the name of the ending intead of the actual image
-                    self.reseting_game_values(); self.save_game(); self.intro_screen().new("new").main()
+                    try: self.reseting_game_values(); self.save_game(); self.intro_screen().new("new").main()
+                    except Exception: self.reseting_game_values(); self.save_game(); self.intro_screen().new("new").main()
                 else: self.new("old").main()
 
             # Save & Quit button
@@ -2779,8 +2777,7 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
-        if img == "img/window_fail.png": pygame.mixer.Sound.stop(self.car)
-        elif img == "img/lost.png": pygame.mixer.Sound.stop(self.lost)
+        if img == "img/lost.png": pygame.mixer.Sound.stop(self.lost)
 
     def intro_screen(self):
         """
@@ -3501,7 +3498,10 @@ class Game:
 
             # Main menu button
             self.screen.blit(main_menu_button.image, main_menu_button.rect)
-            if main_menu_button.is_pressed(mouse_pos, mouse_pressed): self.endings.append("canon_ending") if "canon_ending" not in self.endings else None; self.reseting_game_values(); self.save_game(); pygame.mixer.Sound.stop(self.theme); self.intro_screen().new("old").main()
+            if main_menu_button.is_pressed(mouse_pos, mouse_pressed): 
+                self.endings.append("canon_ending") if "canon_ending" not in self.endings else None
+                self.reseting_game_values(); self.save_game()
+                pygame.mixer.Sound.stop(self.theme); self.intro_screen().new("old").main()
 
             # Updates
             self.clock.tick(FPS)
