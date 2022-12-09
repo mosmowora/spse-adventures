@@ -1688,8 +1688,9 @@ class Game:
             if self.lyz_created:
                 match self.lyz_day_number: 
                     case 1:
-                        if not self.vybalenie: self.smart_watch(smart_watch, time='14')
-                        elif not self.nap: self.smart_watch(smart_watch, time='18')
+                        if not self.vybalenie: self.smart_watch_logic(smart_watch, time='14'); open_inventory = False
+                        elif not self.nap: self.smart_watch_logic(smart_watch, time='18'); open_inventory = False
+                        else: self.smart_watch_logic(smart_watch, time='10'); open_inventory = False
                     case 2:
                         if not self.skied_two: self.smart_watch_logic(smart_watch, time='14')
                         elif not self.ski_suit_on: self.smart_watch_logic(smart_watch, time='8')
@@ -2073,7 +2074,7 @@ class Game:
                 
                 elif event.type == pygame.KEYDOWN:
                     if event.key in (pygame.K_ESCAPE, self.controls.defaults[list(self.controls.defaults.keys())[1]]):
-                        # Moving the watch / animation for it
+                        # Animation for the watch
                         while smart_watch_rect.x >= WIN_WIDTH // 2 - 580:
                             smart_watch_rect.x -= x * 2
                             watch_time_rect.x -= x * 2
