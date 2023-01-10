@@ -821,8 +821,9 @@ class Game:
 
         # Creating sprites
         if self.lyz_created:
-            if room is not None: tmp_room = room
+            if room is not None: tmp_room: list[str] = room
             else: tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
+            if self.lyz_day_number == 5: tmp_room[46] = tmp_room[46][0:45] + tmp_room[46][46].replace(".", "╩", 1) + tmp_room[46][47:]
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room') else Ground(self, j, i)
@@ -923,6 +924,7 @@ class Game:
                     elif column == "◙": self.interactive[Block(self, j, i, "◙")] = "◙" + str(i) + str(j) # Desk with TV
                     elif column == "♀": self.interactive[Block(self, j, i, "♀")] = "♀" + str(i) + str(j) # Flags for skiing
                     elif column == "♪": self.interactive[Block(self, j, i, "♪")] = "♪" + str(i) + str(j) # Rocks
+                    elif column == "╩": self.interactive[Block(self, j, i, "╩")] = "╩" + str(i) + str(j) # Snowman
                     elif column == "N": self.interactive[Npc(self, j, i, "")] = "N" + str(i) + str(j) # NPC
                     elif column == ":": self.interactive[Npc(self, j, i, ":")] = ":" + str(i) + str(j) # Samko NPC
                     elif column == "K": self.interactive[Npc(self, j, i, "K")] = "K" + str(i) + str(j) # Kacka

@@ -848,7 +848,7 @@ class Block(pygame.sprite.Sprite):
         """
 
         # Interactible blocks
-        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "]", "^"]
+        inter = ["L", "Ľ", "ľ", "D", "G", "B", "h", "t", "T", "Ť", "S", "Z", "s", "z", "b", "d", "O", "o", "ó", "Ó", "é", "y", "Y", "g", "w", "E", "ý", "ž", "č", "ú", "ň", "@", "#", "*", "A", "3", "4", "5", "6", "7", "8", "ä", "ď", "▬", "∟", "↔", "[", "]", "^", "╩"]
 
         self.game = game
         self.type = type
@@ -960,6 +960,7 @@ class Block(pygame.sprite.Sprite):
         elif type == "♂": self.image = self.game.terrain_spritesheet.get_sprite(602, 2, self.width, self.height)
         elif type == "♀": self.image = self.game.terrain_spritesheet.get_sprite(602, 36, self.width, self.height)
         elif type == "♪": self.image = self.game.terrain_spritesheet.get_sprite(603, 70, self.width, self.height)
+        elif type == "╩": self.image = self.game.terrain_spritesheet.get_sprite(500, 106, self.width, self.height)
         
 
         self.rect = self.image.get_rect()
