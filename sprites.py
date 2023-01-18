@@ -998,7 +998,6 @@ class Blockade(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-
 class Ground(pygame.sprite.Sprite):
     """
     Class for ground
@@ -1083,7 +1082,6 @@ class Banana(pygame.sprite.Sprite):
             if "bananok" in self.game.inv.keys(): self.game.number_bananok += 1
             else: self.game.inv["bananok"] = "img/bananok.png"; self.game.number_bananok += 1
             self.game.bananky_on_ground[self.floors[self.game.rooms.index(self.game.in_room)]][str(int(self.x / TILE_SIZE)) + str(int(self.y / TILE_SIZE))] = False
-
 
 class Interact(pygame.sprite.Sprite):
     """
@@ -1198,6 +1196,9 @@ class Interact(pygame.sprite.Sprite):
 
                     # Unpacking things
                     elif self.interactive[hits[0]] == "[" + str(i) + str(j): self.game.interacted = ["Bag", i, j]
+                    
+                    # Snowman
+                    elif self.interactive[hits[0]] == "╩" + str(i) + str(j): self.game.interacted = ["Snowman", i, j]; print(j, i)
                     
                     # Napping
                     elif self.interactive[hits[0]] == "^" + str(i) + str(j): self.game.interacted = ["Nap", i, j]

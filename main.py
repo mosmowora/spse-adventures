@@ -808,7 +808,7 @@ class Game:
         # Grader
         self.grades: dict[str, int] = {}
 
-    def create_tile_map(self, room: List[str] = None):
+    def create_tile_map(self, room: List[str] = None, regenerate: bool = False):
         """
         Creates tile map
         """
@@ -823,7 +823,7 @@ class Game:
         if self.lyz_created:
             if room is not None: tmp_room: list[str] = room
             else: tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
-            if self.lyz_day_number == 5: tmp_room[46] = tmp_room[46][0:45] + tmp_room[46][46].replace(".", "╩", 1) + tmp_room[46][47:]
+            if self.lyz_day_number == 5 and not regenerate: self.lyz_in_room = lyz_outside_modif.copy(); tmp_room = self.lyz_in_room.copy()
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room') else Ground(self, j, i)
@@ -1028,7 +1028,7 @@ class Game:
                     elif column == "p": self.npc.append(Npc(self, j, i, "p")) # People
                     elif column == "§" and self.lost_guy: self.npc.append(Npc(self, j, i, "§")) # Lost guy
                     elif column == "2" and self.bananky_on_ground[floors[self.rooms.index(self.in_room)]][str(j) + str(i)]: Banana(self, j, i) 
-
+        
     def talking_with_samko(self):
         samko_pos: list = []
         try: samko_pos = list(list(self.interactive.values())[list(map(lambda x: x[0], self.interactive.values())).index(":")])[1:]
@@ -1261,6 +1261,7 @@ class Game:
                     case "right": Interact(self, (self.player.rect.x + TILE_SIZE), self.player.rect.y, self.interactive) 
                 
                 # What was clicked
+                print(self.interacted)
                 match self.interacted[0].capitalize():
                     case "Trashcan": self.trashcan()
                     case "Door": self.door()
@@ -1283,6 +1284,7 @@ class Game:
                     case "Pult": self.quest.amper(self.amper_stuff)
                     case "Battery": self.batteries()
                     case "Flashlight": self.flashlight()
+                    case "Snowman": self.destroy_snowman()
                     case "Ladder": self.ladder()
                     case "Bag": 
                         if self.lyz_day_number == 1: self.lyz_day.first.unpack_things() 
@@ -4836,7 +4838,12 @@ class Game:
                     # Updates
                     self.clock.tick(FPS)
                     pygame.display.update()
-                        
+                              
+    def destroy_snowman(self):
+        print("INTERACTED")
+        # if self.interacted[2] == 46 and self.interacted[1] == 46:
+        #     self.create_tile_map(self.lyz_in_room, regenerate=True)
+           
     def shoes_on(self):
         """
         Checks if player has shoes on
@@ -5038,7 +5045,7 @@ class Game:
         Unlocking/going through door
         """
         # Lyziarsky doors (with creating tile map)
-        if self.lyz_in_room in self.lyz_rooms: self.lyz_doors()
+        if self.lyz_in_room in self.lyz_rooms or self.lyz_in_room[0][:] == self.lyz_rooms[OUTSIDE][0][:]: self.lyz_doors()
 
         # Ground floor
         if self.in_room == self.rooms[GROUND_FLOOR]: self.ground_floor_doors()
