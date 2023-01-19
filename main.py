@@ -84,7 +84,7 @@ class Game:
 
         self.rooms: List[List[str]] = [ground_floor, first_floor, second_floor, third_floor, fourth_floor, ending_hallway, basement]
         '''Rooms where player can go'''
-        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_ski_map, lyz_reject_room, lyz_fifa_room, lyz_diner]
+        self.lyz_rooms: List[List[str]] = [lyz_outside, lyz_ground, lyz_first, lyz_second, lyz_room, lyz_ski_map, lyz_reject_room, lyz_fifa_room, lyz_diner, lyz_outside_modif]
         '''Rooms where player can go in the Lyziarsky DLC'''
         self.in_room: List[str] = self.rooms[GROUND_FLOOR] 
         '''Floor where player is rn (starting point) that's ground floor for those who don't know'''
@@ -823,7 +823,7 @@ class Game:
         if self.lyz_created:
             if room is not None: tmp_room: list[str] = room
             else: tmp_room: List[str] = self.samko_placement() if self.lyz_in_room != self.lyz_rooms[LYZ_SKI_MAP] else self.lyz_in_room # Room with Samko
-            if self.lyz_day_number == 5 and not regenerate: self.lyz_in_room = lyz_outside_modif.copy(); tmp_room = self.lyz_in_room.copy()
+            if self.lyz_day_number == 5 and not regenerate: self.lyz_in_room = lyz_outside_modif.copy(); tmp_room = self.lyz_in_room.copy(); self.lyz_saved_room_data = 'outside_modif'
             for i, row in enumerate(tmp_room):
                 for j, column in enumerate(row):
                     Ground(self, j, i, snow=True) if self.lyz_saved_data not in ('diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room') else Ground(self, j, i)
@@ -3271,7 +3271,7 @@ class Game:
             pygame.display.update()
         self.update()
         self.draw()
-        if room_number not in ('outside', 'diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room'): self.saved_room_data = room_number
+        if room_number not in ('outside', 'diner', 'ground', 'first', 'second', 'room', 'rejected_room', 'fifa_room', 'outside_modif'): self.saved_room_data = room_number
         else: self.lyz_saved_data = room_number
               
     def talking(self, msg_content: str, change_color: bool = False, additional_color: tuple[int, int, int] = BRITISH_WHITE, g: bool = False, time: int = 0):
@@ -4841,7 +4841,7 @@ class Game:
                               
     def destroy_snowman(self):
         print("INTERACTED")
-        # if self.interacted[2] == 46 and self.interacted[1] == 46:
+        # if self.interacted[2] == 46 and self.interacted[1] == 47:
         #     self.create_tile_map(self.lyz_in_room, regenerate=True)
            
     def shoes_on(self):
