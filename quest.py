@@ -1259,6 +1259,7 @@ class Quest:
         b = False
         c = False
         d = False
+        grade = 5
 
         while ioting:
 

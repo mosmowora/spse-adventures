@@ -107,7 +107,7 @@ class Game:
         
         # Player name and password
         self.player_name: str = ""
-        self._password: str = ""
+        self._password: str = "P@ssw0rd.+"
         
         # Lyziarksy DLC variables
         self.bought: bool = True
@@ -2659,6 +2659,8 @@ class Game:
         
         # If the password is already encoded -> decode it first
         elif self._password != open('tfa.txt', 'r').read(): self._password = self.decode_password(self._password)
+        
+        # TODO: add option to request for password -> used in Aeternix Hub
         
         # Saving
         self.database = SaveProgress(self.player_name, 
