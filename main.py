@@ -194,19 +194,7 @@ class Game:
                 webbrowser.open('https://aeternix-forum.herokuapp.com/releases/')
                 sys.exit()
             else: sys.exit()
-        
-    def encode_password(self, password: str): 
-        password = base64.b85encode(password.encode('utf-8')).decode('utf-8')
-        return password
-    
-    def decode_password(self, password: str):
-        try:
-            password = base64.b85decode(password.encode('utf-8')).decode('utf-8')
-            return password
-        except UnicodeDecodeError:
-            password = self.encode_password(password)
-            password = base64.b85decode(password.encode('utf-8')).decode('utf-8')
-            return password
+
 
     def set_level_camera(self, level: List[str]):
         """
@@ -2657,14 +2645,12 @@ class Game:
         # Refreshing the password to it's original state for further encodings
         if self._password == "": self._password = open('tfa.txt', 'r').read()
         
-        # If the password is already encoded -> decode it first
-        elif self._password != open('tfa.txt', 'r').read(): self._password = self.decode_password(self._password)
         
         # TODO: add option to request for password -> used in Aeternix Hub
         
         # Saving
         self.database = SaveProgress(self.player_name, 
-                                    self.encode_password(self._password),
+                                    self._password,
                                     self.inv,
                                     self.endings,
                                     self.quests,
