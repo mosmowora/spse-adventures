@@ -3,12 +3,11 @@ import base64
 import getpass
 import random as r
 import sys
-import time
+import time as cas
 import webbrowser
-from time import strftime
+import time
 from tkinter import messagebox
 from types import NoneType
-from typing import Literal
 
 import cv2
 import numpy as np
@@ -108,6 +107,7 @@ class Game:
         # Player name and password
         self.player_name: str = ""
         self._password: str = "P@ssw0rd.+"
+        self.time_played = cas.time()
         
         # Lyziarksy DLC variables
         self.bought: bool = True
@@ -191,7 +191,7 @@ class Game:
     def show_update(self): 
         if self.__new_version():
             if messagebox.askyesno("New update", "Update the game?"):
-                webbrowser.open('https://aeternix-forum.herokuapp.com/releases/')
+                webbrowser.open('-------------------------')
                 sys.exit()
             else: sys.exit()
 
@@ -1182,6 +1182,9 @@ class Game:
             # Saved settings
             self.music_on = data["settings"]["music"]
             self.talking_speed_number = data["settings"]["talking_speed"]
+            
+            # Time played
+            self.time_played = data["played"]
 
             # Tile map
             self.create_tile_map()
@@ -2047,9 +2050,9 @@ class Game:
         watching: bool = True
         x: int = 0
         smart_watch_rect = smart_watch_img.get_rect(x=WIN_WIDTH // 2 - 580, y=WIN_HEIGHT // 2 - 200)
-        watch_time = self.settings_font.render(strftime("%R"), True, WHITE)
-        if len([x for x in (self.vybalenie, self.nap) if not x]) == 2 and self.lyz_day_number == 1: watch_time = self.settings_font.render("18:"+strftime("%R").split(":")[1], True, WHITE)
-        elif time is not None: watch_time = self.settings_font.render(time+":"+strftime("%R").split(":")[1] if ":" not in time else time, True, WHITE)
+        watch_time = self.settings_font.render(cas.strftime("%R"), True, WHITE)
+        if len([x for x in (self.vybalenie, self.nap) if not x]) == 2 and self.lyz_day_number == 1: watch_time = self.settings_font.render("18:"+cas.strftime("%R").split(":")[1], True, WHITE)
+        elif time is not None: watch_time = self.settings_font.render(time+":"+cas.strftime("%R").split(":")[1] if ":" not in time else time, True, WHITE)
             
 
         watch_time_rect = watch_time.get_rect(x=WIN_WIDTH // 2 - 440, y=WIN_HEIGHT // 2 - 100)
@@ -2665,10 +2668,11 @@ class Game:
                                     self.bought,
                                     self.grades,
                                     self.controls.defaults,
+                                    self.time_played,
                                     {
                                         "music": self.music_on,
                                         "talking_speed": self.talking_speed_number
-                                    }
+                                    },
                                     )
         self.database.save()
         print("SAVED")
@@ -3578,7 +3582,7 @@ class Game:
                 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
                 player = MediaPlayer("videos/sb.mp4.mp4")
                 pygame.mixer.Sound.stop(self.theme)
-                start_time = time.time()
+                start_time = cas.time()
                 
                 while True:
                     
@@ -3589,7 +3593,7 @@ class Game:
                     
                     cv2.imshow("Our trip to Lyziarsky", frame)
 
-                    elapsed = (time.time() - start_time) * 1000  # msec
+                    elapsed = (cas.time() - start_time) * 1000  # msec
                     play_time = int(cap.get(cv2.CAP_PROP_POS_MSEC))
                     sleep = max(1, int(play_time - elapsed))
                     if cv2.waitKey(sleep) & 0xFF == ord('q'): 

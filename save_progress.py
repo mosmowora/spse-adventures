@@ -21,6 +21,7 @@ class SaveProgress():
     dlc_bought: bool
     grades: dict[str, int]
     controls: dict[str, int]
+    played_for: float
     settings: dict[str, bool | int] = None
     
     @staticmethod
@@ -42,7 +43,7 @@ class SaveProgress():
         loaded_data: list = firedatabase.retrieve_data()
 
         # New data
-        write_data = {"name": self.name, 'credentials': self.credentials, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "lyz_room_level": self.lyz_dlc_level, "lyz_room_number": self.lyz_dlc_number, "DLC bought": self.dlc_bought, "grades": self.grades, "controls": self.controls, "settings": self.settings}
+        write_data = {"name": self.name, 'credentials': self.credentials, "inventory": self.inventory, "endings": self.endings, "quests": self.quests, "number_bananok": self.number_bananok, "bananky_in_trash": self.bananky_in_trash, "bananky_on_ground": self.bananky_on_ground, "amper_stuff": self.amper_stuff, "level": self.level, "room_number": self.room_number, "lyz_room_level": self.lyz_dlc_level, "lyz_room_number": self.lyz_dlc_number, "DLC bought": self.dlc_bought, "grades": self.grades, "controls": self.controls, "played": self.played_for, "settings": self.settings}
 
         has_profile = False
 
